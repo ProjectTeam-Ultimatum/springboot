@@ -12,3 +12,4 @@ public class UltimatumApplication {
 
 }
 //루아임니당 !!!!!!
+// 김이랑입니다
