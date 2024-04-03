@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class UltimatumApplication {
-//test
+//test...
     public static void main(String[] args) {
         SpringApplication.run(UltimatumApplication.class, args);
     }
