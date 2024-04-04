@@ -17,6 +17,7 @@ public class RecommendFood {
 
     @Id
     @GeneratedValue
+    @Column(name = "recommend_food_id")
     private Long recommendFoodId;
 
     private String recommendFoodTitle;
@@ -41,6 +42,6 @@ public class RecommendFood {
 
     @OneToMany
     @JoinColumn(name = "food_base_tag_id")
-    private List<FoodTag> foodBaseTagId = new ArrayList<>();
+    private List<FoodTag> foodTags = new ArrayList<>();
 
 }
