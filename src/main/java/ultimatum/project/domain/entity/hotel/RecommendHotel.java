@@ -16,7 +16,7 @@ public class RecommendHotel {
 
     @Id
     @GeneratedValue
-
+    @Column(name = "recommend_hotel_id")
     private Long recommendHotelId;
 
     private String recommendHotelTitle;
@@ -38,7 +38,7 @@ public class RecommendHotel {
     private String recommendHotelBudget;
 
     @OneToMany
-    @JoinColumn(name = "hotelBaseTagId")
-    private List<HotelTag> hotelBaseTagId = new ArrayList<>();
+    @JoinColumn(name = "hotel_base_tag_id")
+    private List<HotelTag> hotelTags = new ArrayList<>();
 
 }

@@ -16,6 +16,7 @@ public class RecommendPlace {
 
     @Id
     @GeneratedValue
+    @Column(name = "recommend_place_id")
     private Long recommendPlaceId;
 
     private String recommendPlaceTitle;
@@ -37,7 +38,7 @@ public class RecommendPlace {
     private String recommendPlaceBudget;
 
     @OneToMany
-    @JoinColumn(name = "placeBaseTagId")
-    private List<PlaceTag> placeBaseTagId = new ArrayList<>();
+    @JoinColumn(name = "place_base_tag_id")
+    private List<PlaceTag> placeTags = new ArrayList<>();
 
 }
