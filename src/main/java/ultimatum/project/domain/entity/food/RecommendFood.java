@@ -39,8 +39,12 @@ public class RecommendFood {
 
     private String recommendFoodBudget;
 
-    @OneToMany
-    @JoinColumn(name = "food_base_tag_id")
-    private List<FoodTag> foodBaseTagId = new ArrayList<>();
+    //category 필드를 List 형식
+    @ElementCollection
+    private List<String> category;
+
+//    @OneToMany
+//    @JoinColumn(name = "food_base_tag_id")
+//    private List<FoodTag> foodBaseTagId = new ArrayList<>();
 
 }
