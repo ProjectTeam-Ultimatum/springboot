@@ -1,13 +1,13 @@
-package ultimatum.project.domain.entity.food;
+package ultimatum.project.domain.entity.plan;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
+import ultimatum.project.domain.entity.food.RecommendFood;
 import ultimatum.project.domain.entity.plan.PlanDay;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Builder
@@ -29,12 +29,12 @@ public class PlanFood {
 
     private LocalDateTime planFoodRouteTime;
 
-    @ManyToOne
-    private RecommendFood recommendFoodId;
+    @OneToMany
+    @JoinColumn(name = "recommend_food_id")
+    private List<RecommendFood> recommendFoodId = new ArrayList<>();
 
     @ManyToOne
+    @JoinColumn(name = "plan_day_id")
     private PlanDay planDayId;
-
-
 
 }

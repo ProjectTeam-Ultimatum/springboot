@@ -1,8 +1,6 @@
 package ultimatum.project.domain.entity.review;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -20,5 +18,9 @@ public class ReviewReply {
     private String reviewReplyer;
 
     private String reviewReplyContent;
+
+    @ManyToOne
+    @JoinColumn(name = "review_id")
+    private Review reviewId;
 
 }

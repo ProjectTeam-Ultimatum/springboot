@@ -1,9 +1,6 @@
 package ultimatum.project.domain.entity.recommendreply;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 import ultimatum.project.domain.entity.food.RecommendFood;
 import ultimatum.project.domain.entity.hotel.RecommendHotel;
@@ -28,12 +25,15 @@ public class RecommendReply {
     private String recommendReplyTagValue;
 
     @ManyToOne
+    @JoinColumn(name = "recommend_place_id")
     private RecommendPlace recommendPlaceId;
 
     @ManyToOne
+    @JoinColumn(name = "recommend_food_id")
     private RecommendFood recommendFoodId;
 
     @ManyToOne
+    @JoinColumn(name = "recommend_hotel_id")
     private RecommendHotel recommendHotelId;
 
 }

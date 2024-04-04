@@ -1,10 +1,10 @@
 package ultimatum.project.domain.entity.place;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Builder
@@ -26,18 +26,18 @@ public class RecommendPlace {
 
     private String recommendPlaceContent;
 
-    private Long recommendPlaceLatitude;
+    private String recommendPlaceLatitude;
 
-    private Long recommendPlaceLongitude;
+    private String recommendPlaceLongitude;
 
     private Long recommendPlaceLike;
 
     private Long recommendPlaceStar;
 
-    private Long recommendPlaceBudget;
+    private String recommendPlaceBudget;
 
-//    @OneToMany
-//    private Long placeBaseTagId;
-
+    @OneToMany
+    @JoinColumn(name = "placeBaseTagId")
+    private List<PlaceTag> placeBaseTagId = new ArrayList<>();
 
 }

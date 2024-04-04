@@ -1,9 +1,6 @@
 package ultimatum.project.domain.entity.image;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 import ultimatum.project.domain.entity.food.RecommendFood;
 import ultimatum.project.domain.entity.hotel.RecommendHotel;
@@ -20,17 +17,18 @@ public class RecommendImage {
     @GeneratedValue
     private Long recommendImageId;
 
-    private String recommendImagePath;
-
-    private String filename;
+    private String recommendImageUrl;
 
     @ManyToOne
+    @JoinColumn(name = "recommend_food_id")
     private RecommendFood recommendFoodId;
 
     @ManyToOne
+    @JoinColumn(name = "recommend_place_id")
     private RecommendHotel recommendPlaceId;
 
     @ManyToOne
+    @JoinColumn(name = "recommend_hotel_id")
     private RecommendPlace recommendHotelId;
 
 }

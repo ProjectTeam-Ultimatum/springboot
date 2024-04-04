@@ -15,7 +15,7 @@ public class Member {
 
     @Id
     @GeneratedValue
-    private Long memberId;
+    private String memberId;
 
     private String memberPassword;
 
@@ -30,7 +30,4 @@ public class Member {
     private String memberStyle;
 
     private String memberRule;
-
-    private Long memberImageid;
-
 }

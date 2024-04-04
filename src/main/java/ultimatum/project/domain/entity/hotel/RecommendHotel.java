@@ -1,10 +1,10 @@
 package ultimatum.project.domain.entity.hotel;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Builder
@@ -27,17 +27,18 @@ public class RecommendHotel {
 
     private String recommendHotelContent;
 
-    private Long recommendHotellAtitude;
+    private String recommendHotellAtitude;
 
-    private Long recommendHotelLongitude;
+    private String recommendHotelLongitude;
 
     private Long recommendHotelLike;
 
     private Long recommendHotelStar;
 
-    private Long recommendHotelBudget;
+    private String recommendHotelBudget;
 
-//    @OneToMany
-//    private Long hotelBaseTagId;
+    @OneToMany
+    @JoinColumn(name = "hotelBaseTagId")
+    private List<HotelTag> hotelBaseTagId = new ArrayList<>();
 
 }

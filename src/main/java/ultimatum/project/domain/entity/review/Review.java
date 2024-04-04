@@ -21,17 +21,8 @@ public class Review {
 
     private String reviewContent;
 
-    private Integer reviewLike;
+    private Long reviewLike;
 
     private String reviewLocation;
-
-    @ManyToOne
-    @JoinColumn(name = "review_image_id")
-    private ReviewImage reviewImageid;
-
-    @ManyToOne
-    @JoinColumn(name = "review_reply_id")
-    private ReviewReply reviewReplyId;
-
 
 }

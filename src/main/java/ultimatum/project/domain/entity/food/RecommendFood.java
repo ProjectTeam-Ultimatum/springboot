@@ -1,12 +1,11 @@
 package ultimatum.project.domain.entity.food;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Builder
@@ -34,13 +33,14 @@ public class RecommendFood {
 
     private Long recommendFoodStar;
 
-    private Long recommendFoodLatitude;
+    private String recommendFoodLatitude;
 
-    private Long recommendFoodLongitude;
+    private String recommendFoodLongitude;
 
-    private Long recommendFoodBudget;
+    private String recommendFoodBudget;
 
-//    @OneToMany
-//    private FoodTag foodBaseTagId; 이거 모르겠음
+    @OneToMany
+    @JoinColumn(name = "food_base_tag_id")
+    private List<FoodTag> foodBaseTagId = new ArrayList<>();
 
 }

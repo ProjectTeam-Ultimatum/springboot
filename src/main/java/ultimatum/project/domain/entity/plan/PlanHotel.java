@@ -1,13 +1,13 @@
-package ultimatum.project.domain.entity.hotel;
+package ultimatum.project.domain.entity.plan;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
+import ultimatum.project.domain.entity.hotel.RecommendHotel;
 import ultimatum.project.domain.entity.plan.PlanDay;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Builder
@@ -28,10 +28,12 @@ public class PlanHotel {
 
     private LocalDateTime planHotelRouteTime;
 
-    @ManyToOne
-    private RecommendHotel recommendHotelId;
+    @OneToMany
+    @JoinColumn(name = "recommend_hotel_id")
+    private List<RecommendHotel> recommendHotelId = new ArrayList<>();
 
     @ManyToOne
+    @JoinColumn(name = "plan_day_id")
     private PlanDay planDayId;
 
 }

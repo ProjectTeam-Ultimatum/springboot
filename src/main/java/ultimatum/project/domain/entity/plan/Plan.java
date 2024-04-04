@@ -19,11 +19,7 @@ public class Plan {
     @GeneratedValue
     private Long planId;
 
-//    뭔지 모르겠음
-//    @OneToMany
-//    private
-
-    private Long memberId;
+    private String memberId;
 
     private LocalDateTime travelPeriod;
 
