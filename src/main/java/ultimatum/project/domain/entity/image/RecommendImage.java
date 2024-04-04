@@ -1,0 +1,34 @@
+package ultimatum.project.domain.entity.image;
+
+import jakarta.persistence.*;
+import lombok.*;
+import ultimatum.project.domain.entity.food.RecommendFood;
+import ultimatum.project.domain.entity.hotel.RecommendHotel;
+import ultimatum.project.domain.entity.place.RecommendPlace;
+
+@Entity
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class RecommendImage {
+    @Id
+    @GeneratedValue
+    private Long recommendImageId;
+
+    private String recommendImageUrl;
+
+    @ManyToOne
+    @JoinColumn(name = "recommend_food_id")
+    private RecommendFood recommendFoodId;
+
+    @ManyToOne
+    @JoinColumn(name = "recommend_place_id")
+    private RecommendHotel recommendPlaceId;
+
+    @ManyToOne
+    @JoinColumn(name = "recommend_hotel_id")
+    private RecommendPlace recommendHotelId;
+
+}
