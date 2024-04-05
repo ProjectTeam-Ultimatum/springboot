@@ -3,6 +3,8 @@ package ultimatum.project.service.review;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -68,6 +70,13 @@ public class ReviewService {
 
                 log.info("target:" + targetLocation);
                 // 파일 저장
+                /**
+                 * file.getInputStream() : MultipartFile 인터페이스의 getInputStream 메서드를 호출하여, 업로드된 파일의 내용을 읽을 수 있는 InputStream을 가져옴
+                 * targetLocation : 파일이 저장될 대상 경로를 나타낸다. 이경로는 Path 객체로 표현 되며,
+                 *                  filStorageLocagion.resolve(fileuuie+"_"+fileName)과 같은 방식으로 생성.
+                 *                  여기서 fileStorageLocation은 파일 저장 기본경로 이며, resolve 메소드를 통해 최종 파일명을 포함한 전체 경로를 구성한다.
+                 * StandardCopyOption.REPLACE_EXISTING : 대상 파일이 이미 존재하는 경우, 기존 파일을 새 파일로 대체하도록 지시
+                 */
                 Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
 
@@ -109,17 +118,25 @@ public class ReviewService {
     }
 
 
-    public List<ReadReviewResponse> getAllReviews() {
+    public Page<ReadReviewResponse> getAllReviews(Pageable pageable) {
 
-        List<Review> reviews = reviewRepository.findAll();
-        return reviews.stream().map(review -> {
-            List<ReviewImageResponse> images = review.getReviewImages().stream()
+        //페이지네이션을 적용하여 Review 엔티티들을 조회
+        Page<Review> reviewPage = reviewRepository.findAll(pageable);
+
+        //Review 엔티티들을 ReadReviewResponse DTO로 변환
+        return reviewPage.map(review -> {
+            //이미지중 하나씩만가져오기
+            ReviewImageResponse imageResponse = review.getReviewImages().stream()
                     .map(image -> new ReviewImageResponse(
                             image.getReviewImageId(),
                             image.getUuid(),
                             image.getReviewFileName()
-                    )).limit(1)
-                    .collect(Collectors.toList());
+                    ))
+                    .findFirst()
+                    .orElse(null);
+
+            //단일 이미지를 리스트에 넣음
+            List<ReviewImageResponse> imageResponses = new ArrayList<>();
 
             return new ReadReviewResponse(
                     review.getReviewTitle(),
@@ -127,11 +144,11 @@ public class ReviewService {
                     review.getReviewContent(),
                     review.getReviewLike(),
                     review.getReviewLocation(),
-                    images,
+                    imageResponses,
                     review.getReg_date(),
                     review.getMod_date()
             );
-        }).collect(Collectors.toList());
+        });
     }
 
 
@@ -205,6 +222,17 @@ public class ReviewService {
                 review.getReviewLocation(),
                 imageResponses
         );
+    }
+
+    @Transactional
+    public DeleteReviewResponse deleteReview(Long reviewId){
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new EntityNotFoundException("사용자 게시글 ID를 찾을 수 없습니다." + reviewId));
+
+        reviewRepository.delete(review);
+        return new DeleteReviewResponse(reviewId);
+
+
     }
 
 

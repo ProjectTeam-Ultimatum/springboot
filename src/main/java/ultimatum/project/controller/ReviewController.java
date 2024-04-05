@@ -2,14 +2,16 @@ package ultimatum.project.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.dto.reviewDTO.*;
 import ultimatum.project.service.review.ReviewService;
 
@@ -40,18 +42,24 @@ public class ReviewController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ReadReviewResponse>> getAllReviews() {
-        List<ReadReviewResponse> reviews = reviewService.getAllReviews();
+    @Operation(summary = "게시글 전체 보기")
+    public ResponseEntity<Page<ReadReviewResponse>> getAllReviews(
+            @PageableDefault (size = 6, sort = "reviewId", direction = Sort.Direction.DESC)Pageable pageable) {
+        Page<ReadReviewResponse> reviews = reviewService.getAllReviews(pageable);
         return ResponseEntity.ok(reviews);
     }
 
     @GetMapping("/{reviewId}")
+    @Operation(summary = "게시글 하나만 보기")
+
     public ResponseEntity<ReadReviewResponse> getReviewById(@PathVariable Long reviewId) {
         ReadReviewResponse response = reviewService.getReviewById(reviewId);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping(value="/{reviewId}", consumes = {"multipart/form-data"})
+    @Operation(summary = "게시글 수정")
+
     public ResponseEntity<UpdateReviewResponse> updateReview(@PathVariable Long reviewId,
                                                              @RequestParam("reviewTitle") String reviewTitle,
                                                              @RequestParam("reviewSubtitle") String reviewSubtitle,
@@ -68,5 +76,13 @@ public class ReviewController {
 
         return ResponseEntity.ok(response);
 
+    }
+
+    @DeleteMapping( "/{reviewId}")
+    @Operation(summary = "게시글 삭제")
+    public ResponseEntity<DeleteReviewResponse> deleteReview(@PathVariable Long reviewId){
+       reviewService.deleteReview(reviewId);
+
+        return ResponseEntity.ok(new DeleteReviewResponse(reviewId));
     }
 }
