@@ -12,15 +12,16 @@ import lombok.*;
 public class ReviewImage {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue( strategy = GenerationType.IDENTITY)
+
     private Long reviewImageId;
 
     private String uuid;
 
     private String reviewFileName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
-    private Review reviewId;
+    private Review review;
 
 }
