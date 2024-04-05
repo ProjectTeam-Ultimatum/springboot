@@ -12,7 +12,7 @@ import lombok.*;
 public class MemberImage {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberImageId;
 
     private String memberImageUrl;

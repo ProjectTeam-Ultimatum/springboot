@@ -15,7 +15,7 @@ import ultimatum.project.domain.entity.place.RecommendPlace;
 public class RecommendReply {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long recommendReplyId;
 
     private String recommendReply;

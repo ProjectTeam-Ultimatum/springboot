@@ -2,6 +2,7 @@ package ultimatum.project.domain.entity.member;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
@@ -14,7 +15,7 @@ import lombok.*;
 public class Member {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String memberId;
 
     private String memberPassword;
