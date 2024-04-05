@@ -2,6 +2,7 @@ package ultimatum.project.service.review;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -20,6 +21,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Log4j2
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -44,7 +46,6 @@ public class ReviewService {
         review = reviewRepository.save(review); // 저장하고 리턴받음으로써 ID를 획득
 
 
-
         //ReviewImage 객체 리스트를 생성하기 위한 준비
         List<ReviewImage> reviewImages = new ArrayList<>();
         // 이미지 파일 처리 로직
@@ -64,6 +65,8 @@ public class ReviewService {
 
                 // 파일 저장 경로
                 Path targetLocation = fileStorageLocation.resolve(savedFileName);
+
+                log.info("target:" + targetLocation);
                 // 파일 저장
                 Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
@@ -98,7 +101,7 @@ public class ReviewService {
                 review.getReviewLocation(),
                 reviewImages.stream().map(image ->
                         new ReviewImageResponse(
-                        image.getReviewImageId(),image.getReviewFileName(), image.getUuid()
+                                image.getReviewImageId(), image.getReviewFileName(), image.getUuid()
                         )
                 ).collect(Collectors.toList())
         );
@@ -106,9 +109,7 @@ public class ReviewService {
     }
 
 
-
-
-    public List<ReadReviewResponse> getAllReviews(){
+    public List<ReadReviewResponse> getAllReviews() {
 
         List<Review> reviews = reviewRepository.findAll();
         return reviews.stream().map(review -> {
@@ -117,7 +118,7 @@ public class ReviewService {
                             image.getReviewImageId(),
                             image.getUuid(),
                             image.getReviewFileName()
-                    ))
+                    )).limit(1)
                     .collect(Collectors.toList());
 
             return new ReadReviewResponse(
@@ -134,7 +135,7 @@ public class ReviewService {
     }
 
 
-    public ReadReviewResponse getReviewById(Long reviewId){
+    public ReadReviewResponse getReviewById(Long reviewId) {
 
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자 게시글 ID를 찾을 수 없습니다." + reviewId));
@@ -144,7 +145,7 @@ public class ReviewService {
                         image.getReviewImageId(),
                         image.getUuid(),
                         image.getReviewFileName()
-                )).limit(1)     //첫번째 이미지만 포함
+                ))    //첫번째 이미지만 포함
                 .collect(Collectors.toList());
 
         return new ReadReviewResponse(
@@ -162,53 +163,39 @@ public class ReviewService {
     }
 
     @Transactional
-    public UpdateReviewResponse updateReview(Long reviewId, UpdateReviewRequest request, List<MultipartFile> images){
+    public UpdateReviewResponse updateReview(Long reviewId, UpdateReviewRequest request, List<MultipartFile> newImages) {
 
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(()-> new EntityNotFoundException("게시글을 찾을수없습니다." + reviewId));
+                .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을수없습니다." + reviewId));
 
         review.update(request.getReviewTitle(), request.getReviewSubtitle(), request.getReviewContent(), request.getReviewLocation());
+        //기존이미지 삭제
+        review.getReviewImages().clear();
 
 
-
-        //이미지 처리 로직
-        request.getImages().forEach(imageInfo -> {
-            switch (imageInfo.getAction()){
-                case "add" :
-                    //새 이미지 추가 로직..
-                    ReviewImage newImage = new ReviewImage();
-                    newImage.setReview(review);
-                    newImage.setReviewFileName(imageInfo.getFileName());
-                    //이미지 파일 저장 로직...
-                    review.getReviewImages().add(newImage);
-                    break;
-                case "delete":
-                    //이미지 삭제 로직
-                    review.getReviewImages().removeIf(image -> image.getReviewImageId().equals(imageInfo.getId()));
-                    break;
-                case "update" :
-                    //이미지 업데이트 로직
-                    review.getReviewImages().stream()
-                            .filter(image -> image.getReviewImageId().equals(imageInfo.getId()))
-                            .findFirst()
-                            .ifPresent(image -> {
-                                image.setReviewFileName(imageInfo.getFileName());
-                            });
-                    break;
-
+        //새 이미지들 저장
+        for(MultipartFile file : newImages){
+            //이미지 파일 저장 로직 (파일을 /upload 디렉토리에 저장)
+            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+            String fileUuid = UUID.randomUUID().toString();
+            Path targetLocation = fileStorageLocation.resolve(fileUuid + "_"+fileName);
+            try {
+                Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+            }catch (IOException e) {
+                throw new RuntimeException("파일저장에 실패했습니다. : " + fileName, e);
             }
-        });
+            ReviewImage newImage = new ReviewImage();
+            newImage.setReview(review);
+            newImage.setUuid(fileUuid);
+            newImage.setReviewFileName(fileName);
+            review.getReviewImages().add(newImage);
+        }
 
         reviewRepository.save(review);
 
-
-        //이미지 정보 포함하여 UpdateReviewResponse 생성
         List<ReviewImageResponse> imageResponses = review.getReviewImages().stream()
-                .map(image -> new ReviewImageResponse(
-                        image.getReviewImageId(),
-                        image.getUuid(),
-                        image.getReviewFileName()
-                )).collect(Collectors.toList());
+                .map(image -> new ReviewImageResponse(image.getReviewImageId(), image.getUuid(), image.getReviewFileName()))
+                .collect(Collectors.toList());
 
         return new UpdateReviewResponse(
                 review.getReviewId(),
@@ -219,4 +206,7 @@ public class ReviewService {
                 imageResponses
         );
     }
+
+
+
 }

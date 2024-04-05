@@ -16,15 +16,7 @@ public class UpdateReviewRequest {
     private String reviewSubtitle;
     private String reviewContent;
     private String reviewLocation;
-    private List<ImageInfo> Images; //이미지추가, 삭제, 업데이트를 위한 정보
+    private List<ReviewImageRequest> ReviewImages; //이미지추가, 삭제, 업데이트를 위한 정보
 
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class ImageInfo {
-        private Long id; //이미지 ID, 새 이미지는 Null 또는 특정값 (-1등)
-        private String action; // add, delete, update
-        private String fileName; // 파일이름
-    }
 
 }

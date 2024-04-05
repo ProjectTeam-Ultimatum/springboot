@@ -59,12 +59,14 @@ public class ReviewController {
                                                              @RequestParam("reviewLocation") String reviewLocation,
                                                              @RequestParam("images") List<MultipartFile> images) {
         UpdateReviewRequest request = new UpdateReviewRequest(
-                reviewTitle, reviewSubtitle, reviewContent, reviewLocation, images);
+                reviewTitle, reviewSubtitle, reviewContent, reviewLocation, null );
+                                                                                    //이미지 관련 정보는 여기서 처리하지 않음.
+
 
 
         UpdateReviewResponse response = reviewService.updateReview(reviewId, request, images);
 
-        return new ResponseEntity<>(response, HttpStatus.UPGRADE_REQUIRED);
+        return ResponseEntity.ok(response);
 
     }
 }
