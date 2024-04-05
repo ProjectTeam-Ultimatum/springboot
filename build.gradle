@@ -32,6 +32,8 @@ dependencies {
     //swaqger-springdoc
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
+    implementation 'org.modelmapper:modelmapper:3.1.1' //modelmapper
+
 }
 
 // Lombok 설정

@@ -37,8 +37,6 @@ public class RecommendHotel {
 
     private String recommendHotelBudget;
 
-    @OneToMany
-    @JoinColumn(name = "hotel_base_tag_id")
-    private List<HotelTag> hotelTags = new ArrayList<>();
+    private String recommendHotelCategory;
 
 }

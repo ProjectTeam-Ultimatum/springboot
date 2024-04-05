@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table>
+    <tr>
+        <th>식당이름</th>
+        <th>식당소개</th>
+        <th>설명</th>
+        <th>카테고리</th>
+    </tr>
+    <tr th:each="RecommendFood : ${ recommendList }">
+        <td th:text="${ RecommendFood.recommendFoodTitle }"></td>
+        <td th:text="${ RecommendFood.recommendFoodSubtitle }"></td>
+        <td th:text="${ RecommendFood.recommendFoodContent }"></td>
+        <td th:text="${ RecommendFood.recommendFoodCategory }"></td>
+    </tr>
+</table>
+</body>
+</html>
