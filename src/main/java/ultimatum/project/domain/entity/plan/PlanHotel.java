@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 public class PlanHotel {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long planHotelId;
 
     private LocalDateTime planHotelDate;

@@ -16,7 +16,7 @@ import java.util.List;
 public class RecommendFood {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recommend_food_id")
     private Long recommendFoodId;
 

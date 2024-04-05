@@ -18,7 +18,7 @@ import java.util.List;
 public class PlanFood {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long planFoodId;
 
     private LocalDateTime planFoodDate;

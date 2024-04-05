@@ -16,8 +16,9 @@ public class SwaggerConfig {
 
     @Bean
     public GroupedOpenApi Review(){
+        // path : controller 가 속해있는 폴더경로 입력
         String[] path = {
-                "org.example.ohgiraffers.board.controller.ReviewController"
+                "ultimatum.project.chatting.ChatController"
         };
         return GroupedOpenApi.builder()
                 .group("1.Review")
@@ -28,10 +29,10 @@ public class SwaggerConfig {
     @Bean
     public GroupedOpenApi secondOpenApi(){
         String[] path = {
-                ""
+                "ultimatum.project.chatting"
         };
         return GroupedOpenApi.builder()
-                .group("2. 아직 미정")
+                .group("2. 채팅")
                 .packagesToScan(path)
                 .build();
     }

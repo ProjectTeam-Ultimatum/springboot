@@ -12,7 +12,7 @@ import lombok.*;
 public class ReviewImage {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewImageId;
 
     private String uuid;
