@@ -22,6 +22,7 @@ import java.util.List;
 @ResponseBody
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
+@CrossOrigin
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -49,18 +50,18 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
-    @GetMapping("/{reviewId}")
+    @GetMapping("/{review_id}")
     @Operation(summary = "게시글 하나만 보기")
 
-    public ResponseEntity<ReadReviewResponse> getReviewById(@PathVariable Long reviewId) {
-        ReadReviewResponse response = reviewService.getReviewById(reviewId);
+    public ResponseEntity<ReadReviewResponse> getReviewById(@PathVariable Long review_id) {
+        ReadReviewResponse response = reviewService.getReviewById(review_id);
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping(value="/{reviewId}", consumes = {"multipart/form-data"})
+    @PutMapping(value="/{review_id}", consumes = {"multipart/form-data"})
     @Operation(summary = "게시글 수정")
 
-    public ResponseEntity<UpdateReviewResponse> updateReview(@PathVariable Long reviewId,
+    public ResponseEntity<UpdateReviewResponse> updateReview(@PathVariable Long review_id,
                                                              @RequestParam("reviewTitle") String reviewTitle,
                                                              @RequestParam("reviewSubtitle") String reviewSubtitle,
                                                              @RequestParam("reviewContent") String reviewContent,
@@ -72,17 +73,17 @@ public class ReviewController {
 
 
 
-        UpdateReviewResponse response = reviewService.updateReview(reviewId, request, images);
+        UpdateReviewResponse response = reviewService.updateReview(review_id, request, images);
 
         return ResponseEntity.ok(response);
 
     }
 
-    @DeleteMapping( "/{reviewId}")
+    @DeleteMapping( "/{review_id}")
     @Operation(summary = "게시글 삭제")
-    public ResponseEntity<DeleteReviewResponse> deleteReview(@PathVariable Long reviewId){
-       reviewService.deleteReview(reviewId);
+    public ResponseEntity<DeleteReviewResponse> deleteReview(@PathVariable Long review_id){
+       reviewService.deleteReview(review_id);
 
-        return ResponseEntity.ok(new DeleteReviewResponse(reviewId));
+        return ResponseEntity.ok(new DeleteReviewResponse(review_id));
     }
 }
