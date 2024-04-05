@@ -22,7 +22,7 @@ import java.util.List;
 @ResponseBody
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:8080")
 public class ReviewController {
 
     private final ReviewService reviewService;
