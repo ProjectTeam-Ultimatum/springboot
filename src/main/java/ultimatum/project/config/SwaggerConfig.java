@@ -36,4 +36,6 @@ public class SwaggerConfig {
                 .packagesToScan(path)
                 .build();
     }
+
+
 }

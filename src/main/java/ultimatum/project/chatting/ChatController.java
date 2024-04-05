@@ -5,11 +5,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/chat")
 public class ChatController {
 
     private final ChatService chatService;
+
+//===================================================채팅방 컨트롤러 =====================================================
 
     // 채팅방 생성
     @PostMapping("/create")
@@ -34,19 +37,19 @@ public class ChatController {
         return ResponseEntity.ok().body(chatService.enterChatRoom(roomId));
     }
 
-    // 채팅 메시지 전송
-    @PostMapping("/message")
-    public ResponseEntity<?> sendMessage(@RequestBody ChatMessageDto chatMessageDto) {
-        // chatService를 사용하여 메시지 전송
-        chatService.sendMessage(chatMessageDto);
-        return ResponseEntity.ok().build();
-    }
-
     // 채팅방 퇴장 처리
     @PostMapping("/room/{chatRoomId}/leave")
     public ResponseEntity<?> leaveChatRoom(@PathVariable Long chatRoomId, @RequestBody ChatMessageDto chatMessageDto) {
         chatMessageDto.setChatRoomId(chatRoomId); // URL에서 받은 chatRoomId를 chatMessageDto에 설정
         chatService.leaveChatRoom(chatMessageDto);
+        return ResponseEntity.ok().build();
+    }
+//===========================================메세지 컨트롤러==============================================================
+    // 채팅 메시지 전송
+    @PostMapping("/message")
+    public ResponseEntity<?> sendMessage(@RequestBody ChatMessageDto chatMessageDto) {
+        // chatService를 사용하여 메시지 전송
+        chatService.sendMessage(chatMessageDto);
         return ResponseEntity.ok().build();
     }
 }
