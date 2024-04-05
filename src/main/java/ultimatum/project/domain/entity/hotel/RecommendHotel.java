@@ -15,7 +15,7 @@ import java.util.List;
 public class RecommendHotel {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recommend_hotel_id")
     private Long recommendHotelId;
 

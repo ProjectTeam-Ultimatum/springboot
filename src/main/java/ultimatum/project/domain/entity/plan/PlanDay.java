@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class PlanDay {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long planDayId;
 
     private LocalDateTime planDayStartTime;

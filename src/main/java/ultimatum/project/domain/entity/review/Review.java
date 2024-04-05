@@ -12,7 +12,7 @@ import lombok.*;
 public class Review {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewId;
 
     private String reviewTitle;

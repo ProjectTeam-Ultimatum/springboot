@@ -14,7 +14,7 @@ import ultimatum.project.domain.entity.place.RecommendPlace;
 @NoArgsConstructor
 public class RecommendImage {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long recommendImageId;
 
     private String recommendImageUrl;
