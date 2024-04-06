@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
@@ -37,6 +39,17 @@ public class ChatController {
         return ResponseEntity.ok().body(chatService.enterChatRoom(roomId));
     }
 
+    // 채팅방 삭제
+    @DeleteMapping("/room/{roomId}")
+    public ResponseEntity<?> deleteChatRoom(@PathVariable Long roomId) {
+        boolean result = chatService.deleteChatRoom(roomId);
+        if(result) {
+            return ResponseEntity.ok().build(); // 성공적으로 삭제되었을 때
+        } else {
+            return ResponseEntity.notFound().build(); // 채팅방을 찾을 수 없거나 삭제에 실패했을 때
+        }
+    }
+
     // 채팅방 퇴장 처리
     @PostMapping("/room/{chatRoomId}/leave")
     public ResponseEntity<?> leaveChatRoom(@PathVariable Long chatRoomId, @RequestBody ChatMessageDto chatMessageDto) {
@@ -52,4 +65,11 @@ public class ChatController {
         chatService.sendMessage(chatMessageDto);
         return ResponseEntity.ok().build();
     }
+
+    // 채팅 내역
+//    @GetMapping("/room/{roomId}/messages")
+//    public ResponseEntity<List<ChatMessageDto>> getMessagesByChatRoomId(@PathVariable Long roomId) {
+//        List<ChatMessageDto> messages = chatService.getMessagesByChatRoomId(roomId);
+//        return ResponseEntity.ok(messages);
+//    }
 }

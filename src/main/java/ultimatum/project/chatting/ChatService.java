@@ -51,6 +51,7 @@ public class ChatService {
         // 채팅방 참여자에게 새 메시지 알림
     }
 
+    //채팅방 생성
     public ChatRoomDto createChatRoom(ChatRoomDto chatRoomDto) {
         // ChatRoom 엔티티를 생성하고, chatRoomDto에서 받은 정보를 설정
         ChatRoom chatRoom = new ChatRoom();
@@ -59,6 +60,16 @@ public class ChatService {
         ChatRoom savedRoom = chatRoomRepository.save(chatRoom);
         // 저장된 chatRoom 엔티티를 기반으로 ChatRoomDto 생성 및 반환
         return new ChatRoomDto(savedRoom.getChatRoomId(), savedRoom.getChatRoomName());
+    }
+
+    //채팅방 삭제
+    public boolean deleteChatRoom(Long roomId) {
+        if(chatRoomRepository.existsById(roomId)) {
+            chatRoomRepository.deleteById(roomId);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void leaveChatRoom(ChatMessageDto chatMessageDto) {
@@ -110,5 +121,22 @@ public class ChatService {
             }
         }
     }
+
+    //메세지 내용 불러오기
+//    public List<ChatMessageDto> getMessagesByChatRoomId(Long chatRoomId) {
+//        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+//                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+//
+//        List<ChatMessage> messages = messageRepository.findByChatRoom(chatRoom);
+//
+//        return messages.stream()
+//                .map(message -> new ChatMessageDto(
+//                        message.getMessageType(), // messageType 추가
+//                        message.getChatRoom().getChatRoomId(),
+//                        message.getSenderId(),
+//                        message.getMessage()))
+//                .collect(Collectors.toList());
+//    }
+
 
 }
