@@ -18,8 +18,7 @@ import ultimatum.project.service.review.ReviewService;
 import java.util.List;
 
 @Tag(name = "reviews", description = "사용자 게시판 api")
-@Controller
-@ResponseBody
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
 @CrossOrigin(origins = "http://localhost:8080")

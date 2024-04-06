@@ -110,7 +110,7 @@ public class ReviewService {
                 review.getReviewLocation(),
                 reviewImages.stream().map(image ->
                         new ReviewImageResponse(
-                                image.getReviewImageId(), image.getReviewFileName(), image.getUuid()
+                                image.getReviewImageId(), image.getUuid(), image.getFilePath(),image.getReviewFileName()
                         )
                 ).collect(Collectors.toList())
         );
@@ -128,9 +128,8 @@ public class ReviewService {
             //이미지중 하나씩만가져오기
             ReviewImageResponse imageResponse = review.getReviewImages().stream()
                     .map(image -> new ReviewImageResponse(
-                            image.getReviewImageId(),
-                            image.getUuid(),
-                            image.getReviewFileName()
+                            image.getReviewImageId(), image.getUuid(), image.getFilePath(),image.getReviewFileName()
+
                     ))
                     .findFirst()
                     .orElse(null);
@@ -159,9 +158,8 @@ public class ReviewService {
 
         List<ReviewImageResponse> images = review.getReviewImages().stream()
                 .map(image -> new ReviewImageResponse(
-                        image.getReviewImageId(),
-                        image.getUuid(),
-                        image.getReviewFileName()
+                        image.getReviewImageId(), image.getUuid(), image.getFilePath(),image.getReviewFileName()
+
                 ))    //첫번째 이미지만 포함
                 .collect(Collectors.toList());
 
@@ -211,7 +209,9 @@ public class ReviewService {
         reviewRepository.save(review);
 
         List<ReviewImageResponse> imageResponses = review.getReviewImages().stream()
-                .map(image -> new ReviewImageResponse(image.getReviewImageId(), image.getUuid(), image.getReviewFileName()))
+                .map(image -> new ReviewImageResponse(
+                        image.getReviewImageId(), image.getUuid(), image.getFilePath(),image.getReviewFileName()
+                ))
                 .collect(Collectors.toList());
 
         return new UpdateReviewResponse(

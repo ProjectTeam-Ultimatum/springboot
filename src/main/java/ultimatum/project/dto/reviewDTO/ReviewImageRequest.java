@@ -11,6 +11,7 @@ import ultimatum.project.domain.entity.review.Review;
 public class ReviewImageRequest {
 
     private String uuid;
+    private String filePath;
     private String reviewFileName;
     private Review review;
 }

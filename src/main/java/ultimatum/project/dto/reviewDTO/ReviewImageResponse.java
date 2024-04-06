@@ -11,6 +11,7 @@ public class ReviewImageResponse {
     private Long reviewImageId;
 
     private String uuid;
+    private String filePath;
 
     private String reviewFileName;
 }
