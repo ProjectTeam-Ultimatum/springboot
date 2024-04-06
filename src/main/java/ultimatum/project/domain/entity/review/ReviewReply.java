@@ -12,7 +12,9 @@ import lombok.*;
 public class ReviewReply {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @GeneratedValue( strategy = GenerationType.IDENTITY)
+
     private Long reviewReplyId;
 
     private String reviewReplyer;

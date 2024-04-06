@@ -16,12 +16,9 @@ public class SwaggerConfig {
 
     @Bean
     public GroupedOpenApi Review(){
-        String[] path = {
-                "org.example.ohgiraffers.board.controller.ReviewController"
-        };
         return GroupedOpenApi.builder()
-                .group("1.Review")
-                .packagesToScan(path)
+                .group("Review")
+                .pathsToMatch("/api/reviews/**") // API 경로를 지정
                 .build();
     }
 
