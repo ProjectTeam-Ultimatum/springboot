@@ -12,7 +12,7 @@ import lombok.*;
 public class FoodMenu {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long menuId;
 
     @ManyToOne

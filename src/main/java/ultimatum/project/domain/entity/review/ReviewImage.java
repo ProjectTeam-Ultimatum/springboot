@@ -12,6 +12,7 @@ import lombok.*;
 public class ReviewImage {
 
     @Id
+
     @GeneratedValue( strategy = GenerationType.IDENTITY)
 
     private Long reviewImageId;

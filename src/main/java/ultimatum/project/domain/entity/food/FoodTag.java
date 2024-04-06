@@ -1,9 +1,6 @@
 package ultimatum.project.domain.entity.food;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -15,7 +12,7 @@ import lombok.*;
 public class FoodTag {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "food_base_tag_id")
     private Long foodBaseTagId;
 

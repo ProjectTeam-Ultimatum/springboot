@@ -2,6 +2,7 @@ package ultimatum.project.domain.entity.plan;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ultimatum.project.domain.entity.hotel.RecommendHotel;
 import ultimatum.project.domain.entity.place.RecommendPlace;
 import ultimatum.project.domain.entity.plan.PlanDay;
 
@@ -18,7 +19,7 @@ import java.util.List;
 public class PlanPlace {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long planPlaceId;
 
     private LocalDateTime planPlaceDate;
@@ -27,9 +28,12 @@ public class PlanPlace {
 
     private LocalDateTime planPlaceArriveTime;
 
-    @OneToMany
-    @JoinColumn(name = "recommend_place_id")
-    private List<RecommendPlace> recommendPlaceId = new ArrayList<>();
+//    @OneToMany
+//    @JoinColumn(name = "recommend_place_id")
+//    private List<RecommendPlace> recommendPlaceId = new ArrayList<>();
+
+    @ManyToOne
+    private RecommendPlace recommendPlace;
 
     @ManyToOne
     @JoinColumn(name = "plan_day_id")

@@ -19,7 +19,7 @@ import java.util.List;
 public class Review {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewId;
 
     private String reviewTitle;

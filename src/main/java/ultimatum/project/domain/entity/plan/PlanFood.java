@@ -18,7 +18,7 @@ import java.util.List;
 public class PlanFood {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long planFoodId;
 
     private LocalDateTime planFoodDate;
@@ -29,9 +29,12 @@ public class PlanFood {
 
     private LocalDateTime planFoodRouteTime;
 
-    @OneToMany
-    @JoinColumn(name = "recommend_food_id")
-    private List<RecommendFood> recommendFoodId = new ArrayList<>();
+//    @OneToMany
+//    @JoinColumn(name = "recommend_food_id")
+//    private List<RecommendFood> recommendFoodId = new ArrayList<>();
+
+    @ManyToOne
+    private RecommendFood recommendFood;
 
     @ManyToOne
     @JoinColumn(name = "plan_day_id")
