@@ -8,10 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessageDto {
-    //메시지 타입 : 입장, 채팅
-    public enum MessageType{
-        ENTER, TALK, LEAVE
-    }
 
     private MessageType messageType; //메시지 타입
     private Long chatRoomId; //방 번호

@@ -67,9 +67,9 @@ public class ChatController {
     }
 
     // 채팅 내역
-//    @GetMapping("/room/{roomId}/messages")
-//    public ResponseEntity<List<ChatMessageDto>> getMessagesByChatRoomId(@PathVariable Long roomId) {
-//        List<ChatMessageDto> messages = chatService.getMessagesByChatRoomId(roomId);
-//        return ResponseEntity.ok(messages);
-//    }
+    @GetMapping("/room/{roomId}/messages")
+    public ResponseEntity<List<ChatMessageDto>> getMessagesByChatRoomId(@PathVariable Long roomId) {
+        List<ChatMessageDto> messages = chatService.getMessagesByChatRoomId(roomId);
+        return ResponseEntity.ok(messages);
+    }
 }

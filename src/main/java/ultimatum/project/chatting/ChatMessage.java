@@ -1,12 +1,11 @@
 package ultimatum.project.chatting;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessage {
@@ -23,9 +22,5 @@ public class ChatMessage {
     private String message; //메시지 내용
 
     @Enumerated(EnumType.STRING)
-    private MessageType messageType; // 메시지 타입 추가
-
-    public enum MessageType {
-        ENTER, TALK, LEAVE
-    }
+    private MessageType messageType;  // 메시지 타입 추가
 }

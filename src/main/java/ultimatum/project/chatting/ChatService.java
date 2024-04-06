@@ -123,20 +123,20 @@ public class ChatService {
     }
 
     //메세지 내용 불러오기
-//    public List<ChatMessageDto> getMessagesByChatRoomId(Long chatRoomId) {
-//        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-//                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
-//
-//        List<ChatMessage> messages = messageRepository.findByChatRoom(chatRoom);
-//
-//        return messages.stream()
-//                .map(message -> new ChatMessageDto(
-//                        message.getMessageType(), // messageType 추가
-//                        message.getChatRoom().getChatRoomId(),
-//                        message.getSenderId(),
-//                        message.getMessage()))
-//                .collect(Collectors.toList());
-//    }
+    public List<ChatMessageDto> getMessagesByChatRoomId(Long chatRoomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+
+        List<ChatMessage> messages = messageRepository.findByChatRoom(chatRoom);
+
+        return messages.stream()
+                .map(message -> new ChatMessageDto(
+                        message.getMessageType(),
+                        message.getChatRoom().getChatRoomId(),
+                        message.getSenderId(),
+                        message.getMessage()))
+                .collect(Collectors.toList());
+    }
 
 
 }
