@@ -19,7 +19,7 @@ import java.util.List;
 @Setter
 @ToString
 @Log4j2
-@Controller //빈 스캐닝
+//@Controller //빈 스캐닝
 @RestController
 @RequestMapping("/recommend")
 public class RecommendListControlloer {
@@ -32,7 +32,7 @@ public class RecommendListControlloer {
         List<RecommendListDTO> recommendList = recommendListService.findRecommendList();
         model.addAttribute("recommendList", recommendList);
         log.info("recommendList 는", recommendList);
-        return "list/food";
+        return "recommendList";
     }
 
 }
