@@ -34,7 +34,7 @@ public class ReviewService {
 
 
     // 파일 저장 경로 설정 (환경에 따라 변경 가능)
-    private final Path fileStorageLocation = Paths.get("uploads")
+    private final Path fileStorageLocation = Paths.get("/Users/ruahkim/Desktop/uploads")
             .toAbsolutePath().normalize();
 
     @Transactional
