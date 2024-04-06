@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReviewImageResponse {
     private Long reviewImageId;
+    private String imageName;
+    private String imageUri;
 
-    private String uuid;
-    private String filePath;
-
-    private String reviewFileName;
 }

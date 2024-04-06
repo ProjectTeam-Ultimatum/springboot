@@ -10,8 +10,7 @@ import ultimatum.project.domain.entity.review.Review;
 @NoArgsConstructor
 public class ReviewImageRequest {
 
-    private String uuid;
-    private String filePath;
-    private String reviewFileName;
+    private String imageName;
+    private String imageUri;
     private Review review;
 }

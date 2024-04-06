@@ -21,3 +21,9 @@ spring:
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
+  config:
+    import: classpath:aws.yml
+  servlet:
+    multipart:
+      max-request-size: 50MB
+      max-file-size: 50MB
