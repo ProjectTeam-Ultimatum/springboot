@@ -41,6 +41,14 @@ public class Review {
     @UpdateTimestamp
     private LocalDateTime mod_date;
 
+    @PrePersist
+    public void prePersist() {
+        // 엔티티가 처음 저장될 때 reviewLike를 0으로 설정
+        if (reviewLike == null) {
+            reviewLike = 0L;
+        }
+    }
+
     public void update(String reviewTitle, String reviewSubtitle,
                        String reviewContent, String reviewLocation){
         this.reviewTitle = reviewTitle;

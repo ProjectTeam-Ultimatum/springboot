@@ -43,7 +43,6 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final AmazonS3 amazonS3;
-
     private final String bucketName = "ultimatum0807"; // S3 버킷 이름 설정
 
 
@@ -102,6 +101,7 @@ public class ReviewService {
                 review.getReviewTitle(),
                 review.getReviewSubtitle(),
                 review.getReviewContent(),
+                review.getReviewLike(),
                 review.getReviewLocation(),
                 reviewImages.stream().map(image ->
                         new ReviewImageResponse(
@@ -130,6 +130,7 @@ public class ReviewService {
             //단일 이미지를 리스트에 넣음
 
             return new ReadReviewResponse(
+                    review.getReviewId(),
                     review.getReviewTitle(),
                     review.getReviewSubtitle(),
                     review.getReviewContent(),
@@ -156,6 +157,7 @@ public class ReviewService {
                 .collect(Collectors.toList());
 
         return new ReadReviewResponse(
+                review.getReviewId(),
                 review.getReviewTitle(),
                 review.getReviewSubtitle(),
                 review.getReviewContent(),
@@ -263,11 +265,21 @@ public class ReviewService {
                 log.error("Error deleting object {} from S3 bucket {}", imageUri, bucketName, e);
             }
         }
-
         reviewRepository.delete(review);
-
         return new DeleteReviewResponse(reviewId);
+    }
 
 
+    @Transactional
+    public ReviewLikeResponse updateReviewLike (Long reviewId, ReviewLikeRequest request){
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰 아이디를 못찾음!"));
+        review.setReviewLike(request.getReviewLike());
+        reviewRepository.save(review);
+
+        return new ReviewLikeResponse(
+                review.getReviewId(),
+                review.getReviewLike()
+        );
     }
 }

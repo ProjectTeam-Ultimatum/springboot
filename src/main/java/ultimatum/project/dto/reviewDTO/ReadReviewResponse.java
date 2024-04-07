@@ -14,6 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 public class ReadReviewResponse {
 
+    private Long reviewId;
+
     private String reviewTitle;
 
     private String reviewSubtitle;

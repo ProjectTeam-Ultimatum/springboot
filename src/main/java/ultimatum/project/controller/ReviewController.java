@@ -85,4 +85,14 @@ public class ReviewController {
 
         return ResponseEntity.ok(new DeleteReviewResponse(review_id));
     }
+
+    @PostMapping("/{reviewId}")
+    @Operation(summary = "좋아요 수정")
+    public ResponseEntity<ReviewLikeResponse> updateLike(@PathVariable Long reviewId, @RequestBody ReviewLikeRequest request) {
+
+            // 리뷰 서비스에서 좋아요 수를 업데이트하는 메소드를 호출합니다.
+            ReviewLikeResponse response = reviewService.updateReviewLike(reviewId,request);
+
+            return ResponseEntity.ok(response);
+    }
 }

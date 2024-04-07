@@ -15,6 +15,7 @@ public class CreateReviewResponse {
     private String reviewTitle;
     private String reviewSubtitle;
     private String reviewContent;
+    private Long reviewLike;
     private String reviewLocation;
     private List<ReviewImageResponse> reviewImages;
 
