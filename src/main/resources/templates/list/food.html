@@ -12,11 +12,11 @@
         <th>설명</th>
         <th>카테고리</th>
     </tr>
-    <tr th:each="RecommendFood : ${ recommendList }">
-        <td th:text="${ RecommendFood.recommendFoodTitle }"></td>
-        <td th:text="${ RecommendFood.recommendFoodSubtitle }"></td>
-        <td th:text="${ RecommendFood.recommendFoodContent }"></td>
-        <td th:text="${ RecommendFood.recommendFoodCategory }"></td>
+    <tr th:each="recommendFood : ${ recommendList }">
+        <td th:text="${ recommendFood.recommendFoodTitle }"></td>
+        <td th:text="${ recommendFood.recommendFoodSubtitle }"></td>
+        <td th:text="${ recommendFood.recommendFoodContent }"></td>
+        <td th:text="${ recommendFood.recommendFoodCategory }"></td>
     </tr>
 </table>
 </body>

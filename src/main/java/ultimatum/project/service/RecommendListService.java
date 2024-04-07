@@ -18,9 +18,7 @@ import java.util.stream.Collectors;
 public class RecommendListService {
 
     private final RecommendListRepository recommendListRepository;
-
     private final ModelMapper modelMapper;
-
 
     // 메뉴 전체 조회
     public List<RecommendListDTO> findRecommendList(){
@@ -33,9 +31,6 @@ public class RecommendListService {
                 .map(recommend -> modelMapper.map(recommend, RecommendListDTO.class))
                 .collect(Collectors.toList());
 
-
     }
 
-    
-    
 }
