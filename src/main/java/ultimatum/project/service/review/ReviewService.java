@@ -180,8 +180,10 @@ public class ReviewService {
         //기존이미지 삭제
         review.getReviewImages().clear();
 
+        List<ReviewImage> images = reviewImageRepository.findByReview(review);
+
         //연관된 모든 리뷰 이미지들에 대하여
-        for (ReviewImage reviewImage : review.getReviewImages()){
+        for (ReviewImage reviewImage : images){
             // imageUri S3 오브젝트 키 추출
             String imageUri = reviewImage.getImageUri();
             try {
