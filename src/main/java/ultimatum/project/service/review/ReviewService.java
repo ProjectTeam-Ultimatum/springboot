@@ -1,7 +1,9 @@
 package ultimatum.project.service.review;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,11 @@ import ultimatum.project.repository.ReviewImageRepository;
 import ultimatum.project.repository.ReviewRepository;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,10 +43,8 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final AmazonS3 amazonS3;
+
     private final String bucketName = "ultimatum0807"; // S3 버킷 이름 설정
-
-
-
 
 
     @Transactional
@@ -61,7 +66,7 @@ public class ReviewService {
                 String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
                 //s3에 파일 업로드
-                String s3Key = "uploads/"+ originalFileName;
+                String s3Key = "uploads/" + originalFileName;
                 ObjectMetadata metadata = new ObjectMetadata();
                 metadata.setContentLength(file.getSize());
                 amazonS3.putObject(bucketName, s3Key, file.getInputStream(), metadata);
@@ -100,7 +105,7 @@ public class ReviewService {
                 review.getReviewLocation(),
                 reviewImages.stream().map(image ->
                         new ReviewImageResponse(
-                                image.getReviewImageId(), image.getImageName(),image.getImageUri()
+                                image.getReviewImageId(), image.getImageName(), image.getImageUri()
                         )
                 ).collect(Collectors.toList())
         );
@@ -116,16 +121,13 @@ public class ReviewService {
         //Review 엔티티들을 ReadReviewResponse DTO로 변환
         return reviewPage.map(review -> {
             //이미지중 하나씩만가져오기
-            ReviewImageResponse imageResponse = review.getReviewImages().stream()
+            List<ReviewImageResponse> imageResponses = review.getReviewImages().stream()
                     .map(image -> new ReviewImageResponse(
-                            image.getReviewImageId(), image.getImageName(),image.getImageUri()
+                            image.getReviewImageId(), image.getImageName(), image.getImageUri()
 
-                    ))
-                    .findFirst()
-                    .orElse(null);
+                    )).collect(Collectors.toList());
 
             //단일 이미지를 리스트에 넣음
-            List<ReviewImageResponse> imageResponses = new ArrayList<>();
 
             return new ReadReviewResponse(
                     review.getReviewTitle(),
@@ -148,7 +150,7 @@ public class ReviewService {
 
         List<ReviewImageResponse> images = review.getReviewImages().stream()
                 .map(image -> new ReviewImageResponse(
-                        image.getReviewImageId(), image.getImageName(),image.getImageUri()
+                        image.getReviewImageId(), image.getImageName(), image.getImageUri()
 
                 ))    //첫번째 이미지만 포함
                 .collect(Collectors.toList());
@@ -174,12 +176,27 @@ public class ReviewService {
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을수없습니다." + reviewId));
 
         review.update(request.getReviewTitle(), request.getReviewSubtitle(), request.getReviewContent(), request.getReviewLocation());
+
         //기존이미지 삭제
         review.getReviewImages().clear();
 
+        //연관된 모든 리뷰 이미지들에 대하여
+        for (ReviewImage reviewImage : review.getReviewImages()){
+            // imageUri S3 오브젝트 키 추출
+            String imageUri = reviewImage.getImageUri();
+            try {
+                URL url = new URL(imageUri);
+                // 버킷 이름을 제외한 오브젝트 키 추출
+                String key = url.getPath().substring(1);
+                amazonS3.deleteObject(bucketName, URLDecoder.decode(key, StandardCharsets.UTF_8));
+
+            }catch (Exception e) {
+                log.error("Error deleting object {} from S3 bucket {}", imageUri, bucketName, e);
+            }
+        }
 
         //새 이미지들 저장
-        for(MultipartFile file : newImages){
+        for (MultipartFile file : newImages) {
 
             try {
 
@@ -187,7 +204,7 @@ public class ReviewService {
                 String updateFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
                 //s3에 파일 업로드
-                String s3Key = "uploads/"+ updateFileName;
+                String s3Key = "uploads/" + updateFileName;
                 ObjectMetadata metadata = new ObjectMetadata();
                 metadata.setContentLength(file.getSize());
                 amazonS3.putObject(bucketName, s3Key, file.getInputStream(), metadata);
@@ -202,7 +219,7 @@ public class ReviewService {
                 review.getReviewImages().add(newImage);
 
 
-            }catch (IOException e) {
+            } catch (IOException e) {
                 throw new RuntimeException("파일저장에 실패했습니다. : " + file.getOriginalFilename(), e);
             }
 
@@ -212,7 +229,7 @@ public class ReviewService {
 
         List<ReviewImageResponse> imageResponses = review.getReviewImages().stream()
                 .map(image -> new ReviewImageResponse(
-                        image.getReviewImageId(), image.getImageName(),image.getImageUri()
+                        image.getReviewImageId(), image.getImageName(), image.getImageUri()
                 ))
                 .collect(Collectors.toList());
 
@@ -227,16 +244,28 @@ public class ReviewService {
     }
 
     @Transactional
-    public DeleteReviewResponse deleteReview(Long reviewId){
+    public DeleteReviewResponse deleteReview(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자 게시글 ID를 찾을 수 없습니다." + reviewId));
 
+        //연관된 모든 리뷰 이미지들에 대하여
+        for (ReviewImage reviewImage : review.getReviewImages()){
+            // imageUri S3 오브젝트 키 추출
+            String imageUri = reviewImage.getImageUri();
+            try {
+                URL url = new URL(imageUri);
+                // 버킷 이름을 제외한 오브젝트 키 추출
+                String key = url.getPath().substring(1);
+                amazonS3.deleteObject(bucketName, URLDecoder.decode(key, StandardCharsets.UTF_8));
+            }catch (Exception e) {
+                log.error("Error deleting object {} from S3 bucket {}", imageUri, bucketName, e);
+            }
+        }
+
         reviewRepository.delete(review);
+
         return new DeleteReviewResponse(reviewId);
 
 
     }
-
-
-
 }
