@@ -6,5 +6,5 @@ import ultimatum.project.domain.entity.image.RecommendImage;
 import java.util.List;
 
 public interface RecommendImageRepository extends JpaRepository<RecommendImage, Long> {
-    List<RecommendImage> findByRecommendFoodId(Long recommendFoodId);
+    //List<RecommendImage> findByRecommendFoodId(Long recommendFoodId);
 }

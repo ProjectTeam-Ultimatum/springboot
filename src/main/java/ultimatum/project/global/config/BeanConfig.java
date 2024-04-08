@@ -1,4 +1,4 @@
-package ultimatum.project.config;
+package ultimatum.project.global.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
