@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ultimatum.project.domain.entity.review.ReviewImage;
+import ultimatum.project.domain.entity.review.ReviewReply;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -28,8 +29,9 @@ public class ReadReviewResponse {
 
     private List<ReviewImageResponse> reviewImages;
 
-    private LocalDateTime reg_date;
+    private List<ReviewReply> replies;
 
+    private LocalDateTime reg_date;
 
     private LocalDateTime mod_date;
 }

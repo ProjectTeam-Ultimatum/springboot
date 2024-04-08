@@ -9,8 +9,15 @@ import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewReply;
 import ultimatum.project.dto.reviewReplyDTO.CreateReplyRequest;
 import ultimatum.project.dto.reviewReplyDTO.CreateReplyResponse;
+import ultimatum.project.dto.reviewReplyDTO.ReadReplyResponse;
+import ultimatum.project.global.exception.CustomException;
+import ultimatum.project.global.exception.ErrorCode;
 import ultimatum.project.repository.ReviewReplyRepository;
 import ultimatum.project.repository.ReviewRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -22,27 +29,43 @@ public class ReviewReplyService {
     private final ReviewRepository reviewRepository;
 
     @Transactional
-    public CreateReplyResponse createReply(Long reviewId,CreateReplyRequest request){
+    public CreateReplyResponse createReply(Long reviewId,CreateReplyRequest request) {
 
 
-            //리뷰 엔티티 조회
-           Review review = reviewRepository.findById(reviewId)
-                    .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을수 없습니다." + reviewId));
+        //리뷰 엔티티 조회
+       Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
-            //DTO를 엔티티로 변환 후 저장
-            ReviewReply reviewReply = new ReviewReply();
-            reviewReply.setReview(review);
-            reviewReply.setReviewReplyer(request.getReviewReplyer());
-            reviewReply.setReviewReplyContent(request.getReviewReplyContent());
-            reviewReply = reviewReplyRepository.save(reviewReply);
+        //DTO를 엔티티로 변환 후 저장
+        ReviewReply reviewReply = new ReviewReply();
+        reviewReply.setReview(review);
+        reviewReply.setReviewReplyer(request.getReviewReplyer());
+        reviewReply.setReviewReplyContent(request.getReviewReplyContent());
+        reviewReply = reviewReplyRepository.save(reviewReply);
 
-            log.info(reviewReply);
-            //저장된 엔티티를 다시 DTO로 변환하여 반환
-            return new CreateReplyResponse(
-                    reviewReply.getReviewReplyId(),
-                    reviewReply.getReviewReplyer(),
-                    reviewReply.getReviewReplyContent());
+        log.info(reviewReply);
+        //저장된 엔티티를 다시 DTO로 변환하여 반환
+        return new CreateReplyResponse(
+                reviewReply.getReviewReplyId(),
+                reviewReply.getReviewReplyer(),
+                reviewReply.getReviewReplyContent());
 
     }
 
+    public List<ReadReplyResponse> getAllReplyById(Long review_id){
+
+
+        Review review = reviewRepository.findById(review_id)
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+        List<ReviewReply> replies = reviewReplyRepository.findByReview(review);
+
+        //조회된 ReviewReply 목록을 ReadReplyResponseDTO 목록 변환
+        return replies.stream().map(reply -> new ReadReplyResponse(
+                reply.getReviewReplyId(),
+                reply.getReviewReplyer(),
+                reply.getReviewReplyContent(),
+                reply.getReg_date(),
+                reply.getMod_date()
+        )).collect(Collectors.toList());
+    }
 }

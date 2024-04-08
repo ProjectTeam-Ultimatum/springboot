@@ -1,14 +1,10 @@
 package ultimatum.project.service.review;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,21 +13,19 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewImage;
+import ultimatum.project.domain.entity.review.ReviewReply;
 import ultimatum.project.dto.reviewDTO.*;
 import ultimatum.project.repository.ReviewImageRepository;
+import ultimatum.project.repository.ReviewReplyRepository;
 import ultimatum.project.repository.ReviewRepository;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -42,6 +36,7 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
+    private final ReviewReplyRepository replyRepository;
     private final AmazonS3 amazonS3;
     private final String bucketName = "ultimatum0807"; // S3 버킷 이름 설정
 
@@ -136,6 +131,8 @@ public class ReviewService {
                     .map(image -> new ReviewImageResponse(
                             image.getReviewImageId(), image.getImageName(), image.getImageUri()
                     )).collect(Collectors.toList());
+            List<ReviewReply> replies = replyRepository.findByReview(review);
+
 
             //단일 이미지를 리스트에 넣음
             return new ReadReviewResponse(
@@ -146,6 +143,7 @@ public class ReviewService {
                     review.getReviewLike(),
                     review.getReviewLocation(),
                     imageResponses,
+                    replies,
                     review.getReg_date(),
                     review.getMod_date()
             );
@@ -164,6 +162,8 @@ public class ReviewService {
 
                 )).collect(Collectors.toList());
 
+        List<ReviewReply> replies = replyRepository.findByReview(review);
+
         return new ReadReviewResponse(
                 review.getReviewId(),
                 review.getReviewTitle(),
@@ -172,9 +172,9 @@ public class ReviewService {
                 review.getReviewLike(),
                 review.getReviewLocation(),
                 images,
+                replies,
                 review.getReg_date(),
                 review.getMod_date()
-
         );
 
     }
