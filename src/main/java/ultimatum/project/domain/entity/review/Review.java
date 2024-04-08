@@ -32,6 +32,13 @@ public class Review {
 
     private String reviewLocation;
 
+    /**
+     * 왜 @OneToMany 를 써서 양방향으로 사용했는가?
+     *      1. 연관된 데이터 접근의 편의성을 위해(하나의 엔티티가 여러관련 엔티티의 컬렉션을 직접 가질 때 유용
+     *      2. 컬렉션에 대한 작업 : 컬렉션을 다룰때 엔티티간의 관계를 관리하고, 콜렉션에 속한 엔티티를 추가하거나 제거하는 작업을
+     *      JPA가 자동으로 처리할수 있게 해준다.
+     *      *** So, 리뷰를 생성하거나 수정하거나 삭제하거나 할때, 이미지에 대한 처리도 함께 해야하기 때문에 양방향을 써야한다. **
+     */
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImages = new ArrayList<>();
 

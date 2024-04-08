@@ -1,4 +1,4 @@
-package ultimatum.project.config;
+package ultimatum.project.global.config;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;

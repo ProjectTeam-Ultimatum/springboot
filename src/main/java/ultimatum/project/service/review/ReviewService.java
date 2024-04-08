@@ -62,15 +62,25 @@ public class ReviewService {
         // 이미지 파일 처리 로직
         for (MultipartFile file : files) {     // request.getReviewImages() 배열 또는 리스트를 가져옵니다.
             try {
+                /**
+                 * StringUtils.cleanPath : 파일경로에서 불필요한 문자나 경로 순회패턴('../')을 제거하여 파일 시스템 공격 방지에 도움
+                 * Objects.requireNonNull : 파일의 이름이 null 인경우 예외 발생시킴
+                 */
                 String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
                 //s3에 파일 업로드
+                // 파일의 저장위치와 파일 이름
                 String s3Key = "uploads/" + originalFileName;
+                                        // objectMetadata() : 업로드할 파일의 메타데이터를 설정하는데 사용(파일의 크기를 설정)
                 ObjectMetadata metadata = new ObjectMetadata();
                 metadata.setContentLength(file.getSize());
+                // amazonS3.putObject : 파일스트림과 메타데이터를 함께 S3에 업로드
                 amazonS3.putObject(bucketName, s3Key, file.getInputStream(), metadata);
 
                 //s3 파일 uri 생성
+                /**
+                 * amazonS3.getUrl().toString() : 성공적인 업로드 후 파일에 접근할 수 있는 uri를 얻기 위해
+                 */
                 String fileUri = amazonS3.getUrl(bucketName, s3Key).toString();
 
 
@@ -97,7 +107,8 @@ public class ReviewService {
         });
 
         // CreateReviewResponse 객체 생성 및 반환
-        return new CreateReviewResponse(review.getReviewId(),
+        return new CreateReviewResponse(
+                review.getReviewId(),
                 review.getReviewTitle(),
                 review.getReviewSubtitle(),
                 review.getReviewContent(),
@@ -124,11 +135,9 @@ public class ReviewService {
             List<ReviewImageResponse> imageResponses = review.getReviewImages().stream()
                     .map(image -> new ReviewImageResponse(
                             image.getReviewImageId(), image.getImageName(), image.getImageUri()
-
                     )).collect(Collectors.toList());
 
             //단일 이미지를 리스트에 넣음
-
             return new ReadReviewResponse(
                     review.getReviewId(),
                     review.getReviewTitle(),
@@ -153,8 +162,7 @@ public class ReviewService {
                 .map(image -> new ReviewImageResponse(
                         image.getReviewImageId(), image.getImageName(), image.getImageUri()
 
-                ))    //첫번째 이미지만 포함
-                .collect(Collectors.toList());
+                )).collect(Collectors.toList());
 
         return new ReadReviewResponse(
                 review.getReviewId(),
@@ -201,9 +209,7 @@ public class ReviewService {
 
         //새 이미지들 저장
         for (MultipartFile file : newImages) {
-
             try {
-
                 // multipart file 객체의 파일의 원본이름을 정제하는 과정
                 String updateFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 

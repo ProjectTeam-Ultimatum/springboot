@@ -70,8 +70,6 @@ public class ReviewController {
                 reviewTitle, reviewSubtitle, reviewContent, reviewLocation, null );
                                                                                     //이미지 관련 정보는 여기서 처리하지 않음.
 
-
-
         UpdateReviewResponse response = reviewService.updateReview(review_id, request, images);
 
         return ResponseEntity.ok(response);
