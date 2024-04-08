@@ -1,4 +1,4 @@
-package ultimatum.project.config;
+package ultimatum.project.global.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import org.springdoc.core.models.GroupedOpenApi;
@@ -32,6 +32,17 @@ public class SwaggerConfig {
         };
         return GroupedOpenApi.builder()
                 .group("2. 아직 미정")
+                .packagesToScan(path)
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi thirdOpenApi(){
+        String[] path = {
+                "ultimatum.project.controller"
+        };
+        return GroupedOpenApi.builder()
+                .group("3. 전역예외처리")
                 .packagesToScan(path)
                 .build();
     }
