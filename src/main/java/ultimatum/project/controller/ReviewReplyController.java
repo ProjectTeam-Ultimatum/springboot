@@ -6,11 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.dto.reviewReplyDTO.CreateReplyRequest;
 import ultimatum.project.dto.reviewReplyDTO.CreateReplyResponse;
 import ultimatum.project.dto.reviewReplyDTO.ReadReplyResponse;
-import ultimatum.project.repository.ReviewRepository;
 import ultimatum.project.service.review.ReviewReplyService;
 
 import java.util.List;

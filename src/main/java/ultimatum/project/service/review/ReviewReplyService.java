@@ -1,6 +1,5 @@
 package ultimatum.project.service.review;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,6 @@ import ultimatum.project.global.exception.ErrorCode;
 import ultimatum.project.repository.ReviewReplyRepository;
 import ultimatum.project.repository.ReviewRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
