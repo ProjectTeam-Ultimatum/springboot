@@ -13,8 +13,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewImage;
-import ultimatum.project.domain.entity.review.ReviewReply;
 import ultimatum.project.dto.reviewDTO.*;
+import ultimatum.project.dto.reviewReplyDTO.ReadReplyResponse;
 import ultimatum.project.repository.ReviewImageRepository;
 import ultimatum.project.repository.ReviewReplyRepository;
 import ultimatum.project.repository.ReviewRepository;
@@ -119,10 +119,10 @@ public class ReviewService {
     }
 
 
-    public Page<ReadReviewResponse> getAllReviews(Pageable pageable) {
+    public Page<ReadAllReviewResponse> getAllReviews(String reviewLocation, Pageable pageable) {
 
         //페이지네이션을 적용하여 Review 엔티티들을 조회
-        Page<Review> reviewPage = reviewRepository.findAll(pageable);
+        Page<Review> reviewPage = reviewRepository.findByReviewLocation(reviewLocation, pageable);
 
         //Review 엔티티들을 ReadReviewResponse DTO로 변환
         return reviewPage.map(review -> {
@@ -131,11 +131,11 @@ public class ReviewService {
                     .map(image -> new ReviewImageResponse(
                             image.getReviewImageId(), image.getImageName(), image.getImageUri()
                     )).collect(Collectors.toList());
-            List<ReviewReply> replies = replyRepository.findByReview(review);
 
+            long replyCount = replyRepository.countByReview(review);
 
             //단일 이미지를 리스트에 넣음
-            return new ReadReviewResponse(
+            return new ReadAllReviewResponse(
                     review.getReviewId(),
                     review.getReviewTitle(),
                     review.getReviewSubtitle(),
@@ -143,7 +143,7 @@ public class ReviewService {
                     review.getReviewLike(),
                     review.getReviewLocation(),
                     imageResponses,
-                    replies,
+                    replyCount,
                     review.getReg_date(),
                     review.getMod_date()
             );
@@ -151,7 +151,7 @@ public class ReviewService {
     }
 
 
-    public ReadReviewResponse getReviewById(Long reviewId) {
+    public ReadReviewByIdResponse getReviewById(Long reviewId) {
 
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자 게시글 ID를 찾을 수 없습니다." + reviewId));
@@ -162,9 +162,12 @@ public class ReviewService {
 
                 )).collect(Collectors.toList());
 
-        List<ReviewReply> replies = replyRepository.findByReview(review);
+        List<ReadReplyResponse> replies = review.getReviewReplies().stream()
+                .map(reply -> new ReadReplyResponse(
+                        reply.getReviewReplyId(), reply.getReviewReplyer(), reply.getReviewReplyContent(), reply.getReg_date(),reply.getMod_date()
+                )).collect(Collectors.toList());
 
-        return new ReadReviewResponse(
+        return new ReadReviewByIdResponse(
                 review.getReviewId(),
                 review.getReviewTitle(),
                 review.getReviewSubtitle(),

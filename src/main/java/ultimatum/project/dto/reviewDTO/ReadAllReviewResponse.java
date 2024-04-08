@@ -3,17 +3,14 @@ package ultimatum.project.dto.reviewDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ultimatum.project.domain.entity.review.ReviewImage;
-import ultimatum.project.domain.entity.review.ReviewReply;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReadReviewResponse {
+public class ReadAllReviewResponse {
 
     private Long reviewId;
 
@@ -29,9 +26,12 @@ public class ReadReviewResponse {
 
     private List<ReviewImageResponse> reviewImages;
 
-    private List<ReviewReply> replies;
+    private long replyCount;
 
     private LocalDateTime reg_date;
 
     private LocalDateTime mod_date;
+
+
+
 }

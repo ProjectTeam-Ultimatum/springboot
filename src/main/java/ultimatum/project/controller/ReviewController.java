@@ -9,7 +9,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.dto.reviewDTO.*;
@@ -43,17 +42,17 @@ public class ReviewController {
 
     @GetMapping
     @Operation(summary = "게시글 전체 보기")
-    public ResponseEntity<Page<ReadReviewResponse>> getAllReviews(
+    public ResponseEntity<Page<ReadAllReviewResponse>> getAllReviews(String reviewLocation,
             @PageableDefault (size = 6, sort = "reviewId", direction = Sort.Direction.DESC)Pageable pageable) {
-        Page<ReadReviewResponse> reviews = reviewService.getAllReviews(pageable);
+        Page<ReadAllReviewResponse> reviews = reviewService.getAllReviews(reviewLocation, pageable);
         return ResponseEntity.ok(reviews);
     }
 
     @GetMapping("/{review_id}")
     @Operation(summary = "게시글 하나만 보기")
 
-    public ResponseEntity<ReadReviewResponse> getReviewById(@PathVariable Long review_id) {
-        ReadReviewResponse response = reviewService.getReviewById(review_id);
+    public ResponseEntity<ReadReviewByIdResponse> getReviewById(@PathVariable Long review_id) {
+        ReadReviewByIdResponse response = reviewService.getReviewById(review_id);
         return ResponseEntity.ok(response);
     }
 

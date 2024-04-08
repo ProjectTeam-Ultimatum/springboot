@@ -42,6 +42,9 @@ public class Review {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImages = new ArrayList<>();
 
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewReply> reviewReplies = new ArrayList<>();
+
     @CreationTimestamp
     private LocalDateTime reg_date;
 
