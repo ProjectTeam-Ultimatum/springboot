@@ -22,4 +22,14 @@ public class SwaggerConfig {
                 .build();
     }
 
+    @Bean
+    public GroupedOpenApi thirdOpenApi(){
+        String[] path = {
+                "ultimatum.project.controller"
+        };
+        return GroupedOpenApi.builder()
+                .group("3. 전역예외처리")
+                .packagesToScan(path)
+                .build();
+    }
 }
