@@ -15,7 +15,7 @@ import java.util.List;
 public class RecommendHotel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     @Column(name = "recommend_hotel_id")
     private Long recommendHotelId;
 
@@ -37,8 +37,6 @@ public class RecommendHotel {
 
     private String recommendHotelBudget;
 
-    @OneToMany
-    @JoinColumn(name = "hotel_base_tag_id")
-    private List<HotelTag> hotelTags = new ArrayList<>();
+    private String recommendHotelCategory;
 
 }

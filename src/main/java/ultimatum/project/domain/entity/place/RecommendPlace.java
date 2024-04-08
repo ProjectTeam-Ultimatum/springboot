@@ -37,8 +37,6 @@ public class RecommendPlace {
 
     private String recommendPlaceBudget;
 
-    @OneToMany
-    @JoinColumn(name = "place_base_tag_id")
-    private List<PlaceTag> placeTags = new ArrayList<>();
+    private String recommendPlaceCategory;
 
 }
