@@ -1,7 +1,6 @@
 package ultimatum.project.chatting;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -19,8 +18,10 @@ import java.util.Set;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class WebSocketCharHandler extends TextWebSocketHandler {
+public class WebSocketChatHandler extends TextWebSocketHandler {
     private  final ObjectMapper mapper;
+
+    private final ChatService chatService;
 
     // 현재 연결된 세션들
     private final Set<WebSocketSession> sessions = new HashSet<>();
@@ -39,6 +40,7 @@ public class WebSocketCharHandler extends TextWebSocketHandler {
         sessions.add(session);
     }
 
+
     // 소켓 통신 시 메세지의 전송을 다루는 부분
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -53,14 +55,36 @@ public class WebSocketCharHandler extends TextWebSocketHandler {
         switch (chatMessageDto.getMessageType()) {
             case ENTER:
                 handleEnter(session, chatRoomId);
+                // 사용자 아이디를 이용해 "XX 님이 입장하셨습니다." 메시지를 생성하고 전송합니다.
+                // 여기서는 메시지를 데이터베이스에 저장하지 않습니다.
+                String enterMessageContent = chatMessageDto.getSenderId() + " 님이 입장하셨습니다.";
+                ChatMessageDto enterMessage = new ChatMessageDto(
+                        MessageType.ENTER,
+                        chatRoomId,
+                        chatMessageDto.getSenderId(),
+                        enterMessageContent
+                );
+                sendMessageToChatRoom(enterMessage, chatRoomSessionMap.get(chatRoomId));
+                break;
+//           나중에 로그인 구현됐을때 바꿔야할 코드.
+//            case ENTER:
+//                handleEnter(session, chatRoomId);
+//                // 사용자 ID를 기반으로 사용자 정보 조회
+//                String userName = userService.getUserNameById(chatMessageDto.getSenderId());
+//                // 사용자 이름을 사용하여 입장 메시지 구성
+//                String enterMessageContent = userName + " 님이 입장하셨습니다.";
+//                // 메시지 전송 로직...
+//                break;
+            case TALK:
+                // 일반 채팅 메시지인 경우, 데이터베이스에 메시지 저장
+                chatService.saveMessage(chatMessageDto);
+                sendMessageToChatRoom(chatMessageDto, chatRoomSessionMap.get(chatRoomId));
                 break;
             case LEAVE:
                 handleLeave(session, chatRoomId);
                 break;
-            // 다른 메시지 타입 처리
+            // 다른 메시지 타입 처리...
         }
-
-        sendMessageToChatRoom(chatMessageDto, chatRoomSessionMap.get(chatRoomId));
     }
 
     // 소켓 종료 확인

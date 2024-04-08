@@ -35,6 +35,12 @@ dependencies {
     //websocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
+    //modelmapper
+    implementation 'org.modelmapper:modelmapper:3.1.0'
+
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+
 }
 
 // Lombok 설정

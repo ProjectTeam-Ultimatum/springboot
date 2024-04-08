@@ -3,6 +3,7 @@ package ultimatum.project.chatting;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -17,9 +18,24 @@ import java.util.stream.Collectors;
 public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final MessageRepository messageRepository;
+    private final ModelMapper modelMapper; // ModelMapper 라이브러리를 사용한 예시
 
     private final Map<Long, Set<WebSocketSession>> chatRoomSessionMap = new HashMap<>();
     private final ObjectMapper mapper;
+
+    // 채팅 메시지 저장
+    public void saveMessage(ChatMessageDto chatMessageDto) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatMessageDto.getChatRoomId())
+                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setChatRoom(chatRoom);
+        chatMessage.setSenderId(chatMessageDto.getSenderId());
+        chatMessage.setMessage(chatMessageDto.getMessage());
+        chatMessage.setMessageType(chatMessageDto.getMessageType());
+
+        messageRepository.save(chatMessage);
+    }
 
 
     // 모든 채팅방 조회
