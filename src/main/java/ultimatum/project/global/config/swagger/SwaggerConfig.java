@@ -1,4 +1,4 @@
-package ultimatum.project.global.config;
+package ultimatum.project.global.config.swagger;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import org.springdoc.core.models.GroupedOpenApi;

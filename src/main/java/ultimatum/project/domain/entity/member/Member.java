@@ -6,6 +6,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Entity
 @Builder
 @Getter
@@ -22,6 +26,8 @@ public class Member {
 
     private String memberName;
 
+    private String memberEmail;
+
     private Long memberAge;
 
     private String memberGender;
@@ -30,5 +36,13 @@ public class Member {
 
     private String memberStyle;
 
-    private String memberRule;
+    private String memberRole;
+
+    public List<String> getRoleList(){
+        if(this.memberRole.length() > 0){
+            return Arrays.asList(this.memberRole.split(","));
+        }
+        return new ArrayList<>();
+    }
+
 }
