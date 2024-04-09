@@ -3,13 +3,13 @@ package ultimatum.project.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.dto.reviewDTO.*;
@@ -17,11 +17,12 @@ import ultimatum.project.service.review.ReviewService;
 
 import java.util.List;
 
+@Log4j2
 @Tag(name = "reviews", description = "사용자 게시판 api")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "*")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -43,17 +44,17 @@ public class ReviewController {
 
     @GetMapping
     @Operation(summary = "게시글 전체 보기")
-    public ResponseEntity<Page<ReadReviewResponse>> getAllReviews(
+    public ResponseEntity<Page<ReadAllReviewResponse>> getAllReviews(
             @PageableDefault (size = 6, sort = "reviewId", direction = Sort.Direction.DESC)Pageable pageable) {
-        Page<ReadReviewResponse> reviews = reviewService.getAllReviews(pageable);
+        Page<ReadAllReviewResponse> reviews = reviewService.getAllReviews( pageable);
         return ResponseEntity.ok(reviews);
     }
 
     @GetMapping("/{review_id}")
     @Operation(summary = "게시글 하나만 보기")
 
-    public ResponseEntity<ReadReviewResponse> getReviewById(@PathVariable Long review_id) {
-        ReadReviewResponse response = reviewService.getReviewById(review_id);
+    public ResponseEntity<ReadReviewByIdResponse> getReviewById(@PathVariable Long review_id) {
+        ReadReviewByIdResponse response = reviewService.getReviewById(review_id);
         return ResponseEntity.ok(response);
     }
 
@@ -70,8 +71,6 @@ public class ReviewController {
                 reviewTitle, reviewSubtitle, reviewContent, reviewLocation, null );
                                                                                     //이미지 관련 정보는 여기서 처리하지 않음.
 
-
-
         UpdateReviewResponse response = reviewService.updateReview(review_id, request, images);
 
         return ResponseEntity.ok(response);
@@ -84,5 +83,14 @@ public class ReviewController {
        reviewService.deleteReview(review_id);
 
         return ResponseEntity.ok(new DeleteReviewResponse(review_id));
+    }
+
+    @PostMapping("/{reviewId}")
+    @Operation(summary = "좋아요 수정")
+    public ResponseEntity<ReviewLikeResponse> updateLike(@PathVariable Long reviewId, @RequestBody ReviewLikeRequest request) {
+
+            // 리뷰 서비스에서 좋아요 수를 업데이트하는 메소드를 호출합니다.
+            ReviewLikeResponse response = reviewService.updateReviewLike(reviewId,request);
+            return ResponseEntity.ok(response);
     }
 }

@@ -14,22 +14,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
+
     @Bean
     public GroupedOpenApi Review(){
         return GroupedOpenApi.builder()
-                .group("Review")
+                .group("사용자게시판")
                 .pathsToMatch("/api/reviews/**") // API 경로를 지정
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi secondOpenApi(){
-        String[] path = {
-                ""
-        };
-        return GroupedOpenApi.builder()
-                .group("2. 아직 미정")
-                .packagesToScan(path)
                 .build();
     }
 

@@ -1,14 +1,10 @@
 package ultimatum.project.service.review;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,21 +13,20 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewImage;
+import ultimatum.project.domain.entity.review.ReviewReply;
 import ultimatum.project.dto.reviewDTO.*;
+import ultimatum.project.dto.reviewReplyDTO.ReadReplyResponse;
 import ultimatum.project.repository.ReviewImageRepository;
+import ultimatum.project.repository.ReviewReplyRepository;
 import ultimatum.project.repository.ReviewRepository;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -42,8 +37,8 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
+    private final ReviewReplyRepository replyRepository;
     private final AmazonS3 amazonS3;
-
     private final String bucketName = "ultimatum0807"; // S3 버킷 이름 설정
 
 
@@ -63,15 +58,25 @@ public class ReviewService {
         // 이미지 파일 처리 로직
         for (MultipartFile file : files) {     // request.getReviewImages() 배열 또는 리스트를 가져옵니다.
             try {
+                /**
+                 * StringUtils.cleanPath : 파일경로에서 불필요한 문자나 경로 순회패턴('../')을 제거하여 파일 시스템 공격 방지에 도움
+                 * Objects.requireNonNull : 파일의 이름이 null 인경우 예외 발생시킴
+                 */
                 String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
                 //s3에 파일 업로드
+                // 파일의 저장위치와 파일 이름
                 String s3Key = "uploads/" + originalFileName;
+                                        // objectMetadata() : 업로드할 파일의 메타데이터를 설정하는데 사용(파일의 크기를 설정)
                 ObjectMetadata metadata = new ObjectMetadata();
                 metadata.setContentLength(file.getSize());
+                // amazonS3.putObject : 파일스트림과 메타데이터를 함께 S3에 업로드
                 amazonS3.putObject(bucketName, s3Key, file.getInputStream(), metadata);
 
                 //s3 파일 uri 생성
+                /**
+                 * amazonS3.getUrl().toString() : 성공적인 업로드 후 파일에 접근할 수 있는 uri를 얻기 위해
+                 */
                 String fileUri = amazonS3.getUrl(bucketName, s3Key).toString();
 
 
@@ -98,10 +103,12 @@ public class ReviewService {
         });
 
         // CreateReviewResponse 객체 생성 및 반환
-        return new CreateReviewResponse(review.getReviewId(),
+        return new CreateReviewResponse(
+                review.getReviewId(),
                 review.getReviewTitle(),
                 review.getReviewSubtitle(),
                 review.getReviewContent(),
+                review.getReviewLike(),
                 review.getReviewLocation(),
                 reviewImages.stream().map(image ->
                         new ReviewImageResponse(
@@ -113,10 +120,10 @@ public class ReviewService {
     }
 
 
-    public Page<ReadReviewResponse> getAllReviews(Pageable pageable) {
+    public Page<ReadAllReviewResponse> getAllReviews(Pageable pageable) {
 
         //페이지네이션을 적용하여 Review 엔티티들을 조회
-        Page<Review> reviewPage = reviewRepository.findAll(pageable);
+        Page<Review> reviewPage = reviewRepository.findAll( pageable);
 
         //Review 엔티티들을 ReadReviewResponse DTO로 변환
         return reviewPage.map(review -> {
@@ -124,18 +131,20 @@ public class ReviewService {
             List<ReviewImageResponse> imageResponses = review.getReviewImages().stream()
                     .map(image -> new ReviewImageResponse(
                             image.getReviewImageId(), image.getImageName(), image.getImageUri()
-
                     )).collect(Collectors.toList());
 
-            //단일 이미지를 리스트에 넣음
+            long replyCount = replyRepository.countByReview(review);
 
-            return new ReadReviewResponse(
+            //단일 이미지를 리스트에 넣음
+            return new ReadAllReviewResponse(
+                    review.getReviewId(),
                     review.getReviewTitle(),
                     review.getReviewSubtitle(),
                     review.getReviewContent(),
                     review.getReviewLike(),
                     review.getReviewLocation(),
                     imageResponses,
+                    replyCount,
                     review.getReg_date(),
                     review.getMod_date()
             );
@@ -143,7 +152,7 @@ public class ReviewService {
     }
 
 
-    public ReadReviewResponse getReviewById(Long reviewId) {
+    public ReadReviewByIdResponse getReviewById(Long reviewId) {
 
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자 게시글 ID를 찾을 수 없습니다." + reviewId));
@@ -151,20 +160,24 @@ public class ReviewService {
         List<ReviewImageResponse> images = review.getReviewImages().stream()
                 .map(image -> new ReviewImageResponse(
                         image.getReviewImageId(), image.getImageName(), image.getImageUri()
+                )).collect(Collectors.toList());
 
-                ))    //첫번째 이미지만 포함
-                .collect(Collectors.toList());
+        List<ReadReplyResponse> replies = review.getReviewReplies().stream()
+                .map(reply -> new ReadReplyResponse(
+                        reply.getReviewReplyId(), reply.getReviewReplyer(), reply.getReviewReplyContent(), reply.getReg_date(),reply.getMod_date()
+                )).collect(Collectors.toList());
 
-        return new ReadReviewResponse(
+        return new ReadReviewByIdResponse(
+                review.getReviewId(),
                 review.getReviewTitle(),
                 review.getReviewSubtitle(),
                 review.getReviewContent(),
                 review.getReviewLike(),
                 review.getReviewLocation(),
                 images,
+                replies,
                 review.getReg_date(),
                 review.getMod_date()
-
         );
 
     }
@@ -199,9 +212,7 @@ public class ReviewService {
 
         //새 이미지들 저장
         for (MultipartFile file : newImages) {
-
             try {
-
                 // multipart file 객체의 파일의 원본이름을 정제하는 과정
                 String updateFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
@@ -263,11 +274,24 @@ public class ReviewService {
                 log.error("Error deleting object {} from S3 bucket {}", imageUri, bucketName, e);
             }
         }
+        for (ReviewReply reviewReply : review.getReviewReplies()){
 
+        }
         reviewRepository.delete(review);
-
         return new DeleteReviewResponse(reviewId);
+    }
 
 
+    @Transactional
+    public ReviewLikeResponse updateReviewLike (Long reviewId, ReviewLikeRequest request){
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰 아이디를 못찾음!"));
+        review.setReviewLike(request.getReviewLike());
+        reviewRepository.save(review);
+
+        return new ReviewLikeResponse(
+                review.getReviewId(),
+                review.getReviewLike()
+        );
     }
 }
