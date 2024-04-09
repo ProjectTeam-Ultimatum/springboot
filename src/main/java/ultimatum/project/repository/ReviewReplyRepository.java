@@ -11,4 +11,6 @@ public interface ReviewReplyRepository extends JpaRepository<ReviewReply, Long> 
 
     long countByReview(Review review);
 
+
+
 }

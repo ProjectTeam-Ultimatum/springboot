@@ -22,7 +22,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "*")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -91,7 +91,6 @@ public class ReviewController {
 
             // 리뷰 서비스에서 좋아요 수를 업데이트하는 메소드를 호출합니다.
             ReviewLikeResponse response = reviewService.updateReviewLike(reviewId,request);
-
             return ResponseEntity.ok(response);
     }
 }

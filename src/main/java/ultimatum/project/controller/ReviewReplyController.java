@@ -6,9 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ultimatum.project.dto.reviewReplyDTO.CreateReplyRequest;
-import ultimatum.project.dto.reviewReplyDTO.CreateReplyResponse;
-import ultimatum.project.dto.reviewReplyDTO.ReadReplyResponse;
+import ultimatum.project.dto.reviewReplyDTO.*;
 import ultimatum.project.service.review.ReviewReplyService;
 
 import java.util.List;
@@ -18,7 +16,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "*")
 public class ReviewReplyController {
     private final ReviewReplyService reviewReplyService;
 
@@ -36,6 +34,16 @@ public class ReviewReplyController {
     @Operation(summary = "해당 게시물에 작성된 댓글 보기")
     public ResponseEntity<List<ReadReplyResponse>> readReplyByReview(@PathVariable Long review_id){
         List<ReadReplyResponse> response = reviewReplyService.getAllReplyById(review_id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/reply/{reply_id}")
+    @Operation(summary = "댓글수정")
+    public ResponseEntity<UpdateReplyResponse> updateReplyByReplyId(@PathVariable Long reply_id,
+                                                                    @RequestBody UpdateReplyRequest request) {
+
+        UpdateReplyResponse response = reviewReplyService.updateReply(reply_id, request);
+
         return ResponseEntity.ok(response);
     }
 }

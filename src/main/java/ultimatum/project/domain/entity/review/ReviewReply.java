@@ -33,5 +33,11 @@ public class ReviewReply {
     @UpdateTimestamp
     private LocalDateTime mod_date;
 
+    public void update(String reviewReplyer,String reviewReplyContent){
+        this.reviewReplyer = reviewReplyer;
+        this.reviewReplyContent = reviewReplyContent;
+
+    }
+
 
 }
