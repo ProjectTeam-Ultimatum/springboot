@@ -3,6 +3,7 @@ package ultimatum.project.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,6 +17,7 @@ import ultimatum.project.service.review.ReviewService;
 
 import java.util.List;
 
+@Log4j2
 @Tag(name = "reviews", description = "사용자 게시판 api")
 @RestController
 @RequiredArgsConstructor
@@ -42,9 +44,9 @@ public class ReviewController {
 
     @GetMapping
     @Operation(summary = "게시글 전체 보기")
-    public ResponseEntity<Page<ReadAllReviewResponse>> getAllReviews(String reviewLocation,
+    public ResponseEntity<Page<ReadAllReviewResponse>> getAllReviews(
             @PageableDefault (size = 6, sort = "reviewId", direction = Sort.Direction.DESC)Pageable pageable) {
-        Page<ReadAllReviewResponse> reviews = reviewService.getAllReviews(reviewLocation, pageable);
+        Page<ReadAllReviewResponse> reviews = reviewService.getAllReviews( pageable);
         return ResponseEntity.ok(reviews);
     }
 

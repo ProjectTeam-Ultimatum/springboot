@@ -119,10 +119,10 @@ public class ReviewService {
     }
 
 
-    public Page<ReadAllReviewResponse> getAllReviews(String reviewLocation, Pageable pageable) {
+    public Page<ReadAllReviewResponse> getAllReviews(Pageable pageable) {
 
         //페이지네이션을 적용하여 Review 엔티티들을 조회
-        Page<Review> reviewPage = reviewRepository.findByReviewLocation(reviewLocation, pageable);
+        Page<Review> reviewPage = reviewRepository.findAll( pageable);
 
         //Review 엔티티들을 ReadReviewResponse DTO로 변환
         return reviewPage.map(review -> {
@@ -159,7 +159,6 @@ public class ReviewService {
         List<ReviewImageResponse> images = review.getReviewImages().stream()
                 .map(image -> new ReviewImageResponse(
                         image.getReviewImageId(), image.getImageName(), image.getImageUri()
-
                 )).collect(Collectors.toList());
 
         List<ReadReplyResponse> replies = review.getReviewReplies().stream()
