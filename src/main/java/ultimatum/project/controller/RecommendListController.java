@@ -9,11 +9,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import ultimatum.project.dto.food.RecommendListDTO;
+import org.springframework.web.bind.annotation.*;
+import ultimatum.project.dto.food.RecommendListFoodResponse;
+import ultimatum.project.dto.image.RecommendImageFoodResponse;
 import ultimatum.project.service.RecommendListService;
 
 import java.util.List;
@@ -26,7 +24,8 @@ import java.util.List;
 @Tag(name = "recommendList", description = "추천리스트")
 @Log4j2
 //@Controller //빈 스캐닝
-@CrossOrigin(origins = "http://localhost:8080")
+//@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/recommend")
 public class RecommendListController {
@@ -47,12 +46,19 @@ public class RecommendListController {
 //        return recommendList;
 //    }
 
+    //food 리스트 조회
     @GetMapping("list")
-    public ResponseEntity<Page<RecommendListDTO>> listReadAll(
-            @PageableDefault(size = 5, sort = "recommendFoodId",
+    public ResponseEntity<Page<RecommendListFoodResponse>> listReadAll(
+            @PageableDefault(size = 12, sort = "recommendFoodId",
                     direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<RecommendListDTO> responses = recommendListService.readAllList(pageable);
+        Page<RecommendListFoodResponse> responses = recommendListService.readFoodAllList(pageable);
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
+
+
+
+
+
+
 
 }

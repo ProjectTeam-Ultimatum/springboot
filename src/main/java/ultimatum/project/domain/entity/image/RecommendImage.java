@@ -21,14 +21,15 @@ public class RecommendImage {
 
     @ManyToOne
     @JoinColumn(name = "recommend_food_id")
-    private RecommendFood recommendFoodId;
+    private RecommendFood recommendFood;
 
     @ManyToOne
     @JoinColumn(name = "recommend_place_id")
-    private RecommendHotel recommendPlaceId;
+    private RecommendHotel recommendPlace;
 
     @ManyToOne
     @JoinColumn(name = "recommend_hotel_id")
-    private RecommendPlace recommendHotelId;
+    private RecommendPlace recommendHotel;
+
 
 }

@@ -1,7 +1,6 @@
-package ultimatum.project.dto.food;
+package ultimatum.project.dto.image;
 
 //import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,19 +9,16 @@ import ultimatum.project.domain.entity.food.RecommendFood;
 import ultimatum.project.domain.entity.hotel.RecommendHotel;
 import ultimatum.project.domain.entity.place.RecommendPlace;
 
-import java.sql.Time;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 //@JsonIgnoreProperties(ignoreUnknown = true)
-public class RecommendImageDTO {
+public class RecommendImageFoodRequest {
 
-    private Long recommendImageId;
     private String recommendImageUrl;
     private RecommendFood recommendFoodId;
-    private RecommendHotel recommendPlaceId;
-    private RecommendPlace recommendHotelId;
+    private RecommendPlace recommendPlaceId;
+    private RecommendHotel recommendHotelId;
 
 }

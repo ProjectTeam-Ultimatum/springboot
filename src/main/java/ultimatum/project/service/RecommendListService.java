@@ -12,9 +12,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ultimatum.project.domain.entity.food.RecommendFood;
-import ultimatum.project.dto.food.RecommendListDTO;
+import ultimatum.project.domain.entity.hotel.RecommendHotel;
+import ultimatum.project.dto.food.RecommendListFoodResponse;
+import ultimatum.project.dto.hotel.RecommendListHotelResponse;
+import ultimatum.project.dto.image.RecommendImageFoodResponse;
+import ultimatum.project.dto.image.RecommendImageHotelResponse;
 import ultimatum.project.repository.RecommendImageRepository;
-import ultimatum.project.repository.RecommendListRepository;
+import ultimatum.project.repository.RecommendListFoodRepository;
+import ultimatum.project.repository.RecommendListHotelRepository;
+import ultimatum.project.repository.RecommendListPlaceRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,9 +31,16 @@ import java.util.stream.Collectors;
 @Transactional
 public class RecommendListService {
 
-    private final RecommendListRepository recommendListRepository;
-    private final RecommendImageRepository recommendImageRepository;
+    private final RecommendListFoodRepository recommendListRepository;
+    private final RecommendListHotelRepository recommendListHotelRepository;
+    private final RecommendListPlaceRepository recommendListPlaceRepository;
+    private RecommendImageRepository recommendImageRepository;
     private final ModelMapper modelMapper;
+
+    @Autowired
+    public void RecommendImageService(RecommendImageRepository recommendImageRepository) {
+        this.recommendImageRepository = recommendImageRepository;
+    }
 
     // 메뉴 전체 조회
 //    public List<RecommendListDTO> findRecommendList() {
@@ -44,33 +57,81 @@ public class RecommendListService {
 //
 //    }
 
-    //메뉴 전체 조회
+    // food 전체 조회
     @Transactional(readOnly = true)
-    public Page<RecommendListDTO> readAllList(Pageable pageable) {
+    public Page<RecommendListFoodResponse> readFoodAllList(Pageable pageable) {
 
         try {
             //페이지네이션을 적용하여 recommendList 엔티티 조회
-            Page<RecommendFood> recommendList = recommendListRepository.findAll(pageable);
+            Page<RecommendFood> recommendListFood = recommendListRepository.findAll(pageable);
 
             //단일 이미지를 리스트에 넣음
-            return recommendList.map(list -> new RecommendListDTO(
-                    list.getRecommendFoodId(),
-                    list.getRecommendFoodTitle(),
-                    list.getRecommendFoodSubtitle(),
-                    list.getRecommendFoodAddress(),
-                    list.getRecommendFoodContent(),
-                    list.getRecommendFoodOpentime(),
-                    list.getRecommendFoodClosetime(),
-                    list.getRecommendFoodStar(),
-                    list.getRecommendFoodLatitude(),
-                    list.getRecommendFoodLongitude(),
-                    list.getRecommendFoodBudget(),
-                    list.getRecommendFoodCategory()
-            ));
+            return recommendListFood.map(list -> {
+                // 이미지 URL을 가져오는 로직 필요
+               List<RecommendImageFoodResponse> foodImages = list.getRecommendImages().stream()
+                       .map(foodimage -> new RecommendImageFoodResponse(
+                               foodimage.getRecommendImageUrl()
+                       )).collect(Collectors.toList());
+
+                // DTO 객체 생성
+                return new RecommendListFoodResponse(
+                        list.getRecommendFoodId(),
+                        list.getRecommendFoodTitle(),
+                        list.getRecommendFoodSubtitle(),
+                        list.getRecommendFoodAddress(),
+                        list.getRecommendFoodContent(),
+                        list.getRecommendFoodOpentime(),
+                        list.getRecommendFoodClosetime(),
+                        list.getRecommendFoodStar(),
+                        list.getRecommendFoodLatitude(),
+                        list.getRecommendFoodLongitude(),
+                        list.getRecommendFoodBudget(),
+                        list.getRecommendFoodCategory(),
+                        foodImages
+                );
+            });
             //예외 처리
         } catch (DataAccessException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 접근 중 오류가 발생했습니다.", e);
         }
     }
+
+    @Transactional(readOnly = true)
+    public Page<RecommendListHotelResponse> readHotelAllList(Pageable pageable) {
+
+        try {
+            //페이지네이션을 적용하여 recommendList 엔티티 조회
+            Page<RecommendHotel> recommendListHotel = recommendListHotelRepository.findAll(pageable);
+
+            //단일 이미지를 리스트에 넣음
+            return recommendListHotel.map(list -> {
+                // 이미지 URL을 가져오는 로직 필요
+                List<RecommendImageHotelResponse> hotelImages = list.getRecommendImages().stream()
+                        .map(hotelImage -> new RecommendImageHotelResponse(
+                                hotelImage.getRecommendImageUrl()
+                        )).collect(Collectors.toList());
+
+                // DTO 객체 생성
+                return new RecommendListHotelResponse(
+                        list.getRecommendHotelId(),
+                        list.getRecommendHotelTitle(),
+                        list.getRecommendHotelSubtitle(),
+                        list.getRecommendHotelAddress(),
+                        list.getRecommendHotelContent(),
+                        list.getRecommendHotellAtitude(),
+                        list.getRecommendHotelLongitude(),
+                        list.getRecommendHotelLike(),
+                        list.getRecommendHotelStar(),
+                        list.getRecommendHotelBudget(),
+                        list.getRecommendHotelCategory(),
+                        hotelImages
+                );
+            });
+            //예외 처리
+        } catch (DataAccessException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 접근 중 오류가 발생했습니다.", e);
+        }
+    }
+
 
 }

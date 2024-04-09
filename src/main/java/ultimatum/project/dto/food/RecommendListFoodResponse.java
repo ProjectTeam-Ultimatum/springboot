@@ -5,14 +5,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ultimatum.project.dto.image.RecommendImageFoodResponse;
+
 import java.sql.Time;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 //@JsonIgnoreProperties(ignoreUnknown = true)
-public class RecommendListDTO {
+public class RecommendListFoodResponse {
     private Long recommendFoodId;
     private String recommendFoodTitle;
     private String recommendFoodSubtitle;
@@ -25,4 +28,5 @@ public class RecommendListDTO {
     private String recommendFoodLongitude;
     private String recommendFoodBudget;
     private String recommendFoodCategory;
+    private List<RecommendImageFoodResponse> recommendImageUrl; //manytoone
 }
