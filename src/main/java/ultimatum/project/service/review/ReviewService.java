@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewImage;
+import ultimatum.project.domain.entity.review.ReviewReply;
 import ultimatum.project.dto.reviewDTO.*;
 import ultimatum.project.dto.reviewReplyDTO.ReadReplyResponse;
 import ultimatum.project.repository.ReviewImageRepository;
@@ -272,6 +273,9 @@ public class ReviewService {
             }catch (Exception e) {
                 log.error("Error deleting object {} from S3 bucket {}", imageUri, bucketName, e);
             }
+        }
+        for (ReviewReply reviewReply : review.getReviewReplies()){
+
         }
         reviewRepository.delete(review);
         return new DeleteReviewResponse(reviewId);

@@ -83,8 +83,12 @@ public class ReviewReplyService {
     }
 
 
-//    @Transactional
-//    public DeleteReplyResponse deleteReply (Long reply_id){
-//
-//    }
+    @Transactional
+    public DeleteReplyResponse deleteReply (Long reply_id){
+
+        ReviewReply reviewReply = reviewReplyRepository.findById(reply_id)
+                .orElseThrow(()-> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+        reviewReplyRepository.delete(reviewReply);
+        return new DeleteReplyResponse(reply_id);
+    }
 }
