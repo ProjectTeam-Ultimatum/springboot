@@ -72,7 +72,8 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
 //                // 사용자 ID를 기반으로 사용자 정보 조회
 //                String userName = userService.getUserNameById(chatMessageDto.getSenderId());
 //                // 사용자 이름을 사용하여 입장 메시지 구성
-//                String enterMessageContent = userName + " 님이 입장하셨습니다.";
+//          1      String enterMessage;'Content = userName + " 님이 입장하셨습니다.";
+
 //                // 메시지 전송 로직...
 //                break;
             case TALK:
