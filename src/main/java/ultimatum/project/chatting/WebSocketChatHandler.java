@@ -57,7 +57,8 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
                 handleEnter(session, chatRoomId);
                 // 사용자 아이디를 이용해 "XX 님이 입장하셨습니다." 메시지를 생성하고 전송합니다.
                 // 여기서는 메시지를 데이터베이스에 저장하지 않습니다.
-                String enterMessageContent = chatMessageDto.getSenderId() + " 님이 입장하셨습니다.";
+                // chatMessageDto.getSenderId()
+                String enterMessageContent =  " 님이 입장하셨습니다.";
                 ChatMessageDto enterMessage = new ChatMessageDto(
                         MessageType.ENTER,
                         chatRoomId,
