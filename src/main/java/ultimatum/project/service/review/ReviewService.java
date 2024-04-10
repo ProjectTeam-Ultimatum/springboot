@@ -13,7 +13,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewImage;
-import ultimatum.project.domain.entity.review.ReviewReply;
 import ultimatum.project.dto.reviewDTO.*;
 import ultimatum.project.dto.reviewReplyDTO.ReadReplyResponse;
 import ultimatum.project.repository.ReviewImageRepository;
@@ -134,6 +133,14 @@ public class ReviewService {
                     )).collect(Collectors.toList());
 
             long replyCount = replyRepository.countByReview(review);
+            List<ReadReplyResponse> replyResponses = review.getReviewReplies().stream()
+                    .map(reply -> new ReadReplyResponse(
+                            reply.getReviewReplyId(),
+                            reply.getReviewReplyer(),
+                            reply.getReviewReplyContent(),
+                            reply.getReg_date(),
+                            reply.getMod_date()
+                    )).toList();
 
             //단일 이미지를 리스트에 넣음
             return new ReadAllReviewResponse(
@@ -145,6 +152,7 @@ public class ReviewService {
                     review.getReviewLocation(),
                     imageResponses,
                     replyCount,
+                    replyResponses,
                     review.getReg_date(),
                     review.getMod_date()
             );
@@ -273,9 +281,6 @@ public class ReviewService {
             }catch (Exception e) {
                 log.error("Error deleting object {} from S3 bucket {}", imageUri, bucketName, e);
             }
-        }
-        for (ReviewReply reviewReply : review.getReviewReplies()){
-
         }
         reviewRepository.delete(review);
         return new DeleteReviewResponse(reviewId);

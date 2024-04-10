@@ -3,6 +3,7 @@ package ultimatum.project.dto.reviewDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import ultimatum.project.dto.reviewReplyDTO.ReadReplyResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +28,8 @@ public class ReadAllReviewResponse {
     private List<ReviewImageResponse> reviewImages;
 
     private long replyCount;
+
+    private List<ReadReplyResponse> replies;
 
     private LocalDateTime reg_date;
 
