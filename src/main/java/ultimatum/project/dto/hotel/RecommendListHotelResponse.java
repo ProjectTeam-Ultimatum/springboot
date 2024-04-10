@@ -30,4 +30,5 @@ public class RecommendListHotelResponse {
     private String recommendHotelBudget;
     private String recommendHotelCategory;
     private List<RecommendImageHotelResponse> recommendImageUrl; //manytoone
+
 }

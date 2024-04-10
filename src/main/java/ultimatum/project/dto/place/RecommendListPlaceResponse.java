@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ultimatum.project.domain.entity.image.RecommendImage;
 import ultimatum.project.dto.image.RecommendImageFoodResponse;
+import ultimatum.project.dto.image.RecommendImageHotelResponse;
 import ultimatum.project.dto.image.RecommendImagePlaceResponse;
 
 import java.util.ArrayList;

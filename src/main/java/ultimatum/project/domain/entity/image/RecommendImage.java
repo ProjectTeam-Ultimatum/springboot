@@ -24,12 +24,12 @@ public class RecommendImage {
     private RecommendFood recommendFood;
 
     @ManyToOne
-    @JoinColumn(name = "recommend_place_id")
-    private RecommendHotel recommendPlace;
+    @JoinColumn(name = "recommend_hotel_id")
+    private RecommendHotel recommendHotel;
 
     @ManyToOne
-    @JoinColumn(name = "recommend_hotel_id")
-    private RecommendPlace recommendHotel;
+    @JoinColumn(name = "recommend_place_id")
+    private RecommendPlace recommendPlace;
 
 
 }

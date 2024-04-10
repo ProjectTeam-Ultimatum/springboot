@@ -13,10 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ultimatum.project.domain.entity.food.RecommendFood;
 import ultimatum.project.domain.entity.hotel.RecommendHotel;
+import ultimatum.project.domain.entity.place.RecommendPlace;
 import ultimatum.project.dto.food.RecommendListFoodResponse;
 import ultimatum.project.dto.hotel.RecommendListHotelResponse;
 import ultimatum.project.dto.image.RecommendImageFoodResponse;
 import ultimatum.project.dto.image.RecommendImageHotelResponse;
+import ultimatum.project.dto.image.RecommendImagePlaceResponse;
+import ultimatum.project.dto.place.RecommendListPlaceResponse;
 import ultimatum.project.repository.RecommendImageRepository;
 import ultimatum.project.repository.RecommendListFoodRepository;
 import ultimatum.project.repository.RecommendListHotelRepository;
@@ -96,6 +99,7 @@ public class RecommendListService {
         }
     }
 
+    //hotel 전체조회
     @Transactional(readOnly = true)
     public Page<RecommendListHotelResponse> readHotelAllList(Pageable pageable) {
 
@@ -125,6 +129,44 @@ public class RecommendListService {
                         list.getRecommendHotelBudget(),
                         list.getRecommendHotelCategory(),
                         hotelImages
+                );
+            });
+            //예외 처리
+        } catch (DataAccessException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 접근 중 오류가 발생했습니다.", e);
+        }
+    }
+
+    //place 전체조회
+    @Transactional(readOnly = true)
+    public Page<RecommendListPlaceResponse> readPlaceAllList(Pageable pageable) {
+
+        try {
+            //페이지네이션을 적용하여 recommendList 엔티티 조회
+            Page<RecommendPlace> recommendListPlace = recommendListPlaceRepository.findAll(pageable);
+
+            //단일 이미지를 리스트에 넣음
+            return recommendListPlace.map(list -> {
+                // 이미지 URL을 가져오는 로직 필요
+                List<RecommendImagePlaceResponse> placeImages = list.getRecommendImages().stream()
+                        .map(placeImage -> new RecommendImagePlaceResponse(
+                                placeImage.getRecommendImageUrl()
+                        )).collect(Collectors.toList());
+
+                // DTO 객체 생성
+                return new RecommendListPlaceResponse(
+                        list.getRecommendPlaceId(),
+                        list.getRecommendPlaceTitle(),
+                        list.getRecommendPlaceSubtitle(),
+                        list.getRecommendPlaceAddress(),
+                        list.getRecommendPlaceContent(),
+                        list.getRecommendPlaceLatitude(),
+                        list.getRecommendPlaceLongitude(),
+                        list.getRecommendPlaceLike(),
+                        list.getRecommendPlaceStar(),
+                        list.getRecommendPlaceBudget(),
+                        list.getRecommendPlaceCategory(),
+                        placeImages
                 );
             });
             //예외 처리
