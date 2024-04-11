@@ -14,6 +14,6 @@ public class MapDTO {
     String addressCopy;
     Integer grade;
     String review;
-    Double lon;
-    Double lat;
+    Double lonCopy;
+    Double latCopy;
 }

@@ -21,14 +21,16 @@ public class MapEntity {
     private String review;
     private String addressCopy;
     private Integer grade;
-    private double lon;
-    private double lat;
+    private double lonCopy;
+    private double latCopy;
 
-    public void update(Long id, String title, String addressCopy, Integer grade, String review) {
+    public void update(Long id, String title, String addressCopy, Integer grade, String review, double lonCopy, double latCopy) {
         this.id = id;
         this.title = title;
         this.addressCopy = addressCopy;
         this.grade = grade;
         this.review = review;
+        this.lonCopy = lonCopy;
+        this.latCopy = latCopy;
     }
 }

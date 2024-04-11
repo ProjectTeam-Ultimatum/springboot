@@ -24,6 +24,8 @@ public class MapController {
         log.info("😎 review : {}", mapDTO.review);
         log.info("😎 title : {}", mapDTO.title);
         log.info("😎 grade : {}", mapDTO.grade);
+        log.info("😎 lon : {}", mapDTO.lonCopy);
+        log.info("😎 lat : {}", mapDTO.latCopy);
         mapDTO.setId(null);
         MapDTO saveMap = mapService.savemap(mapDTO);
         return ResponseEntity.ok(saveMap);
@@ -48,5 +50,10 @@ public class MapController {
         MapDTO deleteMap = mapService.deletemap(id);
 
         return new ResponseEntity<>(deleteMap, HttpStatus.OK);
+    }
+
+    @GetMapping("/listMap")
+    public ResponseEntity<?> listMap() {
+        return ResponseEntity.ok().body(mapService.listmap());
     }
 }
