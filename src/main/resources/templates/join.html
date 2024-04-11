@@ -4,41 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Sign Up Form by Colorlib</title>
+    <title>Sign Up Form</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- Font Icon -->
-    <link rel="stylesheet" href="fonts/material-icon/css/material-design-iconic-font.min.css">
-
     <!-- Main css -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <div class="main">
-
     <!-- Sign up form -->
     <section class="signup">
         <div class="container">
             <div class="signup-content">
-                <div class="signup-image">
-                    <figure><img src="images/signup-image.jpg" alt="sing up image"></figure>
-                    <a href="/login_page" class="signup-image-link">이미 회원이신가요?</a>
-                </div>
                 <div class="signup-form">
                     <h2 class="form-title">회원가입</h2>
-                    <form id="mainForm" method="POST" class="register-form">
+                    <form id="mainForm" class="register-form">
                         <div class="form-group">
-                            <label for="username"><i class="zmdi zmdi-account material-icons-name"></i></label>
-                            <input id="username" type="text" name="username" placeholder="Id"/>
+                            <label for="username">이름</label>
+                            <input id="username" type="text" name="username" placeholder="이름" required/>
                         </div>
                         <div class="form-group">
-                            <label for="email"><i class="zmdi zmdi-email"></i></label>
-                            <input type="email" name="email" id="email" placeholder="Email"/>
+                            <label for="email">이메일</label>
+                            <input type="email" name="email" id="email" placeholder="이메일" required/>
                         </div>
                         <div class="form-group">
-                            <label for="password"><i class="zmdi zmdi-lock"></i></label>
-                            <input type="password" name="password" id="password" placeholder="Password"/>
+                            <label for="password">비밀번호</label>
+                            <input type="password" name="password" id="password" placeholder="비밀번호" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="age">나이</label>
+                            <input type="number" name="age" id="age" placeholder="나이" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">성별</label>
+                            <select name="gender" id="gender" required>
+                                <option value="male">남성</option>
+                                <option value="female">여성</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">주소</label>
+                            <input type="text" name="address" id="address" placeholder="주소" required/>
                         </div>
 
                         <div class="form-group form-button">
@@ -52,31 +59,34 @@
 </div>
 
 <!-- JS -->
-<script src="vendor/jquery/jquery.min.js"></script>
 <script src="js/main.js"></script>
-</body>
 <script>
     function join() {
         var data = {
             memberName: $('#username').val(),
             memberPassword: $('#password').val(),
-            memberEmail: $('#email').val()
+            memberEmail: $('#email').val(),
+            memberAge: $('#age').val(),
+            memberGender: $('#gender').val(),
+            memberAddress: $('#address').val()
         };
 
         $.ajax({
             type: 'POST',
             url: '/api/v1/join',
             dataType: 'text',
-            contentType:'application/json; charset=utf-8',
+            contentType: 'application/json; charset=utf-8',
             data: JSON.stringify(data),
-        }).done(function(res) {
-            alert("회원 가입 성공");
-            location.href = "/login_page";
-        }).fail(function(error) {
-            alert("이미 존재하는 회원입니다.");
-            $("#username").focus();
+            success: function(res) {
+                alert("회원 가입 성공");
+                location.href = "/login_page";
+            },
+            error: function(error) {
+                alert("회원 가입 실패: " + error.responseText);
+                $("#username").focus();
+            }
         });
     }
-
 </script>
+</body>
 </html>

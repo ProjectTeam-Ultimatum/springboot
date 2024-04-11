@@ -52,9 +52,15 @@
     $(document).ready(function() {
         $('#login').on('click', function() {
             var data = {
-                memberName: $('#username').val(),
+                memberEmail: $('#username').val(),
                 memberPassword: $('#password').val()
             };
+
+            /**
+             * 로그인 요청을 하는 ajax입니다.
+             * /login이 컨트롤러에 매핑되는게 없는데 작동하는 이유는 스프링 Security가 해당 URI를 로그인 URI로 쓰고 있기 때문입니다.
+             * /login에는 username과 password 값을 담아서 요청 합니다.
+             */
 
             $.ajax({
                 type: 'POST',

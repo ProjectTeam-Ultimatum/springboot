@@ -41,30 +41,38 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		}
 
 		// 유저네임패스워드 토큰 생성
-		UsernamePasswordAuthenticationToken authenticationToken = 
+		UsernamePasswordAuthenticationToken authenticationToken =
 				new UsernamePasswordAuthenticationToken(
-						loginRequestDto.getMemberName(),
+						loginRequestDto.getMemberEmail(),
 						loginRequestDto.getMemberPassword());
 
+
+		//formLogin 방식에서는 설정에서 loginProcessingUrl("/login_proc")를 호출하면 자동으로 loadUserByUsername가 실행되면서 로그인이 되었습니다.
+		//JWT 방식에선 loadUserByUsername를 수동으로 호출해야 하기 때문에 아래와 같이 authenticate 메소드를 실행합니다.
+		//authenticate 메소드는 위의 그림에서 3번인 AuthenticationManager가 실행합니다.
 		Authentication authentication = 
 				authenticationManager.authenticate(authenticationToken);
 		
 		PrincipalDetails principalDetailis = (PrincipalDetails) authentication.getPrincipal();
-		System.out.println("Authentication : "+principalDetailis.getUser().getMemberName());
+		System.out.println("Authentication : "+principalDetailis.getUser().getMemberEmail());
 		return authentication;
 	}
 
 	// JWT Token 생성해서 response에 담아주기
+	// Authentication 객체가 성공적으로 만들어 졌다면 아래의 Success 메소드가 수행되고
+	// 응답 값에 JWT 토큰을 만들어주고 사용자에게 전달해줍니다.
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 											Authentication authResult) throws IOException, ServletException {
 		PrincipalDetails principalDetailis = (PrincipalDetails) authResult.getPrincipal();
 		
 		String jwtToken = JWT.create()
-				.withSubject(principalDetailis.getUsername())
+//				.withSubject(principalDetailis.getUsername())
 				.withExpiresAt(new Date(System.currentTimeMillis()+ JwtProperties.EXPIRATION_TIME))
 				.withClaim("id", principalDetailis.getUser().getMemberId())
 				.withClaim("username", principalDetailis.getUser().getMemberName())
+				.withClaim("userid", principalDetailis.getUser().getMemberEmail())
+				.withClaim("gender", principalDetailis.getUser().getMemberGender())
 				.sign(Algorithm.HMAC512(JwtProperties.SECRET));
 		
 		response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX+jwtToken);

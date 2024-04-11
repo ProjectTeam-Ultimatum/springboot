@@ -13,7 +13,7 @@ public enum ErrorCode {
     SUCCESS(200, "OK", "요청에 성공하였습니다."),
 
     /* 400 BAD_REQUEST : 잘못된 요청 */
-    INVALID_INPUT_VALUE(400, "BAD_REQUEST", "입력값이 올바르지 않습니다."),
+    INVALID_INPUT_VALUE(400, "BAD_REQUEST", "입력값이 올바르지 않거나 입력되지 않았습니다."),
     BAD_REQUEST(400, "BAD_REQUEST","잘못된 요청입니다."),
 
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */

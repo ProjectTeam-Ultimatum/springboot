@@ -1,13 +1,16 @@
 package ultimatum.project.controller;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import ultimatum.project.domain.dto.MemberRequestDto;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.global.config.auth.PrincipalDetails;
 import ultimatum.project.repository.MemberRepository;
+import ultimatum.project.service.MemberService;
 
 import java.util.List;
 
@@ -18,7 +21,8 @@ public class RestApiController {
 
 
     private final MemberRepository memberRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    private final MemberService memberService;
 
     // 모든 사람이 접근 가능
     @GetMapping("/home")
@@ -49,23 +53,10 @@ public class RestApiController {
     }
 
     @PostMapping("/join")
-    public String join(@RequestBody Member member) {
-        if (member.getMemberName() == null || member.getMemberPassword() == null || member.getMemberEmail() == null) {
-            throw new IllegalArgumentException("회원 정보를 모두 입력하세요.");
-        }
-
-        if (member.getMemberPassword().isEmpty()) {
-            throw new IllegalArgumentException("비밀번호를 입력하세요.");
-        }
-
-        member.setMemberPassword(bCryptPasswordEncoder.encode(member.getMemberPassword()));
-        member.setMemberRole("ROLE_USER");
-        memberRepository.save(member);
-        return "회원가입완료";
+    public String join(@RequestBody @Valid MemberRequestDto memberRequestDto) {
+        // MemberService의 createMember 메서드 호출
+        String resultMessage = memberService.createMember(memberRequestDto);
+        return resultMessage; // 회원가입 결과 메시지 반환
     }
 
-
-
-
 }
-

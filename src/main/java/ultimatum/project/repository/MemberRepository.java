@@ -5,6 +5,6 @@ import ultimatum.project.domain.entity.member.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    Member findByMemberName(String memberName);
+    Member findByMemberEmail(String memberEmail);
 
 }
