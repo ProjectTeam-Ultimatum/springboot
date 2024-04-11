@@ -41,14 +41,14 @@ public class ChatService {
     // 모든 채팅방 조회
     public List<ChatRoomDto> getChatRooms() {
         return chatRoomRepository.findAll().stream()
-                .map(chatRoom -> new ChatRoomDto(chatRoom.getChatRoomId(), chatRoom.getChatRoomName(), chatRoom.getTravelStyleTags()))
+                .map(chatRoom -> new ChatRoomDto(chatRoom.getChatRoomId(), chatRoom.getChatRoomName(), chatRoom.getChatRoomContent(),chatRoom.getTravelStyleTags()))
                 .collect(Collectors.toList());
     }
 
     // 특정 채팅방에 입장
     public ChatRoomDto enterChatRoom(Long roomId) {
         return chatRoomRepository.findById(roomId)
-                .map(chatRoom -> new ChatRoomDto(chatRoom.getChatRoomId(), chatRoom.getChatRoomName(), chatRoom.getTravelStyleTags()))
+                .map(chatRoom -> new ChatRoomDto(chatRoom.getChatRoomId(), chatRoom.getChatRoomName(), chatRoom.getChatRoomContent(), chatRoom.getTravelStyleTags()))
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다!"));
     }
 
@@ -70,11 +70,12 @@ public class ChatService {
     public ChatRoomDto createChatRoom(ChatRoomDto chatRoomDto) {
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setChatRoomName(chatRoomDto.getChatRoomName());
+        chatRoom.setChatRoomContent(chatRoomDto.getChatRoomContent()); // 채팅방 내용 설정을 추가해주세요
         chatRoom.setTravelStyleTags(chatRoomDto.getTravelStyleTags()); // 여행 스타일 태그 설정
 
         ChatRoom savedRoom = chatRoomRepository.save(chatRoom);
 
-        return new ChatRoomDto(savedRoom.getChatRoomId(), savedRoom.getChatRoomName(), savedRoom.getTravelStyleTags());
+        return new ChatRoomDto(savedRoom.getChatRoomId(), savedRoom.getChatRoomName(), savedRoom.getChatRoomContent(), savedRoom.getTravelStyleTags());
     }
 
     //채팅방 삭제
