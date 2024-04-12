@@ -25,5 +25,6 @@ spring:
     import: classpath:aws.yml
   servlet:
     multipart:
-      max-request-size: 50MB
-      max-file-size: 50MB
+      max-request-size: 100MB
+      max-file-size: 100MB
+

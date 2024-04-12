@@ -25,6 +25,8 @@ public class Review {
 
     private String reviewSubtitle;
 
+    //콘텐츠의 타입이 길기 때문에 크기를 16MB 정도로 조정
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String reviewContent;
 
     private Long reviewLike;

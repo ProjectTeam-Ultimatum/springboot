@@ -18,8 +18,4 @@ public class UpdateReviewResponse {
     private String reviewContent;
     private String reviewLocation;
     private List<ReviewImageResponse> reviewImages; //이미지 메타데이터 정보리스트
-
-
-
-
 }

@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.dto.reviewDTO.*;
 import ultimatum.project.service.review.ReviewService;
 
+import java.io.IOException;
 import java.util.List;
 
 @Log4j2
@@ -45,7 +46,8 @@ public class ReviewController {
     @GetMapping
     @Operation(summary = "게시글 전체 보기")
     public ResponseEntity<Page<ReadAllReviewResponse>> getAllReviews(
-            @PageableDefault (size = 6, sort = "reviewId", direction = Sort.Direction.DESC)Pageable pageable) {
+            @PageableDefault (size = 6, sort = "reviewId", direction = Sort.Direction.DESC)Pageable pageable
+    ) {
         Page<ReadAllReviewResponse> reviews = reviewService.getAllReviews( pageable);
         return ResponseEntity.ok(reviews);
     }
@@ -66,12 +68,14 @@ public class ReviewController {
                                                              @RequestParam("reviewSubtitle") String reviewSubtitle,
                                                              @RequestParam("reviewContent") String reviewContent,
                                                              @RequestParam("reviewLocation") String reviewLocation,
-                                                             @RequestParam("images") List<MultipartFile> images) {
+                                                             @RequestParam("images") List<MultipartFile> images,
+                                                             @RequestParam(value = "deleteImages", required = false) List<Long> deleteImageIds) throws IOException {
+
         UpdateReviewRequest request = new UpdateReviewRequest(
                 reviewTitle, reviewSubtitle, reviewContent, reviewLocation, null );
                                                                                     //이미지 관련 정보는 여기서 처리하지 않음.
 
-        UpdateReviewResponse response = reviewService.updateReview(review_id, request, images);
+        UpdateReviewResponse response = reviewService.updateReview(review_id, request, images, deleteImageIds);
 
         return ResponseEntity.ok(response);
 
@@ -85,12 +89,12 @@ public class ReviewController {
         return ResponseEntity.ok(new DeleteReviewResponse(review_id));
     }
 
-    @PostMapping("/{reviewId}")
+    @PostMapping("/{review_id}")
     @Operation(summary = "좋아요 수정")
-    public ResponseEntity<ReviewLikeResponse> updateLike(@PathVariable Long reviewId, @RequestBody ReviewLikeRequest request) {
+    public ResponseEntity<ReviewLikeResponse> updateLike(@PathVariable Long review_id, @RequestBody ReviewLikeRequest request) {
 
             // 리뷰 서비스에서 좋아요 수를 업데이트하는 메소드를 호출합니다.
-            ReviewLikeResponse response = reviewService.updateReviewLike(reviewId,request);
+            ReviewLikeResponse response = reviewService.updateReviewLike(review_id,request);
             return ResponseEntity.ok(response);
     }
 }
