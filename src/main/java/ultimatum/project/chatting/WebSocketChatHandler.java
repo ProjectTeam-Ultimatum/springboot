@@ -1,19 +1,30 @@
 package ultimatum.project.chatting;
 
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.util.IOUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -31,6 +42,7 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
 
     // 사용자가 현재 어떤 채팅방에 있는지 관리하는 Map
     private final Map<WebSocketSession, Long> sessionChatRoomMap = new HashMap<>();
+
 
     // 소켓 연결 확인
     @Override
@@ -55,39 +67,57 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
         switch (chatMessageDto.getMessageType()) {
             case ENTER:
                 handleEnter(session, chatRoomId);
-                // 사용자 아이디를 이용해 "XX 님이 입장하셨습니다." 메시지를 생성하고 전송합니다.
-                // 여기서는 메시지를 데이터베이스에 저장하지 않습니다.
-                // chatMessageDto.getSenderId()
                 String enterMessageContent =  " 님이 입장하셨습니다.";
-                ChatMessageDto enterMessage = new ChatMessageDto(
-                        MessageType.ENTER,
-                        chatRoomId,
-                        chatMessageDto.getSenderId(),
-                        enterMessageContent
-                );
+                ChatMessageDto enterMessage = ChatMessageDto.builder()
+                        .messageType(MessageType.ENTER)
+                        .chatRoomId(chatRoomId)
+                        .senderId(chatMessageDto.getSenderId())
+                        .message(enterMessageContent)
+                        .build();
                 sendMessageToChatRoom(enterMessage, chatRoomSessionMap.get(chatRoomId));
                 break;
-//           나중에 로그인 구현됐을때 바꿔야할 코드.
-//            case ENTER:
-//                handleEnter(session, chatRoomId);
-//                // 사용자 ID를 기반으로 사용자 정보 조회
-//                String userName = userService.getUserNameById(chatMessageDto.getSenderId());
-//                // 사용자 이름을 사용하여 입장 메시지 구성
-//          1      String enterMessage;'Content = userName + " 님이 입장하셨습니다.";
-
-//                // 메시지 전송 로직...
-//                break;
             case TALK:
                 // 일반 채팅 메시지인 경우, 데이터베이스에 메시지 저장
                 chatService.saveMessage(chatMessageDto);
                 sendMessageToChatRoom(chatMessageDto, chatRoomSessionMap.get(chatRoomId));
                 break;
+            case IMAGE:
+                // 이미지 메시지인 경우, 이미지 URL을 포함한 메시지 전송
+                if (chatMessageDto.getImageUrl() != null) {
+                    sendMessageToChatRoom(chatMessageDto, chatRoomSessionMap.get(chatRoomId));
+                }
+                break;
             case LEAVE:
                 handleLeave(session, chatRoomId);
                 break;
-            // 다른 메시지 타입 처리...
+            default:
+                log.warn("Unhandled message type: " + chatMessageDto.getMessageType());
+                break;
         }
     }
+
+    public void broadcastImageLink(String imageUrl, Long chatRoomId) {
+        ChatMessageDto messageDto = new ChatMessageDto();
+        messageDto.setImageUrl(imageUrl);
+        messageDto.setMessageType(MessageType.IMAGE);
+        Set<WebSocketSession> sessions = chatRoomSessionMap.get(chatRoomId);
+
+        if (sessions != null) {
+            sessions.forEach(session -> {
+                try {
+                    String messageJson = mapper.writeValueAsString(messageDto);
+                    session.sendMessage(new TextMessage(messageJson));
+                } catch (JsonProcessingException e) {
+                    log.error("Failed to serialize chat message", e);
+                } catch (IOException e) {
+                    log.error("Failed to send message", e);
+                }
+            });
+        } else {
+            log.warn("No sessions found for chat room ID: {}", chatRoomId);
+        }
+    }
+
 
     // 소켓 종료 확인
     @Override

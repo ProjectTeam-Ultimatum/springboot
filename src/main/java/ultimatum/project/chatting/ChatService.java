@@ -91,7 +91,7 @@ public class ChatService {
     public void leaveChatRoom(ChatMessageDto chatMessageDto) {
         // 채팅방 ID와 사용자 ID를 기반으로 해당 채팅방에서 사용자 세션 제거
         Long chatRoomId = chatMessageDto.getChatRoomId();
-        Long senderId = chatMessageDto.getSenderId();
+        String senderId = chatMessageDto.getSenderId();
 
         // 사용자의 웹소켓 세션 찾기 (이 부분은 웹소켓 세션 관리 방식에 따라 달라질 수 있습니다)
         // 예제에서는 간단히 모든 세션을 순회하며 사용자 ID가 일치하는 세션을 찾아낸 후 해당 세션을 제거합니다
@@ -150,7 +150,8 @@ public class ChatService {
                         message.getMessageType(),
                         message.getChatRoom().getChatRoomId(),
                         message.getSenderId(),
-                        message.getMessage()))
+                        message.getMessage(),
+                        message.getImageUrl()))
                 .collect(Collectors.toList());
     }
 

@@ -40,6 +40,12 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
+    // websocket aws
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+    // file upload
+    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
+    compileOnly 'commons-io:commons-io:2.11.0'
 
 }
 
