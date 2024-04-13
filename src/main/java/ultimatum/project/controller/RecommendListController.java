@@ -48,7 +48,7 @@ public class RecommendListController {
 //        return recommendList;
 //    }
 
-    @Tag(name = "recommendList", description = "맛집리스트")
+    @Tag(name = "recommendList", description = "맛집리스트2")
     //food 조회
     @GetMapping("listfood")
     public ResponseEntity<Page<RecommendListFoodResponse>> listFoodAll(
