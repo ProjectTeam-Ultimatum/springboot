@@ -40,6 +40,7 @@ public class ReviewService {
     private final ReviewImageRepository reviewImageRepository;
     private final ReviewReplyRepository replyRepository;
     private final AmazonS3 amazonS3;
+    private final ReviewImageService imageService;
     private final String bucketName = "ultimatum0807"; // S3 버킷 이름 설정
 
 
@@ -68,7 +69,7 @@ public class ReviewService {
                 //s3에 파일 업로드
                 // 파일의 저장위치와 파일 이름
                 String s3Key = "uploads/" + originalFileName;
-                                        // objectMetadata() : 업로드할 파일의 메타데이터를 설정하는데 사용(파일의 크기를 설정)
+                // objectMetadata() : 업로드할 파일의 메타데이터를 설정하는데 사용(파일의 크기를 설정)
                 ObjectMetadata metadata = new ObjectMetadata();
                 metadata.setContentLength(file.getSize());
                 // amazonS3.putObject : 파일스트림과 메타데이터를 함께 S3에 업로드
@@ -124,7 +125,7 @@ public class ReviewService {
     public Page<ReadAllReviewResponse> getAllReviews(Pageable pageable) {
 
         //페이지네이션을 적용하여 Review 엔티티들을 조회
-        Page<Review> reviewPage = reviewRepository.findAll( pageable);
+        Page<Review> reviewPage = reviewRepository.findAll(pageable);
 
         //Review 엔티티들을 ReadReviewResponse DTO로 변환
         return reviewPage.map(review -> {
@@ -174,7 +175,7 @@ public class ReviewService {
 
         List<ReadReplyResponse> replies = review.getReviewReplies().stream()
                 .map(reply -> new ReadReplyResponse(
-                        reply.getReviewReplyId(), reply.getReviewReplyer(), reply.getReviewReplyContent(), reply.getReg_date(),reply.getMod_date()
+                        reply.getReviewReplyId(), reply.getReviewReplyer(), reply.getReviewReplyContent(), reply.getReg_date(), reply.getMod_date()
                 )).collect(Collectors.toList());
 
         return new ReadReviewByIdResponse(
@@ -193,45 +194,19 @@ public class ReviewService {
     }
 
     @Transactional
-    public UpdateReviewResponse updateReview(Long reviewId, UpdateReviewRequest request, List<MultipartFile> newImages,
-                                             List<Long> deletedImageIds) throws IOException {
+    public UpdateReviewResponse updateReview(Long reviewId, UpdateReviewRequest request,
+                                             List<MultipartFile> newImages,
+                                             List<String> deleteImages
+    ) throws CustomException, IOException {
 
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         review.update(request.getReviewTitle(), request.getReviewSubtitle(), request.getReviewContent(), request.getReviewLocation());
-        // 삭제 요청된 이미지 처리
-        if (deletedImageIds != null && !deletedImageIds.isEmpty()) {
-            List<ReviewImage> imagesToDelete = reviewImageRepository.findAllById(deletedImageIds);
-            for (ReviewImage imageToDelete : imagesToDelete) {
-                try {
-                    String key = extractS3Key(imageToDelete.getImageUri());
-                    amazonS3.deleteObject(bucketName, key);
-                    log.info("Deleted image from S3: {} with key: {}", imageToDelete.getImageName(), key);
-                } catch (Exception e) {
-                    log.error("Error deleting object {} from S3 bucket {}", imageToDelete.getImageUri(), bucketName, e);
-                    throw new RuntimeException("S3 deletion error", e);
-                }
-            }
-            reviewImageRepository.deleteAll(imagesToDelete);
-        }
 
-       // 새 이미지들 저장
-        List<ReviewImage> savedImages = new ArrayList<>();
-        for (MultipartFile file : newImages) {
-            String updateFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-            String s3Key = "uploads/" + updateFileName;
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentLength(file.getSize());
-            amazonS3.putObject(bucketName, s3Key, file.getInputStream(), metadata);
 
-            ReviewImage newImage = new ReviewImage();
-            newImage.setReview(review);
-            newImage.setImageName(updateFileName);
-            newImage.setImageUri(amazonS3.getUrl(bucketName, s3Key).toString());
-            savedImages.add(newImage);
-        }
-        review.getReviewImages().addAll(savedImages);
+        imageService.updateImages(reviewId, newImages, deleteImages);
+
 
         reviewRepository.save(review);
         List<ReviewImageResponse> imageResponses = review.getReviewImages().stream()
@@ -244,21 +219,16 @@ public class ReviewService {
                 review.getReviewSubtitle(),
                 review.getReviewContent(),
                 review.getReviewLocation(),
-                imageResponses
-        );
+                imageResponses);
     }
 
-    private String extractS3Key(String imageUri) throws MalformedURLException {
-        URL url = new URL(imageUri);
-        return url.getPath().substring(1);
-    }
     @Transactional
     public DeleteReviewResponse deleteReview(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자 게시글 ID를 찾을 수 없습니다." + reviewId));
 
         //연관된 모든 리뷰 이미지들에 대하여
-        for (ReviewImage reviewImage : review.getReviewImages()){
+        for (ReviewImage reviewImage : review.getReviewImages()) {
             // imageUri S3 오브젝트 키 추출
             String imageUri = reviewImage.getImageUri();
             try {
@@ -266,7 +236,7 @@ public class ReviewService {
                 // 버킷 이름을 제외한 오브젝트 키 추출
                 String key = url.getPath().substring(1);
                 amazonS3.deleteObject(bucketName, URLDecoder.decode(key, StandardCharsets.UTF_8));
-            }catch (Exception e) {
+            } catch (Exception e) {
                 log.error("Error deleting object {} from S3 bucket {}", imageUri, bucketName, e);
             }
         }
@@ -276,7 +246,7 @@ public class ReviewService {
 
 
     @Transactional
-    public ReviewLikeResponse updateReviewLike (Long reviewId, ReviewLikeRequest request){
+    public ReviewLikeResponse updateReviewLike(Long reviewId, ReviewLikeRequest request) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰 아이디를 못찾음!"));
         review.setReviewLike(request.getReviewLike());

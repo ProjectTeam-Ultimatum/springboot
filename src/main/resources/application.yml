@@ -18,6 +18,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL57Dialect
         show_sql: true
+    show-sql: true
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html

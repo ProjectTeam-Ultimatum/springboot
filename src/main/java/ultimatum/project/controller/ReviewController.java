@@ -13,10 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.dto.reviewDTO.*;
+import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.service.review.ReviewService;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @Tag(name = "reviews", description = "사용자 게시판 api")
@@ -68,14 +70,14 @@ public class ReviewController {
                                                              @RequestParam("reviewSubtitle") String reviewSubtitle,
                                                              @RequestParam("reviewContent") String reviewContent,
                                                              @RequestParam("reviewLocation") String reviewLocation,
-                                                             @RequestParam("images") List<MultipartFile> images,
-                                                             @RequestParam(value = "deleteImages", required = false) List<Long> deleteImageIds) throws IOException {
+                                                             @RequestParam(value = "newImages", required = false) List<MultipartFile> newImages,
+                                                             @RequestParam(value = "deleteImages", required = false) List<String> deleteImages) throws CustomException, IOException {
 
         UpdateReviewRequest request = new UpdateReviewRequest(
-                reviewTitle, reviewSubtitle, reviewContent, reviewLocation, null );
+                reviewTitle, reviewSubtitle, reviewContent, reviewLocation, null);
                                                                                     //이미지 관련 정보는 여기서 처리하지 않음.
 
-        UpdateReviewResponse response = reviewService.updateReview(review_id, request, images, deleteImageIds);
+        UpdateReviewResponse response = reviewService.updateReview(review_id, request, newImages, deleteImages);
 
         return ResponseEntity.ok(response);
 
