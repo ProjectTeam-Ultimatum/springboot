@@ -28,5 +28,6 @@ public class RecommendListFoodResponse {
     private String recommendFoodLongitude;
     private String recommendFoodBudget;
     private String recommendFoodCategory;
+    //private List<RecommendImageFoodResponse> recommendImageResponses;
     private List<RecommendImageFoodResponse> recommendImageUrl; //manytoone
 }
