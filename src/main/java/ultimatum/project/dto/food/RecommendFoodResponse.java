@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 //@JsonIgnoreProperties(ignoreUnknown = true)
-public class RecommendListFoodResponse {
+public class RecommendFoodResponse {
     private Long recommendFoodId;
     private String recommendFoodTitle;
     private String recommendFoodSubtitle;

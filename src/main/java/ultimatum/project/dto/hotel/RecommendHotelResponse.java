@@ -1,22 +1,18 @@
 package ultimatum.project.dto.hotel;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ultimatum.project.domain.entity.image.RecommendImage;
 import ultimatum.project.dto.image.RecommendImageHotelResponse;
-import ultimatum.project.dto.image.RecommendImagePlaceResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RecommendListHotelResponse {
+public class RecommendHotelResponse {
 
     private Long recommendHotelId;
     private String recommendHotelTitle;

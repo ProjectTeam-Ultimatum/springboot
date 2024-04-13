@@ -14,16 +14,16 @@ import org.springframework.web.server.ResponseStatusException;
 import ultimatum.project.domain.entity.food.RecommendFood;
 import ultimatum.project.domain.entity.hotel.RecommendHotel;
 import ultimatum.project.domain.entity.place.RecommendPlace;
-import ultimatum.project.dto.food.RecommendListFoodResponse;
-import ultimatum.project.dto.hotel.RecommendListHotelResponse;
+import ultimatum.project.dto.food.RecommendFoodResponse;
+import ultimatum.project.dto.hotel.RecommendHotelResponse;
 import ultimatum.project.dto.image.RecommendImageFoodResponse;
 import ultimatum.project.dto.image.RecommendImageHotelResponse;
 import ultimatum.project.dto.image.RecommendImagePlaceResponse;
-import ultimatum.project.dto.place.RecommendListPlaceResponse;
+import ultimatum.project.dto.place.RecommendPlaceResponse;
 import ultimatum.project.repository.RecommendImageRepository;
-import ultimatum.project.repository.RecommendListFoodRepository;
-import ultimatum.project.repository.RecommendListHotelRepository;
-import ultimatum.project.repository.RecommendListPlaceRepository;
+import ultimatum.project.repository.RecommendFoodRepository;
+import ultimatum.project.repository.RecommendHotelRepository;
+import ultimatum.project.repository.RecommendPlaceRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,11 +32,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor //공통
 @Transactional
-public class RecommendListService {
+public class RecommendService {
 
-    private final RecommendListFoodRepository recommendListRepository;
-    private final RecommendListHotelRepository recommendListHotelRepository;
-    private final RecommendListPlaceRepository recommendListPlaceRepository;
+    private final RecommendFoodRepository recommendListRepository;
+    private final RecommendHotelRepository recommendHotelRepository;
+    private final RecommendPlaceRepository recommendPlaceRepository;
     private RecommendImageRepository recommendImageRepository;
     private final ModelMapper modelMapper;
 
@@ -45,24 +45,10 @@ public class RecommendListService {
         this.recommendImageRepository = recommendImageRepository;
     }
 
-    // 메뉴 전체 조회
-//    public List<RecommendListDTO> findRecommendList() {
-//
-//        List<RecommendFood> recommendList = recommendListRepository.findAll(Sort.by("recommendFoodId").descending());
-//
-//        // 로그 출력
-//        log.info("전체 추천 음식 조회 결과: {}", recommendList);
-//
-//        //Review 엔티티들을 ReadReviewResponse DTO로 변환
-//        return recommendList.stream()
-//                .map(recommend -> modelMapper.map(recommend, RecommendListDTO.class))
-//                .collect(Collectors.toList());
-//
-//    }
 
     // food 전체 조회
     @Transactional(readOnly = true)
-    public Page<RecommendListFoodResponse> readFoodAllList(Pageable pageable) {
+    public Page<RecommendFoodResponse> readFoodAllList(Pageable pageable) {
 
         try {
             //페이지네이션을 적용하여 recommendList 엔티티 조회
@@ -77,7 +63,7 @@ public class RecommendListService {
                        )).collect(Collectors.toList());
 
                 // DTO 객체 생성
-                return new RecommendListFoodResponse(
+                return new RecommendFoodResponse(
                         list.getRecommendFoodId(),
                         list.getRecommendFoodTitle(),
                         list.getRecommendFoodSubtitle(),
@@ -101,11 +87,11 @@ public class RecommendListService {
 
     //hotel 전체조회
     @Transactional(readOnly = true)
-    public Page<RecommendListHotelResponse> readHotelAllList(Pageable pageable) {
+    public Page<RecommendHotelResponse> readHotelAllList(Pageable pageable) {
 
         try {
             //페이지네이션을 적용하여 recommendList 엔티티 조회
-            Page<RecommendHotel> recommendListHotel = recommendListHotelRepository.findAll(pageable);
+            Page<RecommendHotel> recommendListHotel = recommendHotelRepository.findAll(pageable);
 
             //단일 이미지를 리스트에 넣음
             return recommendListHotel.map(list -> {
@@ -116,7 +102,7 @@ public class RecommendListService {
                         )).collect(Collectors.toList());
 
                 // DTO 객체 생성
-                return new RecommendListHotelResponse(
+                return new RecommendHotelResponse(
                         list.getRecommendHotelId(),
                         list.getRecommendHotelTitle(),
                         list.getRecommendHotelSubtitle(),
@@ -139,11 +125,11 @@ public class RecommendListService {
 
     //place 전체조회
     @Transactional(readOnly = true)
-    public Page<RecommendListPlaceResponse> readPlaceAllList(Pageable pageable) {
+    public Page<RecommendPlaceResponse> readPlaceAllList(Pageable pageable) {
 
         try {
             //페이지네이션을 적용하여 recommendList 엔티티 조회
-            Page<RecommendPlace> recommendListPlace = recommendListPlaceRepository.findAll(pageable);
+            Page<RecommendPlace> recommendListPlace = recommendPlaceRepository.findAll(pageable);
 
             //단일 이미지를 리스트에 넣음
             return recommendListPlace.map(list -> {
@@ -154,7 +140,7 @@ public class RecommendListService {
                         )).collect(Collectors.toList());
 
                 // DTO 객체 생성
-                return new RecommendListPlaceResponse(
+                return new RecommendPlaceResponse(
                         list.getRecommendPlaceId(),
                         list.getRecommendPlaceTitle(),
                         list.getRecommendPlaceSubtitle(),
@@ -174,6 +160,21 @@ public class RecommendListService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 접근 중 오류가 발생했습니다.", e);
         }
     }
+
+    // 메뉴 전체 조회
+//    public List<RecommendListDTO> findRecommendList() {
+//
+//        List<RecommendFood> recommendList = recommendListRepository.findAll(Sort.by("recommendFoodId").descending());
+//
+//        // 로그 출력
+//        log.info("전체 추천 음식 조회 결과: {}", recommendList);
+//
+//        //Review 엔티티들을 ReadReviewResponse DTO로 변환
+//        return recommendList.stream()
+//                .map(recommend -> modelMapper.map(recommend, RecommendListDTO.class))
+//                .collect(Collectors.toList());
+//
+//    }
 
 
 }
