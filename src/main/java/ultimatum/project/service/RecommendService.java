@@ -7,23 +7,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ultimatum.project.domain.entity.food.RecommendFood;
+import ultimatum.project.domain.entity.food.RecommendListFood;
 import ultimatum.project.domain.entity.hotel.RecommendHotel;
 import ultimatum.project.domain.entity.place.RecommendPlace;
 import ultimatum.project.dto.food.RecommendFoodResponse;
+import ultimatum.project.dto.food.RecommendListFoodResponse;
 import ultimatum.project.dto.hotel.RecommendHotelResponse;
 import ultimatum.project.dto.image.RecommendImageFoodResponse;
 import ultimatum.project.dto.image.RecommendImageHotelResponse;
 import ultimatum.project.dto.image.RecommendImagePlaceResponse;
 import ultimatum.project.dto.place.RecommendPlaceResponse;
 import ultimatum.project.repository.RecommendImageRepository;
-import ultimatum.project.repository.RecommendFoodRepository;
-import ultimatum.project.repository.RecommendHotelRepository;
-import ultimatum.project.repository.RecommendPlaceRepository;
+import ultimatum.project.repository.food.RecommendFoodRepository;
+import ultimatum.project.repository.food.RecommendListFoodRepository;
+import ultimatum.project.repository.hotel.RecommendHotelRepository;
+import ultimatum.project.repository.place.RecommendPlaceRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,12 +41,17 @@ public class RecommendService {
     private final RecommendFoodRepository recommendListRepository;
     private final RecommendHotelRepository recommendHotelRepository;
     private final RecommendPlaceRepository recommendPlaceRepository;
+
+    private RecommendListFoodRepository recommendListFoodRepository;
+    private ModelMapper modelMapper;
     private RecommendImageRepository recommendImageRepository;
-    private final ModelMapper modelMapper;
 
     @Autowired
-    public void RecommendImageService(RecommendImageRepository recommendImageRepository) {
+    public void RecommendImageService(RecommendImageRepository recommendImageRepository,
+                                      RecommendListFoodRepository recommendListFoodRepository, ModelMapper modelMapper) {
         this.recommendImageRepository = recommendImageRepository;
+        this.recommendListFoodRepository = recommendListFoodRepository;
+        this.modelMapper = modelMapper;
     }
 
 
@@ -159,6 +168,12 @@ public class RecommendService {
         } catch (DataAccessException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 접근 중 오류가 발생했습니다.", e);
         }
+    }
+
+    //list food 조회
+    public Page<RecommendListFoodResponse> findRecommendListFood(Pageable pageable) {
+        return recommendListFoodRepository.findAll(pageable)
+                .map(entity -> modelMapper.map(entity, RecommendListFoodResponse.class));
     }
 
     // 메뉴 전체 조회

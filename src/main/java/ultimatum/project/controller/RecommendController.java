@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ultimatum.project.dto.food.RecommendFoodResponse;
+import ultimatum.project.dto.food.RecommendListFoodResponse;
 import ultimatum.project.dto.hotel.RecommendHotelResponse;
 import ultimatum.project.dto.place.RecommendPlaceResponse;
 import ultimatum.project.service.RecommendService;
@@ -39,6 +40,15 @@ public class RecommendController {
                     direction = Sort.Direction.DESC) Pageable pageable) {
         Page<RecommendFoodResponse> responses = recommendService.readFoodAll(pageable);
         return new ResponseEntity<>(responses, HttpStatus.OK);
+    }
+
+    //food list 조회
+    @Tag(name = "recommend", description = "API 맛집리스트")
+    @GetMapping("/listfood")
+    public ResponseEntity<Page<RecommendListFoodResponse>> getListFoods(
+            @PageableDefault(size = 12, sort = "recommendFoodId", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<RecommendListFoodResponse> response = recommendService.findRecommendListFood(pageable);
+        return ResponseEntity.ok(response);
     }
 
     //hotel 조회
