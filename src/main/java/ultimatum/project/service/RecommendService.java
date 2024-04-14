@@ -48,7 +48,7 @@ public class RecommendService {
 
     // food 전체 조회
     @Transactional(readOnly = true)
-    public Page<RecommendFoodResponse> readFoodAllList(Pageable pageable) {
+    public Page<RecommendFoodResponse> readFoodAll(Pageable pageable) {
 
         try {
             //페이지네이션을 적용하여 recommendList 엔티티 조회
@@ -87,7 +87,7 @@ public class RecommendService {
 
     //hotel 전체조회
     @Transactional(readOnly = true)
-    public Page<RecommendHotelResponse> readHotelAllList(Pageable pageable) {
+    public Page<RecommendHotelResponse> readHotelAll(Pageable pageable) {
 
         try {
             //페이지네이션을 적용하여 recommendList 엔티티 조회
@@ -125,7 +125,7 @@ public class RecommendService {
 
     //place 전체조회
     @Transactional(readOnly = true)
-    public Page<RecommendPlaceResponse> readPlaceAllList(Pageable pageable) {
+    public Page<RecommendPlaceResponse> readPlaceAll(Pageable pageable) {
 
         try {
             //페이지네이션을 적용하여 recommendList 엔티티 조회

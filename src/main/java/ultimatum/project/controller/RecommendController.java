@@ -37,7 +37,7 @@ public class RecommendController {
     public ResponseEntity<Page<RecommendFoodResponse>> foodAll(
             @PageableDefault(size = 12, sort = "recommendFoodId",
                     direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<RecommendFoodResponse> responses = recommendService.readFoodAllList(pageable);
+        Page<RecommendFoodResponse> responses = recommendService.readFoodAll(pageable);
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 
@@ -47,7 +47,7 @@ public class RecommendController {
     public ResponseEntity<Page<RecommendHotelResponse>> hotelAll(
             @PageableDefault(size = 12, sort = "recommendHotelId",
                     direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<RecommendHotelResponse> responses = recommendService.readHotelAllList(pageable);
+        Page<RecommendHotelResponse> responses = recommendService.readHotelAll(pageable);
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 
@@ -57,7 +57,7 @@ public class RecommendController {
     public ResponseEntity<Page<RecommendPlaceResponse>> placeAll(
             @PageableDefault(size = 12, sort = "recommendPlaceId",
                     direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<RecommendPlaceResponse> responses = recommendService.readPlaceAllList(pageable);
+        Page<RecommendPlaceResponse> responses = recommendService.readPlaceAll(pageable);
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 }
