@@ -34,7 +34,7 @@ public class RecommendController {
     @Tag(name = "recommend", description = "맛집리스트")
     //food 조회
     @GetMapping("food")
-    public ResponseEntity<Page<RecommendFoodResponse>> listFoodAll(
+    public ResponseEntity<Page<RecommendFoodResponse>> foodAll(
             @PageableDefault(size = 12, sort = "recommendFoodId",
                     direction = Sort.Direction.DESC) Pageable pageable) {
         Page<RecommendFoodResponse> responses = recommendService.readFoodAllList(pageable);
@@ -44,7 +44,7 @@ public class RecommendController {
     //hotel 조회
     @Tag(name = "recommend", description = "숙소리스트")
     @GetMapping("hotel")
-    public ResponseEntity<Page<RecommendHotelResponse>> listHotelAll(
+    public ResponseEntity<Page<RecommendHotelResponse>> hotelAll(
             @PageableDefault(size = 12, sort = "recommendHotelId",
                     direction = Sort.Direction.DESC) Pageable pageable) {
         Page<RecommendHotelResponse> responses = recommendService.readHotelAllList(pageable);
@@ -54,7 +54,7 @@ public class RecommendController {
     //place 조회
     @Tag(name = "recommend", description = "가볼만한 곳 리스트")
     @GetMapping("place")
-    public ResponseEntity<Page<RecommendPlaceResponse>> listPlaceAll(
+    public ResponseEntity<Page<RecommendPlaceResponse>> placeAll(
             @PageableDefault(size = 12, sort = "recommendPlaceId",
                     direction = Sort.Direction.DESC) Pageable pageable) {
         Page<RecommendPlaceResponse> responses = recommendService.readPlaceAllList(pageable);
