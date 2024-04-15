@@ -74,10 +74,27 @@ public class ReviewService {
     }
 
 
-    public Page<ReadAllReviewResponse> getAllReviews(Pageable pageable) {
+    public Page<ReadAllReviewResponse> getAllReviews(String reviewLocation, String keyword, Pageable pageable) {
 
-        //페이지네이션을 적용하여 Review 엔티티들을 조회
-        Page<Review> reviewPage = reviewRepository.findAll(pageable);
+        Page<Review> reviewPage;
+
+
+        // 지역 정보만 사용하는 경우
+         if (reviewLocation != null && !reviewLocation.isEmpty()) {
+            reviewPage = reviewRepository.findAllByReviewLocation(reviewLocation, pageable);
+        }
+        // 검색 키워드만 사용하는 경우
+        else if (keyword != null && !keyword.isEmpty()) {
+            reviewPage = reviewRepository
+                    .findByReviewTitleContainingIgnoreCaseOrReviewSubtitleContainingIgnoreCaseOrReviewContentContainingIgnoreCaseOrReviewLocationContainingIgnoreCase
+                            (keyword,keyword,keyword,keyword,pageable);
+
+        }
+        // 파라미터가 없는 경우
+        else {
+            reviewPage = reviewRepository.findAll(pageable);
+        }
+
 
         //Review 엔티티들을 ReadReviewResponse DTO로 변환
         return reviewPage.map(review -> {
