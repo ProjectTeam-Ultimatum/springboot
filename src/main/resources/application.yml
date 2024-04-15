@@ -18,6 +18,14 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL57Dialect
         show_sql: true
+    show-sql: true
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
+  config:
+    import: classpath:aws.yml
+  servlet:
+    multipart:
+      max-request-size: 100MB
+      max-file-size: 100MB
+
