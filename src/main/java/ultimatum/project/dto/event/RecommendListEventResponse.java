@@ -13,7 +13,8 @@ import java.sql.Time;
 @NoArgsConstructor
 public class RecommendListEventResponse {
 
-    private String recommendEventContentsId;
+    private Long recommendEventId;
+    //private String recommendEventContentsId;
     private String recommendEventTitle;
     private String recommendEventIntroduction;
     private String recommendEventAllTag;

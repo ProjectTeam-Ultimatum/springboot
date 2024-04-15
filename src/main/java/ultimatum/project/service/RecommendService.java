@@ -6,6 +6,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -187,7 +188,21 @@ public class RecommendService {
 //    }
 
     //food 음식점
+//    public Page<RecommendListFoodResponse> findRecommendListFood(Pageable pageable) {
+//        return recommendListFoodRepository.findAll(pageable)
+//                .map(entity -> modelMapper.map(entity, RecommendListFoodResponse.class));
+//    }
+
+    //food 음식점 페이징 처리
     public Page<RecommendListFoodResponse> findRecommendListFood(Pageable pageable) {
+        // 페이지 번호를 0부터 시작하도록 조정
+        pageable = PageRequest.of(
+                Math.max(pageable.getPageNumber() - 1, 0), // 0보다 작은 경우는 0으로 설정
+                pageable.getPageSize(),
+                pageable.getSort()
+        );
+
+        // 조회된 페이지 데이터를 반환
         return recommendListFoodRepository.findAll(pageable)
                 .map(entity -> modelMapper.map(entity, RecommendListFoodResponse.class));
     }

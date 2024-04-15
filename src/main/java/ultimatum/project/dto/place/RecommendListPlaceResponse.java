@@ -13,6 +13,8 @@ import java.sql.Time;
 @NoArgsConstructor
 public class RecommendListPlaceResponse {
 
+    private Long recommendPlaceId;
+    //private String recommendPlaceId;
     private String recommendPlaceTitle;
     private String recommendPlaceIntroduction;
     private String recommendPlaceAllTag;
