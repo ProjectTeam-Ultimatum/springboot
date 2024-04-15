@@ -61,9 +61,14 @@ public class S3Service {
      */
     public void deleteFileFromS3(String imageUri) {
         try {
+            //URL 객체 생성
             URL url = new URL(imageUri);
+            // URL의 경로 부분에서 첫 번째 문자(보통 슬래시 '/')를 제거하여 실제 S3의 키를 얻습니다.
+            // S3의 키는 버킷 내에서 객체를 유일하게 식별하는 문자열
             String key = url.getPath().substring(1);
+            // S3 키가 URL 인코딩되어 있을 수 있으므로, 정확한 키를 얻기 위해 UTF-8 인코딩을 사용하여 디코딩
             key = URLDecoder.decode(key, UTF_8);
+            // S3에서 객체 삭제
             amazonS3.deleteObject(bucketName,key);
             log.info("File deleted from S3: {}", imageUri);
 
