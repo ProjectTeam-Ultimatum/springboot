@@ -70,7 +70,7 @@ public class  ReviewController {
                                                              @RequestParam("reviewContent") String reviewContent,
                                                              @RequestParam("reviewLocation") String reviewLocation,
                                                              @RequestParam(value = "newImages", required = false) List<MultipartFile> newImages,
-                                                             @RequestParam(value = "deleteImages", required = false) List<String> deleteImages) throws CustomException, IOException {
+                                                             @RequestParam(value = "deleteImages", required = false) List<String> deleteImages) throws CustomException {
 
         UpdateReviewRequest request = new UpdateReviewRequest(
                 reviewTitle, reviewSubtitle, reviewContent, reviewLocation, newImages, deleteImages);
