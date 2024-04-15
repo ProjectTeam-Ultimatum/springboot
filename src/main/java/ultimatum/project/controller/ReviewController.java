@@ -47,9 +47,11 @@ public class  ReviewController {
     @GetMapping
     @Operation(summary = "게시글 전체 보기")
     public ResponseEntity<Page<ReadAllReviewResponse>> getAllReviews(
+            @RequestParam(value = "reviewLocation", required = false) String reviewLocation,
+            @RequestParam(value = "keyword", required = false) String keyword,
             @PageableDefault (size = 6, sort = "reviewId", direction = Sort.Direction.DESC)Pageable pageable
     ) {
-        Page<ReadAllReviewResponse> reviews = reviewService.getAllReviews(pageable);
+        Page<ReadAllReviewResponse> reviews = reviewService.getAllReviews(reviewLocation, keyword,pageable);
         return ResponseEntity.ok(reviews);
     }
 
