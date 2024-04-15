@@ -110,6 +110,7 @@ public class MemberService {
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
                 .withClaim("id", member.getMemberId())
                 .withClaim("name", member.getMemberName())
+                .withClaim("userid", member.getMemberEmail())
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
 
         return ResponseEntity.ok()

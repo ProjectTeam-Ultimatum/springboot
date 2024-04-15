@@ -30,6 +30,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		String header = request.getHeader(JwtProperties.HEADER_STRING);
+		System.out.println("Header: " + header);
 		if (header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)) {
 			chain.doFilter(request, response);
 			return;
@@ -39,13 +40,15 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 		// JWT에서는 클라이언트에서 API를 요청할 때마다 JWT 토큰 값을 매번 확인해야하므로
 		// BasicAuthenticationFilter를 구현해서 매 페이지 요청마다 아래처럼 토큰을 확인해줘야 합니다.
 		String memberEmail = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token)
-				.getClaim("memberEmail").asString();
+				.getClaim("userid").asString();
+
+		System.out.println("memberEmail: " + memberEmail);
 
 		if (memberEmail != null) {
-			Member user = memberRepository.findByMemberEmail(memberEmail);
+			Member member = memberRepository.findByMemberEmail(memberEmail);
 
-			if (user != null) {
-				PrincipalDetails principalDetails = new PrincipalDetails(user);
+			if (member != null) {
+				PrincipalDetails principalDetails = new PrincipalDetails(member);
 				Authentication authentication =
 						new UsernamePasswordAuthenticationToken(
 								principalDetails,

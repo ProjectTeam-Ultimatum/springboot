@@ -32,6 +32,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		System.out.println("JwtAuthenticationFilter : 진입");
 		
 		// request에 있는 username과 password를 파싱해서 자바 Object로 받기
+		// 요청된 request 값을 통해 loginRequestDto에 저장한다.
 		ObjectMapper om = new ObjectMapper();
 		LoginRequestDto loginRequestDto = null;
 		try {
@@ -50,9 +51,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		//formLogin 방식에서는 설정에서 loginProcessingUrl("/login_proc")를 호출하면 자동으로 loadUserByUsername가 실행되면서 로그인이 되었습니다.
 		//JWT 방식에선 loadUserByUsername를 수동으로 호출해야 하기 때문에 아래와 같이 authenticate 메소드를 실행합니다.
 		//authenticate 메소드는 위의 그림에서 3번인 AuthenticationManager가 실행합니다.
+
+		// authenticate() 함수가 호출 되면 Authentication Provider가
+		// UserDetailsService의 loadUserByUsername를 호출합니다.
 		Authentication authentication = 
 				authenticationManager.authenticate(authenticationToken);
-		
+
+		// 그리고 PrincipalDetails를 리턴해주면 미리 만들었던 UsernamePasswordAuthenticationToken의 두번째 파라미터(Credential Password)와
+		// PrincipalDetails를(DB에서 가져온 값)의 getPassword() 함수로 비교해서 동일하면 Authentication 객체를 만들어서 로그인이 되는 원리입니다.
+
 		PrincipalDetails principalDetailis = (PrincipalDetails) authentication.getPrincipal();
 		System.out.println("Authentication : "+principalDetailis.getUser().getMemberEmail());
 		return authentication;
