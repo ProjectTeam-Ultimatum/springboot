@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewImage;
@@ -14,6 +15,7 @@ import ultimatum.project.repository.ReviewImageRepository;
 import ultimatum.project.repository.ReviewRepository;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,6 +26,28 @@ public class ReviewImageService {
     private final ReviewRepository reviewRepository;
 
     private final S3Service s3Service;
+
+
+    @Transactional
+    public List<ReviewImage> createReviewImages(List<MultipartFile> files, Review review) {
+        List<ReviewImage> reviewImages = new ArrayList<>();
+        for (MultipartFile file : files) {
+            try {
+                String fileUri = s3Service.uploadFileToS3(file);  // S3 업로드 로직을 서비스로 이동
+
+                // ReviewImage 객체 생성 및 저장
+                ReviewImage reviewImage = new ReviewImage();
+                reviewImage.setImageName(StringUtils.cleanPath(file.getOriginalFilename()));
+                reviewImage.setImageUri(fileUri); //s3 파일 uri 설정
+                reviewImage.setReview(review);
+                reviewImages.add(reviewImage);
+
+            } catch (IOException e) {
+                throw new RuntimeException("이미지 저장 실패" + file.getOriginalFilename(), e);
+            }
+        }
+        return reviewImages;
+    }
 
 
     @Transactional
@@ -57,7 +81,7 @@ public class ReviewImageService {
         }
         // 새이미지 추가
         if (request.getReviewImages() != null && !request.getReviewImages().isEmpty()) {
-            for(MultipartFile newImage : request.getReviewImages()) {
+            for (MultipartFile newImage : request.getReviewImages()) {
                 try {
                     String imageUrl = s3Service.uploadFileToS3(newImage);
                     ReviewImage image = ReviewImage.builder()

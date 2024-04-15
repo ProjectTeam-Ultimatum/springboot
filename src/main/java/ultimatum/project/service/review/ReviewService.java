@@ -36,10 +36,8 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final ReviewReplyRepository replyRepository;
-    private final AmazonS3 amazonS3;
     private final S3Service s3Service;
     private final ReviewImageService imageService;
-    private final String bucketName = "ultimatum0807"; // S3 버킷 이름 설정
 
 
     @Transactional
@@ -53,54 +51,16 @@ public class ReviewService {
         review = reviewRepository.save(review); // 저장하고 리턴받음으로써 ID를 획득
 
 
-        //ReviewImage 객체 리스트를 생성하기 위한 준비
-        List<ReviewImage> reviewImages = new ArrayList<>();
-        // 이미지 파일 처리 로직
-        for (MultipartFile file : files) {     // request.getReviewImages() 배열 또는 리스트를 가져옵니다.
-            try {
-                /**
-                 * StringUtils.cleanPath : 파일경로에서 불필요한 문자나 경로 순회패턴('../')을 제거하여 파일 시스템 공격 방지에 도움
-                 * Objects.requireNonNull : 파일의 이름이 null 인경우 예외 발생시킴
-                 */
-                String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
-                //s3에 파일 업로드
-                // 파일의 저장위치와 파일 이름
-                String s3Key = "uploads/" + originalFileName;
-                // objectMetadata() : 업로드할 파일의 메타데이터를 설정하는데 사용(파일의 크기를 설정)
-                ObjectMetadata metadata = new ObjectMetadata();
-                metadata.setContentLength(file.getSize());
-                // amazonS3.putObject : 파일스트림과 메타데이터를 함께 S3에 업로드
-                amazonS3.putObject(bucketName, s3Key, file.getInputStream(), metadata);
-
-                //s3 파일 uri 생성
-                /**
-                 * amazonS3.getUrl().toString() : 성공적인 업로드 후 파일에 접근할 수 있는 uri를 얻기 위해
-                 */
-                String fileUri = amazonS3.getUrl(bucketName, s3Key).toString();
-
-
-                // ReviewImage 객체 생성 및 저장
-                ReviewImage reviewImage = new ReviewImage();
-                reviewImage.setImageName(originalFileName);
-                reviewImage.setImageUri(fileUri); //s3 파일 uri 설정
-                reviewImage.setReview(review);
-                reviewImages.add(reviewImage);
-
-            } catch (IOException e) {
-
-                throw new RuntimeException("이미지 저장 실패" + file.getOriginalFilename(), e);
-            }
-        }
+        // 이미지 파일 처리 및 ReviewImage 객체 리스트 생성
+        List<ReviewImage> reviewImages = imageService.createReviewImages(files, review);
 
         review.setReviewImages(reviewImages);
-        reviewRepository.save(review);
+        reviewRepository.save(review);  // 변경된 review 객체를 다시 저장
 
-        Review finalReview = review;
-        reviewImages.forEach(image -> {
-            image.setReview(finalReview);
-            reviewImageRepository.save(image);
-        });
+        // 이미지 객체들을 DB에 저장
+        reviewImages.forEach(reviewImageRepository::save);
+
 
         // CreateReviewResponse 객체 생성 및 반환
         return new CreateReviewResponse(
@@ -216,6 +176,8 @@ public class ReviewService {
                 review.getReviewLocation(),
                 imageResponses);
     }
+
+
     @Transactional
     public DeleteReviewResponse deleteReview(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
@@ -223,7 +185,12 @@ public class ReviewService {
 
         // S3에서 연관된 이미지 모두 삭제
         review.getReviewImages().forEach(image -> {
-            s3Service.deleteFileFromS3(image.getImageUri());
+            try {
+                s3Service.deleteFileFromS3(image.getImageUri());
+            } catch (Exception e) {
+                // 예외를 잡아서 트랜잭션 롤백 유도
+                throw new RuntimeException("Failed to delete image from S3: " + image.getImageUri(), e);
+            }
         });
 
         // 리뷰 삭제
