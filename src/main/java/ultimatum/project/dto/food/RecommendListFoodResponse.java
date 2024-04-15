@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Time;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -19,6 +21,8 @@ public class RecommendListFoodResponse {
     private String recommendFoodCategory;
     private String recommendFoodAddress;
     private String recommendFoodRegion;
+    private Time recommendFoodOpentime;
+    private Time recommendFoodClosetime;
     private String recommendFoodLatitude;
     private String recommendFoodLongitude;
     private String recommendFoodPhoneNo;

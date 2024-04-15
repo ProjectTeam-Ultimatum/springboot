@@ -210,6 +210,10 @@ public class RecommendService {
                 .map(entity -> modelMapper.map(entity, RecommendListEventResponse.class));
     }
 
+    //오픈시간, 마감시간
+
+
+
     // 메뉴 전체 조회
 //    public List<RecommendListDTO> findRecommendList() {
 //
