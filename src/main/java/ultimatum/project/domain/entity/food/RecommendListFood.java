@@ -1,9 +1,6 @@
 package ultimatum.project.domain.entity.food;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Time;
@@ -21,8 +18,11 @@ public class RecommendListFood {
     private Long recommendFoodId;
     private String recommendFoodContentsId;
     private String recommendFoodTitle;
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String recommendFoodIntroduction;
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String recommendFoodAllTag;
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String recommendFoodTag;
     private String recommendFoodCategory;
     private String recommendFoodAddress;

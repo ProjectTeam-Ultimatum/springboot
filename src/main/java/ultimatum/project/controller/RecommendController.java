@@ -9,9 +9,12 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ultimatum.project.dto.event.RecommendListEventResponse;
 import ultimatum.project.dto.food.RecommendFoodResponse;
 import ultimatum.project.dto.food.RecommendListFoodResponse;
 import ultimatum.project.dto.hotel.RecommendHotelResponse;
+import ultimatum.project.dto.hotel.RecommendListHotelResponse;
+import ultimatum.project.dto.place.RecommendListPlaceResponse;
 import ultimatum.project.dto.place.RecommendPlaceResponse;
 import ultimatum.project.service.RecommendService;
 
@@ -31,18 +34,7 @@ public class RecommendController {
         this.recommendService = recommendService;
     }
 
-    //food 조회
-    @Tag(name = "recommend", description = "맛집리스트")
-    //food 조회
-    @GetMapping("food")
-    public ResponseEntity<Page<RecommendFoodResponse>> foodAll(
-            @PageableDefault(size = 12, sort = "recommendFoodId",
-                    direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<RecommendFoodResponse> responses = recommendService.readFoodAll(pageable);
-        return new ResponseEntity<>(responses, HttpStatus.OK);
-    }
-
-    //food list 조회
+    //food 음식점
     @Tag(name = "recommend", description = "API 맛집리스트")
     @GetMapping("/listfood")
     public ResponseEntity<Page<RecommendListFoodResponse>> getListFoods(
@@ -51,23 +43,32 @@ public class RecommendController {
         return ResponseEntity.ok(response);
     }
 
-    //hotel 조회
-    @Tag(name = "recommend", description = "숙소리스트")
-    @GetMapping("hotel")
-    public ResponseEntity<Page<RecommendHotelResponse>> hotelAll(
-            @PageableDefault(size = 12, sort = "recommendHotelId",
-                    direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<RecommendHotelResponse> responses = recommendService.readHotelAll(pageable);
-        return new ResponseEntity<>(responses, HttpStatus.OK);
+
+    //place 관광지
+    @Tag(name = "recommend", description = "API 관광지리스트")
+    @GetMapping("/listplace")
+    public ResponseEntity<Page<RecommendListPlaceResponse>> getListPlaces(
+            @PageableDefault(size = 12, sort = "recommendPlaceId", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<RecommendListPlaceResponse> response = recommendService.findRecommendListPlace(pageable);
+        return ResponseEntity.ok(response);
     }
 
-    //place 조회
-    @Tag(name = "recommend", description = "가볼만한 곳 리스트")
-    @GetMapping("place")
-    public ResponseEntity<Page<RecommendPlaceResponse>> placeAll(
-            @PageableDefault(size = 12, sort = "recommendPlaceId",
-                    direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<RecommendPlaceResponse> responses = recommendService.readPlaceAll(pageable);
-        return new ResponseEntity<>(responses, HttpStatus.OK);
+    //hotel 숙박
+    @Tag(name = "recommend", description = "API 숙박리스트")
+    @GetMapping("/listhotel")
+    public ResponseEntity<Page<RecommendListHotelResponse>> getListHotels(
+            @PageableDefault(size = 12, sort = "recommendHotelId", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<RecommendListHotelResponse> response = recommendService.findRecommendListHotel(pageable);
+        return ResponseEntity.ok(response);
     }
+
+    //Event 축제행사
+    @Tag(name = "recommend", description = "API 축제행사리스트")
+    @GetMapping("/listevent")
+    public ResponseEntity<Page<RecommendListEventResponse>> getListEvents(
+            @PageableDefault(size = 12, sort = "recommendEventId", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<RecommendListEventResponse> response = recommendService.findRecommendListEvent(pageable);
+        return ResponseEntity.ok(response);
+    }
+
 }
