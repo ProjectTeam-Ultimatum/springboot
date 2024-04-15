@@ -18,7 +18,6 @@ import ultimatum.project.service.review.ReviewService;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @Log4j2
 @Tag(name = "reviews", description = "사용자 게시판 api")
@@ -26,7 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
 @CrossOrigin(origins = "*")
-public class ReviewController {
+public class  ReviewController {
 
     private final ReviewService reviewService;
 
@@ -50,7 +49,7 @@ public class ReviewController {
     public ResponseEntity<Page<ReadAllReviewResponse>> getAllReviews(
             @PageableDefault (size = 6, sort = "reviewId", direction = Sort.Direction.DESC)Pageable pageable
     ) {
-        Page<ReadAllReviewResponse> reviews = reviewService.getAllReviews( pageable);
+        Page<ReadAllReviewResponse> reviews = reviewService.getAllReviews(pageable);
         return ResponseEntity.ok(reviews);
     }
 
@@ -74,10 +73,10 @@ public class ReviewController {
                                                              @RequestParam(value = "deleteImages", required = false) List<String> deleteImages) throws CustomException, IOException {
 
         UpdateReviewRequest request = new UpdateReviewRequest(
-                reviewTitle, reviewSubtitle, reviewContent, reviewLocation, null);
+                reviewTitle, reviewSubtitle, reviewContent, reviewLocation, newImages, deleteImages);
                                                                                     //이미지 관련 정보는 여기서 처리하지 않음.
 
-        UpdateReviewResponse response = reviewService.updateReview(review_id, request, newImages, deleteImages);
+        UpdateReviewResponse response = reviewService.updateReview(review_id, request);
 
         return ResponseEntity.ok(response);
 
@@ -85,8 +84,8 @@ public class ReviewController {
 
     @DeleteMapping( "/{review_id}")
     @Operation(summary = "게시글 삭제")
-    public ResponseEntity<DeleteReviewResponse> deleteReview(@PathVariable Long review_id){
-       reviewService.deleteReview(review_id);
+    public ResponseEntity<DeleteReviewResponse> deleteReview(@PathVariable Long review_id, @RequestParam(required = false) List<String> deleteImages){
+       reviewService.deleteReview(review_id,deleteImages);
 
         return ResponseEntity.ok(new DeleteReviewResponse(review_id));
     }

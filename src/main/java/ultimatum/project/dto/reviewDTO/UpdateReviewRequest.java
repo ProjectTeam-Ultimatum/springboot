@@ -17,4 +17,5 @@ public class UpdateReviewRequest {
     private String reviewContent;
     private String reviewLocation;
     private List<MultipartFile> ReviewImages; //이미지추가, 삭제, 업데이트를 위한 정보
+    private List<String> deleteImageIds;
 }

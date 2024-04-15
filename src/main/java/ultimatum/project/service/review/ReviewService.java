@@ -1,6 +1,5 @@
 package ultimatum.project.service.review;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import jakarta.persistence.EntityNotFoundException;
@@ -23,11 +22,9 @@ import ultimatum.project.repository.ReviewReplyRepository;
 import ultimatum.project.repository.ReviewRepository;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -194,21 +191,19 @@ public class ReviewService {
     }
 
     @Transactional
-    public UpdateReviewResponse updateReview(Long reviewId, UpdateReviewRequest request,
-                                             List<MultipartFile> newImages,
-                                             List<String> deleteImages
-    ) throws CustomException, IOException {
+    public UpdateReviewResponse updateReview(Long reviewId, UpdateReviewRequest request
+    ) throws CustomException {
 
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         review.update(request.getReviewTitle(), request.getReviewSubtitle(), request.getReviewContent(), request.getReviewLocation());
 
-
-        imageService.updateImages(reviewId, newImages, deleteImages);
-
-
         reviewRepository.save(review);
+
+        imageService.updateImages(reviewId, request);
+
+
         List<ReviewImageResponse> imageResponses = review.getReviewImages().stream()
                 .map(image -> new ReviewImageResponse(image.getReviewImageId(), image.getImageName(), image.getImageUri()))
                 .collect(Collectors.toList());
@@ -223,23 +218,12 @@ public class ReviewService {
     }
 
     @Transactional
-    public DeleteReviewResponse deleteReview(Long reviewId) {
+    public DeleteReviewResponse deleteReview(Long reviewId,List<String> deleteImages) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자 게시글 ID를 찾을 수 없습니다." + reviewId));
 
-        //연관된 모든 리뷰 이미지들에 대하여
-        for (ReviewImage reviewImage : review.getReviewImages()) {
-            // imageUri S3 오브젝트 키 추출
-            String imageUri = reviewImage.getImageUri();
-            try {
-                URL url = new URL(imageUri);
-                // 버킷 이름을 제외한 오브젝트 키 추출
-                String key = url.getPath().substring(1);
-                amazonS3.deleteObject(bucketName, URLDecoder.decode(key, StandardCharsets.UTF_8));
-            } catch (Exception e) {
-                log.error("Error deleting object {} from S3 bucket {}", imageUri, bucketName, e);
-            }
-        }
+        imageService.
+                deleteImages(deleteImages);
         reviewRepository.delete(review);
         return new DeleteReviewResponse(reviewId);
     }

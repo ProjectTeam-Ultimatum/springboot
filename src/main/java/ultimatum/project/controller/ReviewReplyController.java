@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ultimatum.project.dto.reviewDTO.DeleteReviewResponse;
 import ultimatum.project.dto.reviewReplyDTO.*;
 import ultimatum.project.service.review.ReviewReplyService;
 
@@ -22,7 +21,7 @@ public class ReviewReplyController {
     private final ReviewReplyService reviewReplyService;
 
 
-    @PostMapping(value = "/{review_id}/replies")
+    @PostMapping(value = "/{review_id}/reply")
     @Operation(summary = "댓글 생성")
     public ResponseEntity<CreateReplyResponse> createReply(@PathVariable Long review_id,
                                                            @RequestBody CreateReplyRequest request){
@@ -38,7 +37,7 @@ public class ReviewReplyController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/reply/{reply_id}")
+    @PutMapping("/{reply_id}/reply")
     @Operation(summary = "댓글수정")
     public ResponseEntity<UpdateReplyResponse> updateReplyByReplyId(@PathVariable Long reply_id,
                                                                     @RequestBody UpdateReplyRequest request) {
@@ -48,7 +47,7 @@ public class ReviewReplyController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/reply/{reply_id}")
+    @DeleteMapping("/{reply_id}/reply")
     @Operation(summary = "댓글 삭제")
     public ResponseEntity<DeleteReplyResponse> deleteReply(@PathVariable Long reply_id){
         reviewReplyService.deleteReply(reply_id);

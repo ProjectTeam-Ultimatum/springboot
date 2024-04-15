@@ -7,10 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewImage;
+import ultimatum.project.dto.reviewDTO.UpdateReviewRequest;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
 import ultimatum.project.repository.ReviewImageRepository;
-import ultimatum.project.repository.ReviewReplyRepository;
 import ultimatum.project.repository.ReviewRepository;
 
 import java.io.IOException;
@@ -27,28 +27,29 @@ public class ReviewImageService {
 
 
     @Transactional
-    public void updateImages(Long reviewId, List<MultipartFile> newImages, List<String> deleteImages) throws IOException {
+    public void updateImages(Long reviewId, UpdateReviewRequest request) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
         //삭제할 이미지 ID처리
-        if (deleteImages != null) {
-            for (String imageIdStr : deleteImages) {
+        if (request.getDeleteImageIds() != null) {
+            for (String imageIdStr : request.getDeleteImageIds()) {
                 Long imageId = Long.parseLong(imageIdStr);
                 //이미지 존재확인
                 ReviewImage image = imageRepository.findById(imageId)
                         .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
                 log.info("삭제할 이미지 id : " + imageId);
+                //데이터베이스에서 이미지 정보 삭제
+               imageRepository.delete(image);
                 //S3 이미지 삭제 로직
                 s3Service.deleteFileFromS3(image.getImageUri());
 
-                //데이터베이스에서 이미지 정보 삭제
-                imageRepository.deleteById(imageId);
+
                 log.info("Image with id: {} deleted from database", imageId);
             }
         }
         // 새이미지 추가
-        if (newImages != null && !newImages.isEmpty()) {
-            newImages.forEach(newImage -> {
+        if (request.getReviewImages() != null && !request.getReviewImages().isEmpty()) {
+            for(MultipartFile newImage : request.getReviewImages()) {
                 try {
                     String imageUrl = s3Service.uploadFileToS3(newImage);
                     ReviewImage image = ReviewImage.builder()
@@ -63,10 +64,10 @@ public class ReviewImageService {
                     // Optionally rethrow to manage transaction rollback
                     throw new RuntimeException("Failed to upload image: " + newImage.getOriginalFilename(), e);
                 }
-            });
-        } else {
-            log.warn("No images provided for upload for reviewId: {}", reviewId);
+            }
+
         }
+
     }
 
     @Transactional
