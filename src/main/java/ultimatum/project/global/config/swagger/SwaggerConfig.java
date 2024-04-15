@@ -1,49 +1,52 @@
 package ultimatum.project.global.config.swagger;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import org.springdoc.core.models.GroupedOpenApi;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.context.SecurityContext;
 
+import java.util.List;
 
-@OpenAPIDefinition(
-        info = @io.swagger.v3.oas.annotations.info.Info(title = "Project Team - Ultimatum",
-                description = "수료전 우리의 최후통첩을 전달합시다",
-                version = "v1")
-)
 @Configuration
 public class SwaggerConfig {
 
     @Bean
-    public GroupedOpenApi Review(){
-        String[] path = {
-                "org.example.ohgiraffers.board.controller.ReviewController"
-        };
-        return GroupedOpenApi.builder()
-                .group("1.Review")
-                .packagesToScan(path)
-                .build();
+    public OpenAPI openAPI(){
+        SecurityScheme securityScheme = getSecurityScheme();
+        SecurityRequirement securityRequirement = getSecurityRequirement();
+
+        return new OpenAPI()
+                .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
+                .security(List.of(securityRequirement))
+                .info(apiInfo());
     }
 
-    @Bean
-    public GroupedOpenApi secondOpenApi(){
-        String[] path = {
-                ""
-        };
-        return GroupedOpenApi.builder()
-                .group("2. 아직 미정")
-                .packagesToScan(path)
-                .build();
+    private Info apiInfo(){
+        return new Info()
+                .title("누림 API Test")
+                .description("누림 팀의 누림 어플리케이션 API 입니다.")
+                .version("1.0.0");
     }
 
-    @Bean
-    public GroupedOpenApi thirdOpenApi(){
-        String[] path = {
-                "ultimatum.project.controller"
-        };
-        return GroupedOpenApi.builder()
-                .group("3. 전역예외처리")
-                .packagesToScan(path)
-                .build();
+
+    /** 보안 관련 헤더 추가를 위한 설정 */
+    private SecurityScheme getSecurityScheme() {
+        return new SecurityScheme()
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("bearer")
+                .bearerFormat("JWT")
+                .in(SecurityScheme.In.HEADER)
+                .name("Authorization");
     }
+
+    private SecurityRequirement getSecurityRequirement() {
+        return new SecurityRequirement().addList("bearerAuth");
+    }
+
+
 }

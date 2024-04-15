@@ -31,8 +31,10 @@ public class IndexController {
         return "userInfo";
     }
 
-    @GetMapping("/test")
+    @GetMapping("/kakaologin")
     public String a() {
-        return "test";
+        return "kakaologin";
     }
+
+
 }
