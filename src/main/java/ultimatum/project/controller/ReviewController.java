@@ -84,8 +84,8 @@ public class  ReviewController {
 
     @DeleteMapping( "/{review_id}")
     @Operation(summary = "게시글 삭제")
-    public ResponseEntity<DeleteReviewResponse> deleteReview(@PathVariable Long review_id, @RequestParam(required = false) List<String> deleteImages){
-       reviewService.deleteReview(review_id,deleteImages);
+    public ResponseEntity<DeleteReviewResponse> deleteReview(@PathVariable Long review_id){
+       reviewService.deleteReview(review_id);
 
         return ResponseEntity.ok(new DeleteReviewResponse(review_id));
     }

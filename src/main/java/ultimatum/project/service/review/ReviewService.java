@@ -37,6 +37,7 @@ public class ReviewService {
     private final ReviewImageRepository reviewImageRepository;
     private final ReviewReplyRepository replyRepository;
     private final AmazonS3 amazonS3;
+    private final S3Service s3Service;
     private final ReviewImageService imageService;
     private final String bucketName = "ultimatum0807"; // S3 버킷 이름 설정
 
@@ -203,7 +204,6 @@ public class ReviewService {
 
         imageService.updateImages(reviewId, request);
 
-
         List<ReviewImageResponse> imageResponses = review.getReviewImages().stream()
                 .map(image -> new ReviewImageResponse(image.getReviewImageId(), image.getImageName(), image.getImageUri()))
                 .collect(Collectors.toList());
@@ -216,14 +216,17 @@ public class ReviewService {
                 review.getReviewLocation(),
                 imageResponses);
     }
-
     @Transactional
-    public DeleteReviewResponse deleteReview(Long reviewId,List<String> deleteImages) {
+    public DeleteReviewResponse deleteReview(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자 게시글 ID를 찾을 수 없습니다." + reviewId));
 
-        imageService.
-                deleteImages(deleteImages);
+        // S3에서 연관된 이미지 모두 삭제
+        review.getReviewImages().forEach(image -> {
+            s3Service.deleteFileFromS3(image.getImageUri());
+        });
+
+        // 리뷰 삭제
         reviewRepository.delete(review);
         return new DeleteReviewResponse(reviewId);
     }

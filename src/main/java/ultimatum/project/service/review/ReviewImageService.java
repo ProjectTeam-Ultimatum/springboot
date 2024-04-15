@@ -30,6 +30,8 @@ public class ReviewImageService {
     public void updateImages(Long reviewId, UpdateReviewRequest request) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+
         //삭제할 이미지 ID처리
         if (request.getDeleteImageIds() != null) {
             for (String imageIdStr : request.getDeleteImageIds()) {
@@ -38,8 +40,14 @@ public class ReviewImageService {
                 ReviewImage image = imageRepository.findById(imageId)
                         .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
                 log.info("삭제할 이미지 id : " + imageId);
-                //데이터베이스에서 이미지 정보 삭제
-               imageRepository.delete(image);
+
+
+                // Review 엔티티에서 이미지 정보 삭제
+                review.getReviewImages().removeIf(img -> img.getReviewImageId().equals(imageId));
+
+                // 데이터베이스에서 이미지 정보 삭제
+                imageRepository.delete(image);
+
                 //S3 이미지 삭제 로직
                 s3Service.deleteFileFromS3(image.getImageUri());
 
@@ -70,22 +78,4 @@ public class ReviewImageService {
 
     }
 
-    @Transactional
-    public void deleteImages(List<String> deleteImages) {
-
-        //삭제할 이미지 ID처리
-        if (deleteImages != null) {
-            for (String imageIdStr : deleteImages) {
-                Long imageId = Long.parseLong(imageIdStr);
-                ReviewImage image = imageRepository.findById(imageId)
-                        .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
-                log.info("삭제할 이미지 id : " + imageId);
-                //이미지 삭제 로직
-                s3Service.deleteFileFromS3(image.getImageUri());
-
-                //데이터베이스에서 이미지 정보 삭제
-                imageRepository.delete(image);
-            }
-        }
-    }
 }
