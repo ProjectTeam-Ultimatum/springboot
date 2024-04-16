@@ -220,12 +220,23 @@ public class RecommendService {
     }
 
     //event 축제행사
+//    public Page<RecommendListEventResponse> findRecommendListEvent(Pageable pageable) {
+//        return recommendListEventRepository.findAll(pageable)
+//                .map(entity -> modelMapper.map(entity, RecommendListEventResponse.class));
+//    }
+
     public Page<RecommendListEventResponse> findRecommendListEvent(Pageable pageable) {
+        // 페이지 번호를 0부터 시작하도록 조정
+        pageable = PageRequest.of(
+                Math.max(pageable.getPageNumber() - 1, 0), // 0보다 작은 경우는 0으로 설정
+                pageable.getPageSize(),
+                pageable.getSort()
+        );
+
+        // 조회된 페이지 데이터를 반환
         return recommendListEventRepository.findAll(pageable)
                 .map(entity -> modelMapper.map(entity, RecommendListEventResponse.class));
     }
-
-    //오픈시간, 마감시간
 
 
 

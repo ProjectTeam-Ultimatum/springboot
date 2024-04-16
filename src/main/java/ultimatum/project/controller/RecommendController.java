@@ -52,7 +52,7 @@ public class RecommendController {
     public ResponseEntity<Page<RecommendListPlaceResponse>> getListPlaces(
             @PageableDefault(size = 12, sort = "recommendPlaceId", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<RecommendListPlaceResponse> response = recommendService.findRecommendListPlace(pageable);
-        log.info("listfood pageable : {}", pageable);
+        log.info("listplace pageable : {}", pageable);
         return ResponseEntity.ok(response);
     }
 
@@ -62,17 +62,28 @@ public class RecommendController {
     public ResponseEntity<Page<RecommendListHotelResponse>> getListHotels(
             @PageableDefault(size = 12, sort = "recommendHotelId", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<RecommendListHotelResponse> response = recommendService.findRecommendListHotel(pageable);
-        log.info("listfood pageable : {}", pageable);
+        log.info("listhotel pageable : {}", pageable);
         return ResponseEntity.ok(response);
     }
 
     //Event 축제행사
+//    @Tag(name = "recommend", description = "API 축제행사리스트")
+//    @GetMapping("/listevent")
+//    public ResponseEntity<Page<RecommendListEventResponse>> getListEvents(
+//            @PageableDefault(size = 12, sort = "recommendEventId", direction = Sort.Direction.DESC) Pageable pageable) {
+//        Page<RecommendListEventResponse> response = recommendService.findRecommendListEvent(pageable);
+//        log.info("listfood pageable : {}", pageable);
+//        return ResponseEntity.ok(response);
+//    }
+
+
     @Tag(name = "recommend", description = "API 축제행사리스트")
     @GetMapping("/listevent")
     public ResponseEntity<Page<RecommendListEventResponse>> getListEvents(
             @PageableDefault(size = 12, sort = "recommendEventId", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<RecommendListEventResponse> response = recommendService.findRecommendListEvent(pageable);
-        log.info("listfood pageable : {}", pageable);
+        /* page -> number, size, sort 파라미터가 Pageable 객체에 담긴다. */
+        log.info("listevent pageable : {}", pageable);
         return ResponseEntity.ok(response);
     }
 
