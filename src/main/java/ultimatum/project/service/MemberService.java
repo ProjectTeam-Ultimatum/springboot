@@ -109,7 +109,7 @@ public class MemberService {
                 .withSubject(member.getMemberEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
                 .withClaim("id", member.getMemberId())
-                .withClaim("name", member.getMemberName())
+                .withClaim("username", member.getMemberName())
                 .withClaim("userid", member.getMemberEmail())
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
 
