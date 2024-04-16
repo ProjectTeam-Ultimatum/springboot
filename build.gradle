@@ -20,6 +20,10 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    testImplementation 'org.springframework.security:spring-security-test'
     runtimeOnly 'com.mysql:mysql-connector-j'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
@@ -35,6 +39,19 @@ dependencies {
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.420'
     implementation 'com.amazonaws:aws-java-sdk-core:1.12.420'
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
+
+
+    //websocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    //modelmapper
+    implementation 'org.modelmapper:modelmapper:3.1.0'
+
+    implementation 'com.auth0:java-jwt:4.0.0'
+
+    implementation 'com.google.code.gson:gson:2.8.8'
+
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
 
 }
