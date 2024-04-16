@@ -5,20 +5,23 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.dto.reviewDTO.*;
+import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewImage;
-import ultimatum.project.dto.reviewDTO.*;
 import ultimatum.project.domain.dto.reviewReplyDTO.ReadReplyResponse;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
+import ultimatum.project.repository.MemberRepository;
 import ultimatum.project.repository.ReviewImageRepository;
 import ultimatum.project.repository.ReviewReplyRepository;
 import ultimatum.project.repository.ReviewRepository;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,22 +36,37 @@ public class ReviewService {
     private final ReviewReplyRepository replyRepository;
     private final S3Service s3Service;
     private final ReviewImageService imageService;
+    private final MemberRepository memberRepository;
 
 
     @Transactional
-    public CreateReviewResponse createReview(CreateReviewRequest request, List<MultipartFile> files) {
-        // Review 객체 생성 및 저장
+    public CreateReviewResponse createReview(Authentication authentication, CreateReviewRequest request, List<MultipartFile> files) throws IOException {
+        if (authentication == null || !authentication.isAuthenticated())  {
+            throw new CustomException(ErrorCode.BAD_REQUSET_USER);
+        }
+        String email = authentication.getName();
+        Member member = memberRepository.findByMemberEmail(email);
+
+        if (member == null) {
+            throw new IOException("Member with email " + email + " not found.");
+        }
+
+        //  Review 객체 생성 및 저장
         Review review = new Review();
         review.setReviewTitle(request.getReviewTitle());
         review.setReviewSubtitle(request.getReviewSubtitle());
         review.setReviewContent(request.getReviewContent());
         review.setReviewLocation(request.getReviewLocation());
+
         review = reviewRepository.save(review); // 저장하고 리턴받음으로써 ID를 획득
 
 
 
         // 이미지 파일 처리 및 ReviewImage 객체 리스트 생성
         List<ReviewImage> reviewImages = imageService.createReviewImages(files, review);
+        if(reviewImages.isEmpty() && !files.isEmpty()) {
+            throw new CustomException(ErrorCode.FILE_PROCESSING_ERROR);
+        }
 
         review.setReviewImages(reviewImages);
         reviewRepository.save(review);  // 변경된 review 객체를 다시 저장
@@ -164,8 +182,18 @@ public class ReviewService {
     }
 
     @Transactional
-    public UpdateReviewResponse updateReview(Long reviewId, UpdateReviewRequest request
-    ) throws CustomException {
+    public UpdateReviewResponse updateReview(Authentication authentication,Long reviewId, UpdateReviewRequest request
+    ) throws CustomException, IOException {
+
+        if (authentication == null || !authentication.isAuthenticated())  {
+            throw new CustomException(ErrorCode.BAD_REQUSET_USER);
+        }
+        String email = authentication.getName();
+        Member member = memberRepository.findByMemberEmail(email);
+
+        if (member == null) {
+            throw new IOException("Member with email " + email + " not found.");
+        }
 
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
@@ -173,7 +201,6 @@ public class ReviewService {
         review.update(request.getReviewTitle(), request.getReviewSubtitle(), request.getReviewContent(), request.getReviewLocation());
 
         reviewRepository.save(review);
-
         imageService.updateImages(reviewId, request);
 
         List<ReviewImageResponse> imageResponses = review.getReviewImages().stream()
@@ -191,7 +218,19 @@ public class ReviewService {
 
 
     @Transactional
-    public DeleteReviewResponse deleteReview(Long reviewId) {
+    public DeleteReviewResponse deleteReview(Authentication authentication,Long reviewId) throws IOException {
+
+
+        if (authentication == null || !authentication.isAuthenticated())  {
+            throw new CustomException(ErrorCode.BAD_REQUSET_USER);
+        }
+        String email = authentication.getName();
+        Member member = memberRepository.findByMemberEmail(email);
+
+        if (member == null) {
+            throw new IOException("Member with email " + email + " not found.");
+        }
+
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자 게시글 ID를 찾을 수 없습니다." + reviewId));
 

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import ultimatum.project.domain.dto.reviewDTO.DeleteReviewResponse;
 import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewImage;
 import ultimatum.project.domain.dto.reviewDTO.UpdateReviewRequest;
@@ -97,9 +98,6 @@ public class ReviewImageService {
                     throw new RuntimeException("Failed to upload image: " + newImage.getOriginalFilename(), e);
                 }
             }
-
         }
-
     }
-
 }

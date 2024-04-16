@@ -36,7 +36,10 @@ public enum ErrorCode {
     DUPLICATE_RESOURCE(409, "CONFLICT","데이터가 이미 존재합니다"),
 
     /* 500 INTERNAL_SERVER_ERROR */
-    SERVER_ERROR(500, "INTERNAL_SERVER_ERROR", "예기치 못한 오류가 발생하였습니다.");
+    SERVER_ERROR(500, "INTERNAL_SERVER_ERROR", "예기치 못한 오류가 발생하였습니다."),
+
+    /* 500 INTERNAL_SERVER_ERROR : 파일 처리 오류 */
+    FILE_PROCESSING_ERROR(500, "INTERNAL_SERVER_ERROR", "파일 처리 중 오류가 발생하였습니다.");
 
 
     private int status;

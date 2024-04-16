@@ -10,13 +10,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.dto.reviewDTO.*;
-import ultimatum.project.dto.reviewDTO.*;
+import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.global.exception.CustomException;
+import ultimatum.project.global.exception.ErrorCode;
+import ultimatum.project.repository.MemberRepository;
 import ultimatum.project.service.review.ReviewService;
 
+import java.io.IOException;
 import java.util.List;
 
 @Log4j2
@@ -25,22 +29,25 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
 @CrossOrigin(origins = "*")
-public class  ReviewController {
+public class ReviewController {
 
     private final ReviewService reviewService;
+    private final MemberRepository memberRepository;
 
     @PostMapping(consumes = {"multipart/form-data"})
     @Operation(summary = "게시글 작성", description = "여러가지입력해")
-    public ResponseEntity<CreateReviewResponse> reviewCreate(@RequestParam("reviewTitle") String reviewTitle,
+    public ResponseEntity<CreateReviewResponse> reviewCreate(Authentication authentication,
+                                                             @RequestParam("reviewTitle") String reviewTitle,
                                                              @RequestParam("reviewSubtitle") String reviewSubtitle,
                                                              @RequestParam("reviewContent") String reviewContent,
                                                              @RequestParam("reviewLocation") String reviewLocation,
-                                                             @RequestParam("reviewImages") List<MultipartFile> reviewImages) {
+                                                             @RequestParam("reviewImages") List<MultipartFile> reviewImages) throws IOException {
+
         // CreateReviewRequest 객체를 생성하고 파라미터로 전달받은 값을 설정합니다.
         CreateReviewRequest request = new CreateReviewRequest(
                 reviewTitle, reviewSubtitle, reviewContent, reviewLocation, reviewImages);
-
-        CreateReviewResponse response = reviewService.createReview(request, reviewImages);
+// 서비스를 호출하여 리뷰를 생성하고 응답 객체를 반환합니다.
+        CreateReviewResponse response = reviewService.createReview(authentication, request, reviewImages);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -49,9 +56,9 @@ public class  ReviewController {
     public ResponseEntity<Page<ReadAllReviewResponse>> getAllReviews(
             @RequestParam(value = "reviewLocation", required = false) String reviewLocation,
             @RequestParam(value = "keyword", required = false) String keyword,
-            @PageableDefault (size = 6, sort = "reviewId", direction = Sort.Direction.DESC)Pageable pageable
+            @PageableDefault(size = 6, sort = "reviewId", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Page<ReadAllReviewResponse> reviews = reviewService.getAllReviews(reviewLocation, keyword,pageable);
+        Page<ReadAllReviewResponse> reviews = reviewService.getAllReviews(reviewLocation, keyword, pageable);
         return ResponseEntity.ok(reviews);
     }
 
@@ -63,31 +70,32 @@ public class  ReviewController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping(value="/{review_id}", consumes = {"multipart/form-data"})
+    @PutMapping(value = "/{review_id}", consumes = {"multipart/form-data"})
     @Operation(summary = "게시글 수정")
 
-    public ResponseEntity<UpdateReviewResponse> updateReview(@PathVariable Long review_id,
+    public ResponseEntity<UpdateReviewResponse> updateReview(Authentication authentication,
+            @PathVariable Long review_id,
                                                              @RequestParam("reviewTitle") String reviewTitle,
                                                              @RequestParam("reviewSubtitle") String reviewSubtitle,
                                                              @RequestParam("reviewContent") String reviewContent,
                                                              @RequestParam("reviewLocation") String reviewLocation,
                                                              @RequestParam(value = "newImages", required = false) List<MultipartFile> newImages,
-                                                             @RequestParam(value = "deleteImages", required = false) List<String> deleteImages) throws CustomException {
+                                                             @RequestParam(value = "deleteImages", required = false) List<String> deleteImages) throws CustomException, IOException {
 
         UpdateReviewRequest request = new UpdateReviewRequest(
                 reviewTitle, reviewSubtitle, reviewContent, reviewLocation, newImages, deleteImages);
-                                                                                    //이미지 관련 정보는 여기서 처리하지 않음.
+        //이미지 관련 정보는 여기서 처리하지 않음.
 
-        UpdateReviewResponse response = reviewService.updateReview(review_id, request);
+        UpdateReviewResponse response = reviewService.updateReview(authentication,review_id, request);
 
         return ResponseEntity.ok(response);
 
     }
 
-    @DeleteMapping( "/{review_id}")
+    @DeleteMapping("/{review_id}")
     @Operation(summary = "게시글 삭제")
-    public ResponseEntity<DeleteReviewResponse> deleteReview(@PathVariable Long review_id){
-       reviewService.deleteReview(review_id);
+    public ResponseEntity<DeleteReviewResponse> deleteReview(Authentication authentication,@PathVariable Long review_id) throws IOException {
+        reviewService.deleteReview(authentication,review_id);
 
         return ResponseEntity.ok(new DeleteReviewResponse(review_id));
     }
@@ -96,8 +104,8 @@ public class  ReviewController {
     @Operation(summary = "좋아요 수정")
     public ResponseEntity<ReviewLikeResponse> updateLike(@PathVariable Long review_id, @RequestBody ReviewLikeRequest request) {
 
-            // 리뷰 서비스에서 좋아요 수를 업데이트하는 메소드를 호출합니다.
-            ReviewLikeResponse response = reviewService.updateReviewLike(review_id,request);
-            return ResponseEntity.ok(response);
+        // 리뷰 서비스에서 좋아요 수를 업데이트하는 메소드를 호출합니다.
+        ReviewLikeResponse response = reviewService.updateReviewLike(review_id, request);
+        return ResponseEntity.ok(response);
     }
 }
