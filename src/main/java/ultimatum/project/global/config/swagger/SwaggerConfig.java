@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.context.SecurityContext;
@@ -14,6 +15,16 @@ import java.util.List;
 
 @Configuration
 public class SwaggerConfig {
+
+
+    @Bean(name = "Review")
+    public GroupedOpenApi Review(){
+        return GroupedOpenApi.builder()
+                .group("사용자게시판")
+                .pathsToMatch("/api/reviews/**") // API 경로를 지정
+                .build();
+    }
+
 
     @Bean
     public OpenAPI openAPI(){
@@ -47,6 +58,8 @@ public class SwaggerConfig {
     private SecurityRequirement getSecurityRequirement() {
         return new SecurityRequirement().addList("bearerAuth");
     }
+
+
 
 
 }

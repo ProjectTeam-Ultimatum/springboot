@@ -29,17 +29,17 @@ public class SecurityConfig {
 	@Autowired
 	private CorsConfig corsConfig;
 
-	@Bean
+	@Bean(name = "passwordEncoder")
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
-	@Bean
+	@Bean(name = "authenticationManager")
 	public AuthenticationManager authenticationManager() throws Exception {
 		return authenticationConfiguration.getAuthenticationManager();
 	}
 
-	@Bean
+	@Bean(name = "filterChain1")
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
 		return http
