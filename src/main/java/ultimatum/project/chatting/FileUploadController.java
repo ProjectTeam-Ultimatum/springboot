@@ -21,7 +21,7 @@ import java.io.IOException;
 public class FileUploadController {
 
     private final AmazonS3 amazonS3Client;
-    @Value("${cloud.aws.s3.bucketName}")
+    @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
     @PostMapping
@@ -34,9 +34,8 @@ public class FileUploadController {
             metadata.setContentType(file.getContentType());
             metadata.setContentLength(file.getSize());
 
-            amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, file.getInputStream(), metadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead)); // 이 부분 추가
-
+            // ACL 관련 설정을 제거하고, 단순히 파일을 업로드하는 코드로 수정
+            amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, file.getInputStream(), metadata));
 
             return ResponseEntity.ok(fileUrl);
         } catch (IOException e) {
