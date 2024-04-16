@@ -1,14 +1,10 @@
-package ultimatum.project.service;
+package ultimatum.project.service.recommned;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.domain.Page;
-import ultimatum.project.domain.entity.event.RecommendListEvent;
-import ultimatum.project.domain.entity.food.RecommendListFood;
-import ultimatum.project.domain.entity.hotel.RecommendListHotel;
-import ultimatum.project.domain.entity.place.RecommendListPlace;
 
 @Builder
 @Getter

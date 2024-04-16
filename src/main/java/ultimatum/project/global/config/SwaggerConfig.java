@@ -5,6 +5,8 @@ import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.path;
+
 
 @OpenAPIDefinition(
         info = @io.swagger.v3.oas.annotations.info.Info(title = "Project Team - Ultimatum",

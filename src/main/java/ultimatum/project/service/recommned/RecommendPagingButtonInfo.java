@@ -1,4 +1,4 @@
-package ultimatum.project.service;
+package ultimatum.project.service.recommned;
 
 import lombok.Builder;
 import lombok.Getter;
