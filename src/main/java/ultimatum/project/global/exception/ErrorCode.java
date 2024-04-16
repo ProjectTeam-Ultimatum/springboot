@@ -14,7 +14,10 @@ public enum ErrorCode {
 
     /* 400 BAD_REQUEST : 잘못된 요청 */
     INVALID_INPUT_VALUE(400, "BAD_REQUEST", "입력값이 올바르지 않거나 입력되지 않았습니다."),
+
     BAD_REQUEST(400, "BAD_REQUEST","잘못된 요청입니다."),
+
+    BAD_REQUSET_USER(400, "BAD_REQUEST", "JWT 인증되지 않은 사용자 정보를 요청했습니다."),
 
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
     UNAUTHENTICATED_USERS(401, "UNAUTHORIZED","인증이 필요합니다."),

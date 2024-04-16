@@ -1,3 +1,8 @@
+/**
+ * PrincipalDetails 클래스는 주로 데이터베이스에서 사용자 정보를 가져와서 Spring Security에 제공하는 역할을 수행합니다.
+ * Member 객체와 PrincipalDetails 객체 간의 매핑을 통해 데이터베이스에 저장된 사용자 정보를
+ * Spring Security가 이해할 수 있는 형태로 변환하여 제공합니다.
+ */
 package ultimatum.project.global.config.auth;
 
 import org.springframework.security.core.GrantedAuthority;

@@ -17,13 +17,13 @@ import java.util.List;
 public class SwaggerConfig {
 
 
-    @Bean(name = "Review")
-    public GroupedOpenApi Review(){
-        return GroupedOpenApi.builder()
-                .group("사용자게시판")
-                .pathsToMatch("/api/reviews/**") // API 경로를 지정
-                .build();
-    }
+//    @Bean(name = "Review")
+//    public GroupedOpenApi Review(){
+//        return GroupedOpenApi.builder()
+//                .group("사용자게시판")
+//                .pathsToMatch("/api/reviews/**") // API 경로를 지정
+//                .build();
+//    }
 
 
     @Bean
@@ -39,8 +39,8 @@ public class SwaggerConfig {
 
     private Info apiInfo(){
         return new Info()
-                .title("누림 API Test")
-                .description("누림 팀의 누림 어플리케이션 API 입니다.")
+                .title("최후통첩 API Test")
+                .description("최후통첩 팀의 제주랑 어플리케이션 API 입니다.")
                 .version("1.0.0");
     }
 

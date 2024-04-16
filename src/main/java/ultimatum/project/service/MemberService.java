@@ -43,9 +43,9 @@ public class MemberService {
         return "회원가입 완료: " + member.getMemberName();
     }
 
-    public Member findMemberByEmail(String email) {
-        return memberRepository.findByMemberEmail(email);
-    }
+//    public Member findMemberByEmail(String email) {
+//        return memberRepository.findByMemberEmail(email);
+//    }
 
 //    public ResponseEntity<String> processKakaoLogin(KakaoUserInfoDto kakaoUserInfoDto, MemberRequestDto memberRequestDto) {
 //        String code = kakaoUserInfoDto.getCode();
@@ -109,7 +109,8 @@ public class MemberService {
                 .withSubject(member.getMemberEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
                 .withClaim("id", member.getMemberId())
-                .withClaim("name", member.getMemberName())
+                .withClaim("username", member.getMemberName())
+                .withClaim("userid", member.getMemberEmail())
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
 
         return ResponseEntity.ok()
