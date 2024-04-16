@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ultimatum.project.domain.dto.reviewReplyDTO.*;
 import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewReply;
 import ultimatum.project.dto.reviewReplyDTO.*;
@@ -25,7 +26,7 @@ public class ReviewReplyService {
     private final ReviewRepository reviewRepository;
 
     @Transactional
-    public CreateReplyResponse createReply(Long reviewId,CreateReplyRequest request) {
+    public CreateReplyResponse createReply(Long reviewId, CreateReplyRequest request) {
 
 
         //리뷰 엔티티 조회

@@ -12,11 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ultimatum.project.domain.dto.reviewDTO.*;
 import ultimatum.project.dto.reviewDTO.*;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.service.review.ReviewService;
 
-import java.io.IOException;
 import java.util.List;
 
 @Log4j2
