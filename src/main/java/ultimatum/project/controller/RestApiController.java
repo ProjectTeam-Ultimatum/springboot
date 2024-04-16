@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import ultimatum.project.domain.dto.KakaoUserInfoDto;
 import ultimatum.project.domain.dto.MemberRequestDto;
 import ultimatum.project.domain.entity.member.Member;
+import ultimatum.project.global.exception.CustomException;
+import ultimatum.project.global.exception.ErrorCode;
 import ultimatum.project.service.KakaoService;
 import ultimatum.project.service.MemberService;
 import ultimatum.project.repository.MemberRepository;
@@ -108,6 +110,32 @@ public class RestApiController {
             // 인증되지 않은 경우 또는 사용자 정보를 가져오지 못한 경우
             return "현재 로그인된 사용자 정보를 가져올 수 없습니다.";
         }
+    }
+
+    @GetMapping("/user/info/detail")
+    @SecurityRequirement(name = "bearerAuth")
+    @ResponseBody
+    public ResponseEntity<String> getUserInfoDetail(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new CustomException(ErrorCode.BAD_REQUSET_USER);
+        }
+
+        String memberEmail = authentication.getName();
+
+        Member member = memberRepository.findByMemberEmail(memberEmail);
+
+        if (member == null) {
+            return ResponseEntity.badRequest().body("사용자 정보를 찾을 수 없습니다.");
+        }
+
+        String userDetails =
+                "사용자 이름: " + member.getMemberName() +
+                        ", 이메일: " + member.getMemberEmail() +
+                        ", 성별: " + member.getMemberGender() +
+                        ", 나이: " + member.getMemberAge() +
+                        ", 주소: " + member.getMemberAddress();
+
+        return ResponseEntity.ok(userDetails);
     }
 
 }

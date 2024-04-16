@@ -43,9 +43,9 @@ public class MemberService {
         return "회원가입 완료: " + member.getMemberName();
     }
 
-    public Member findMemberByEmail(String email) {
-        return memberRepository.findByMemberEmail(email);
-    }
+//    public Member findMemberByEmail(String email) {
+//        return memberRepository.findByMemberEmail(email);
+//    }
 
 //    public ResponseEntity<String> processKakaoLogin(KakaoUserInfoDto kakaoUserInfoDto, MemberRequestDto memberRequestDto) {
 //        String code = kakaoUserInfoDto.getCode();
