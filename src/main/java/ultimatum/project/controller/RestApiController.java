@@ -8,15 +8,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import ultimatum.project.domain.dto.KakaoUserInfoDto;
-import ultimatum.project.domain.dto.MemberRequestDto;
+import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDto;
+import ultimatum.project.domain.dto.logInDTO.MemberRequestDto;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
-import ultimatum.project.service.KakaoService;
-import ultimatum.project.service.MemberService;
+import ultimatum.project.service.member.KakaoService;
+import ultimatum.project.service.member.MemberService;
 import ultimatum.project.repository.MemberRepository;
-import ultimatum.project.global.config.auth.PrincipalDetails;
+import ultimatum.project.global.config.Security.auth.PrincipalDetails;
 
 import java.util.List;
 

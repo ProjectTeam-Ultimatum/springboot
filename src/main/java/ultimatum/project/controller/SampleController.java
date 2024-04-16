@@ -4,7 +4,7 @@ package ultimatum.project.controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ultimatum.project.service.SampleService;
+import ultimatum.project.service.member.SampleService;
 
 @RestController
 @RequestMapping("/api")
