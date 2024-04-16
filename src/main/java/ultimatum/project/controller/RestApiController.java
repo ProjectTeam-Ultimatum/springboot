@@ -23,6 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class RestApiController {
 
     private final MemberRepository memberRepository;

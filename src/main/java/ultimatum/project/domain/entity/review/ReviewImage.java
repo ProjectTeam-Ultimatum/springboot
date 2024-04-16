@@ -12,15 +12,20 @@ import lombok.*;
 public class ReviewImage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue( strategy = GenerationType.IDENTITY)
     private Long reviewImageId;
 
-    private String uuid;
+    private String imageName;
 
-    private String reviewFileName;
+    private String imageUri;
 
-    @ManyToOne
+    /**
+     * fetchType.LAZY : 지연로딩
+     *                  연관된 엔티티를 필요로 할때까지 로딩하지 않음
+     *                  응답속도와 효율성을 높인다.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
-    private Review reviewId;
+    private Review review;
 
 }
