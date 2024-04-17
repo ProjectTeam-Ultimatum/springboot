@@ -19,7 +19,7 @@ public enum ErrorCode {
 
     BAD_REQUSET_USER(400, "BAD_REQUEST", "JWT 인증되지 않은 사용자 정보를 요청했습니다."),
 
-    INVALID_MEMBER(400, "BAD_REQUEST", "로그인 후 이용해주세요"),
+    INVALID_MEMBER(400, "BAD_REQUEST", "로그인 후 이용할 수 있습니다."),
 
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
     UNAUTHENTICATED_USERS(401, "UNAUTHORIZED","인증이 필요합니다."),
