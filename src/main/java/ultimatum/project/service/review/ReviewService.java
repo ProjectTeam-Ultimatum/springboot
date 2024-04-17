@@ -103,7 +103,6 @@ public class ReviewService {
 
         Page<Review> reviewPage;
 
-
         // 지역 정보만 사용하는 경우
          if (reviewLocation != null && !reviewLocation.isEmpty()) {
             reviewPage = reviewRepository.findAllByReviewLocation(reviewLocation, pageable);
@@ -113,13 +112,11 @@ public class ReviewService {
             reviewPage = reviewRepository
                     .findByReviewTitleContainingIgnoreCaseOrReviewSubtitleContainingIgnoreCaseOrReviewContentContainingIgnoreCaseOrReviewLocationContainingIgnoreCase
                             (keyword,keyword,keyword,keyword,pageable);
-
         }
         // 파라미터가 없는 경우
         else {
             reviewPage = reviewRepository.findAll(pageable);
         }
-
 
         //Review 엔티티들을 ReadReviewResponse DTO로 변환
         return reviewPage.map(review -> {

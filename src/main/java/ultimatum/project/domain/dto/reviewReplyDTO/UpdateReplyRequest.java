@@ -9,6 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateReplyRequest {
 
-    private String reviewReplyer;
     private String reviewReplyContent;
 }
