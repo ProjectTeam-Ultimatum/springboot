@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.dto.reviewDTO.*;
+import ultimatum.project.domain.dto.reviewReplyDTO.ReadReplyResponse;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewImage;
-import ultimatum.project.domain.dto.reviewReplyDTO.ReadReplyResponse;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
 import ultimatum.project.repository.MemberRepository;
@@ -21,7 +21,6 @@ import ultimatum.project.repository.ReviewImageRepository;
 import ultimatum.project.repository.ReviewReplyRepository;
 import ultimatum.project.repository.ReviewRepository;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
