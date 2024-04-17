@@ -1,5 +1,6 @@
 package ultimatum.project.service.review;
 
+import com.nimbusds.jose.JOSEObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -33,12 +34,16 @@ public class ReviewImageService {
         List<ReviewImage> reviewImages = new ArrayList<>();
         for (MultipartFile file : files) {
             try {
-                String fileUri = s3Service.uploadFileToS3(file);  // S3 업로드 로직을 서비스로 이동
+                String result = s3Service.uploadFileToS3(file);  // S3 업로드 로직을 서비스로 이동
+                String[] parts = result.split(",");
+                String fileUri = parts[0];
+                String uuid = parts[1];
 
                 // ReviewImage 객체 생성 및 저장
                 ReviewImage reviewImage = new ReviewImage();
                 reviewImage.setImageName(StringUtils.cleanPath(file.getOriginalFilename()));
                 reviewImage.setImageUri(fileUri); //s3 파일 uri 설정
+                reviewImage.setUuid(uuid);
                 reviewImage.setReview(review);
                 reviewImages.add(reviewImage);
 
