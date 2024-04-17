@@ -14,13 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.dto.reviewDTO.*;
-import ultimatum.project.domain.entity.member.Member;
-import ultimatum.project.global.exception.CustomException;
-import ultimatum.project.global.exception.ErrorCode;
-import ultimatum.project.repository.MemberRepository;
 import ultimatum.project.service.review.ReviewService;
 
-import java.io.IOException;
 import java.util.List;
 
 @Log4j2
@@ -32,7 +27,6 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
-    private final MemberRepository memberRepository;
 
     @PostMapping(consumes = {"multipart/form-data"})
     @Operation(summary = "게시글 작성", description = "여러가지입력해")
@@ -74,19 +68,18 @@ public class ReviewController {
     @Operation(summary = "게시글 수정")
 
     public ResponseEntity<UpdateReviewResponse> updateReview(Authentication authentication,
-            @PathVariable Long review_id,
+                                                             @PathVariable Long review_id,
                                                              @RequestParam("reviewTitle") String reviewTitle,
                                                              @RequestParam("reviewSubtitle") String reviewSubtitle,
                                                              @RequestParam("reviewContent") String reviewContent,
                                                              @RequestParam("reviewLocation") String reviewLocation,
                                                              @RequestParam(value = "newImages", required = false) List<MultipartFile> newImages,
-                                                             @RequestParam(value = "deleteImages", required = false) List<String> deleteImages) throws CustomException, IOException {
+                                                             @RequestParam(value = "deleteImages", required = false) List<String> deleteImages) {
 
         UpdateReviewRequest request = new UpdateReviewRequest(
                 reviewTitle, reviewSubtitle, reviewContent, reviewLocation, newImages, deleteImages);
         //이미지 관련 정보는 여기서 처리하지 않음.
-
-        UpdateReviewResponse response = reviewService.updateReview(authentication,review_id, request);
+        UpdateReviewResponse response = reviewService.updateReview(authentication, review_id, request);
 
         return ResponseEntity.ok(response);
 
@@ -94,8 +87,9 @@ public class ReviewController {
 
     @DeleteMapping("/{review_id}")
     @Operation(summary = "게시글 삭제")
-    public ResponseEntity<DeleteReviewResponse> deleteReview(Authentication authentication,@PathVariable Long review_id) throws IOException {
-        reviewService.deleteReview(authentication,review_id);
+    public ResponseEntity<DeleteReviewResponse> deleteReview(Authentication authentication,
+                                                             @PathVariable Long review_id) {
+        reviewService.deleteReview(authentication, review_id);
 
         return ResponseEntity.ok(new DeleteReviewResponse(review_id));
     }

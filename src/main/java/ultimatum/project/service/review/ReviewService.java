@@ -40,7 +40,9 @@ public class ReviewService {
 
 
     @Transactional
-    public CreateReviewResponse createReview(Authentication authentication, CreateReviewRequest request, List<MultipartFile> files) {
+    public CreateReviewResponse createReview(Authentication authentication,
+                                             CreateReviewRequest request,
+                                             List<MultipartFile> files) {
 
         if (authentication == null || !authentication.isAuthenticated())  {
             throw new CustomException(ErrorCode.BAD_REQUSET_USER);
@@ -49,7 +51,7 @@ public class ReviewService {
         Member member = memberRepository.findByMemberEmail(email);
 
         if (member == null) {
-            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
+            throw new CustomException(ErrorCode.INVALID_MEMBER);
         }
 
         //  Review 객체 생성 및 저장
@@ -96,7 +98,8 @@ public class ReviewService {
     }
 
 
-    public Page<ReadAllReviewResponse> getAllReviews(String reviewLocation, String keyword, Pageable pageable) {
+    public Page<ReadAllReviewResponse> getAllReviews(String reviewLocation,
+                                                     String keyword, Pageable pageable) {
 
         Page<Review> reviewPage;
 
@@ -167,7 +170,11 @@ public class ReviewService {
 
         List<ReadReplyResponse> replies = review.getReviewReplies().stream()
                 .map(reply -> new ReadReplyResponse(
-                        reply.getReviewReplyId(), reply.getReviewReplyer(), reply.getReviewReplyContent(), reply.getReg_date(), reply.getMod_date()
+                        reply.getReviewReplyId(),
+                        reply.getReviewReplyer(),
+                        reply.getReviewReplyContent(),
+                        reply.getReg_date(),
+                        reply.getMod_date()
                 )).collect(Collectors.toList());
 
         return new ReadReviewByIdResponse(
@@ -187,8 +194,9 @@ public class ReviewService {
     }
 
     @Transactional
-    public UpdateReviewResponse updateReview(Authentication authentication,Long reviewId, UpdateReviewRequest request
-    ) throws CustomException, IOException {
+    public UpdateReviewResponse updateReview(Authentication authentication,
+                                             Long reviewId,
+                                             UpdateReviewRequest request) throws CustomException {
 
         if (authentication == null || !authentication.isAuthenticated())  {
             throw new CustomException(ErrorCode.BAD_REQUSET_USER);
@@ -200,7 +208,7 @@ public class ReviewService {
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!member.getMemberEmail().equals(review.getAuthor())) {
-            throw new IOException("사용자가 등록한 게시물이 아니오!!");
+            throw new CustomException(ErrorCode.RESOURCE_NOT_YOURS);
         }
 
         review.update(request.getReviewTitle(), request.getReviewSubtitle(), request.getReviewContent(), request.getReviewLocation());
@@ -223,7 +231,7 @@ public class ReviewService {
 
 
     @Transactional
-    public DeleteReviewResponse deleteReview(Authentication authentication,Long reviewId) throws IOException {
+    public DeleteReviewResponse deleteReview(Authentication authentication, Long reviewId){
 
 
         if (authentication == null || !authentication.isAuthenticated())  {
@@ -238,7 +246,7 @@ public class ReviewService {
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!member.getMemberEmail().equals(review.getAuthor())) {
-            throw new IOException("사용자가 등록한 게시물이 아니오!!");
+            throw new CustomException(ErrorCode.RESOURCE_NOT_YOURS);
         }
 
         // S3에서 연관된 이미지 모두 삭제
@@ -259,7 +267,7 @@ public class ReviewService {
     @Transactional
     public ReviewLikeResponse updateReviewLike(Long reviewId, ReviewLikeRequest request) {
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("리뷰 아이디를 못찾음!"));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
         review.setReviewLike(request.getReviewLike());
         reviewRepository.save(review);
 
