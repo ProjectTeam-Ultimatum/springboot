@@ -52,10 +52,9 @@ public class RecommendController {
         // Use the integrated service method that handles both cases
         Page<RecommendListFoodResponse> response = recommendService.findRecommendListFood(tag, region, pageable);
 
-        log.info("listplace pageable : {}", pageable);
+        log.info("listfood pageable : {}", pageable);
         return ResponseEntity.ok(response);
     }
-
 
     //place 관광지
 //    @Tag(name = "recommend", description = "API 관광지리스트")

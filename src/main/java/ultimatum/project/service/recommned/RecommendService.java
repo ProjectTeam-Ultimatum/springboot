@@ -94,6 +94,7 @@ public class RecommendService {
 //        return recommendListFoodRepository.findAll(pageable)
 //                .map(entity -> modelMapper.map(entity, RecommendListFoodResponse.class));
 //    }
+
     public Page<RecommendListFoodResponse> findRecommendListFood(String tag, String region, Pageable pageable) {
         // 페이지 번호를 0부터 시작하도록 조정
         pageable = PageRequest.of(
@@ -110,7 +111,7 @@ public class RecommendService {
             // recommendFoodRegion를 기준으로 필터링된 페이지 데이터를 반환
             results = recommendListFoodRepository.findByRecommendFoodRegionContainingIgnoreCase(region, pageable);
         } else {
-            // 모든 맛집 리스트 데이터를 반환
+            // 관광지 리스트 데이터를 반환
             results = recommendListFoodRepository.findAll(pageable);
         }
 
