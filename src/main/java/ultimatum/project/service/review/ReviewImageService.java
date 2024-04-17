@@ -25,7 +25,6 @@ import java.util.List;
 public class ReviewImageService {
     private final ReviewImageRepository imageRepository;
     private final ReviewRepository reviewRepository;
-
     private final S3Service s3Service;
 
 

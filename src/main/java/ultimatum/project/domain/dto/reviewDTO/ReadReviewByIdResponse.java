@@ -33,4 +33,6 @@ public class ReadReviewByIdResponse {
     private LocalDateTime reg_date;
 
     private LocalDateTime mod_date;
+
+    private String author;
 }

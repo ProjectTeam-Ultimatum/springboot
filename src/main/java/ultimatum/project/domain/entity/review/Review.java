@@ -33,7 +33,7 @@ public class Review {
 
     private String reviewLocation;
 
-    private String memberAccount;
+    private String Author;
 
     /**
      * 왜 @OneToMany 를 써서 양방향으로 사용했는가?

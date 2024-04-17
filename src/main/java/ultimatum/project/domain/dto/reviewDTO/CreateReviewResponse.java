@@ -17,5 +17,5 @@ public class CreateReviewResponse {
     private Long reviewLike;
     private String reviewLocation;
     private List<ReviewImageResponse> reviewImages;
-    private String memberAccount;
+    private String author;
 }

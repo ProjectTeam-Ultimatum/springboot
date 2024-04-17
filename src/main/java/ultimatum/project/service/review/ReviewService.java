@@ -58,7 +58,7 @@ public class ReviewService {
         review.setReviewSubtitle(request.getReviewSubtitle());
         review.setReviewContent(request.getReviewContent());
         review.setReviewLocation(request.getReviewLocation());
-        review.setMemberAccount(email); //멤버 계정 이메일
+        review.setAuthor(email); //멤버 계정 이메일
 
         review = reviewRepository.save(review); // 저장하고 리턴받음으로써 ID를 획득
 
@@ -149,7 +149,7 @@ public class ReviewService {
                     replyResponses,
                     review.getReg_date(),
                     review.getMod_date(),
-                    review.getMemberAccount()
+                    review.getAuthor()
             );
         });
     }
@@ -180,7 +180,8 @@ public class ReviewService {
                 images,
                 replies,
                 review.getReg_date(),
-                review.getMod_date()
+                review.getMod_date(),
+                review.getAuthor()
         );
 
     }
