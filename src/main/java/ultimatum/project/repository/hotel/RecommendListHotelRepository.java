@@ -10,5 +10,5 @@ import ultimatum.project.domain.entity.hotel.RecommendListHotel;
 public interface RecommendListHotelRepository extends JpaRepository<RecommendListHotel, Long> {
 
     Page<RecommendListHotel> findByRecommendHotelTagContainingIgnoreCase(String tag, Pageable pageable);
-    Page<RecommendListHotel> findByRecommendHotelRegionCase(String region, Pageable pageable);
+    Page<RecommendListHotel> findByRecommendHotelRegionContainingIgnoreCase(String region, Pageable pageable);
 }

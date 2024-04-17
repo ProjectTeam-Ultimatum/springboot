@@ -137,16 +137,30 @@ public class RecommendController {
 //        return ResponseEntity.ok(response);
 //    }
 
+//    @Tag(name = "recommend", description = "API 축제행사리스트")
+//    @GetMapping("/listevent")
+//    public ResponseEntity<Page<RecommendListEventResponse>> getListEvents(
+//            @RequestParam(value = "tag", required = false) String tag,
+//            @PageableDefault(size = 12, sort = "recommendEventId", direction = Sort.Direction.DESC) Pageable pageable) {
+//
+//        // Use the integrated service method that handles both cases
+//        Page<RecommendListEventResponse> response = recommendService.findRecommendListEvent(tag, pageable);
+//
+//        log.info("listevent pageable : {}", pageable);
+//        return ResponseEntity.ok(response);
+//    }
+
     @Tag(name = "recommend", description = "API 축제행사리스트")
     @GetMapping("/listevent")
     public ResponseEntity<Page<RecommendListEventResponse>> getListEvents(
             @RequestParam(value = "tag", required = false) String tag,
+            @RequestParam(value = "region", required = false) String region,
             @PageableDefault(size = 12, sort = "recommendEventId", direction = Sort.Direction.DESC) Pageable pageable) {
 
         // Use the integrated service method that handles both cases
-        Page<RecommendListEventResponse> response = recommendService.findRecommendListEvent(tag, pageable);
+        Page<RecommendListEventResponse> response = recommendService.findRecommendListEvent(tag, region, pageable);
 
-        log.info("listevent pageable : {}", pageable);
+        log.info("listhotel pageable : {}", pageable);
         return ResponseEntity.ok(response);
     }
 

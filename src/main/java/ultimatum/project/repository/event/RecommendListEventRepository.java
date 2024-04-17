@@ -8,5 +8,5 @@ import ultimatum.project.domain.entity.food.RecommendListFood;
 
 public interface RecommendListEventRepository extends JpaRepository<RecommendListEvent, Long> {
     Page<RecommendListEvent> findByRecommendEventTagContainingIgnoreCase(String tag, Pageable pageable);
-    Page<RecommendListEvent> findByRecommendEventRegionCase(String region, Pageable pageable);
+    Page<RecommendListEvent> findByRecommendEventRegionContainingIgnoreCase(String region, Pageable pageable);
 }

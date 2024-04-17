@@ -8,5 +8,5 @@ import ultimatum.project.domain.entity.place.RecommendListPlace;
 
 public interface RecommendListPlaceRepository extends JpaRepository<RecommendListPlace, Long> {
     Page<RecommendListPlace> findByRecommendPlaceTagContainingIgnoreCase(String tag, Pageable pageable);
-    Page<RecommendListPlace> findByRecommendPlaceRegionCase(String region, Pageable pageable);
+    Page<RecommendListPlace> findByRecommendPlaceRegionContainingIgnoreCase(String region, Pageable pageable);
 }
