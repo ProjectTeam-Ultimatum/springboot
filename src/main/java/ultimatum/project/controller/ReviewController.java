@@ -41,7 +41,7 @@ public class ReviewController {
                                                              @RequestParam("reviewSubtitle") String reviewSubtitle,
                                                              @RequestParam("reviewContent") String reviewContent,
                                                              @RequestParam("reviewLocation") String reviewLocation,
-                                                             @RequestParam("reviewImages") List<MultipartFile> reviewImages) throws IOException {
+                                                             @RequestParam("reviewImages") List<MultipartFile> reviewImages) {
 
         // CreateReviewRequest 객체를 생성하고 파라미터로 전달받은 값을 설정합니다.
         CreateReviewRequest request = new CreateReviewRequest(
