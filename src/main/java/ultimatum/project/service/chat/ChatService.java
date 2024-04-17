@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.repository.MessageRepository;
 import ultimatum.project.domain.dto.chatDTO.ChatMessageDto;
 import ultimatum.project.domain.dto.chatDTO.ChatRoomDto;
@@ -30,18 +32,29 @@ public class ChatService {
     private final ObjectMapper mapper;
 
     // 채팅 메시지 저장
-    public void saveMessage(ChatMessageDto chatMessageDto) {
+// 채팅 메시지 저장
+    public void saveMessage(ChatMessageDto chatMessageDto, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalArgumentException("인증된 사용자가 아닙니다.");
+        }
+
+        Member member = (Member) authentication.getPrincipal(); // Authentication 객체에서 Member 정보를 가져옴
+        String senderName = member.getMemberName(); // Member 객체에서 사용자 이름을 가져옴
+        String senderEmail = member.getMemberEmail();
+
         ChatRoom chatRoom = chatRoomRepository.findById(chatMessageDto.getChatRoomId())
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
 
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setChatRoom(chatRoom);
-        chatMessage.setSenderId(chatMessageDto.getSenderId());
+        chatMessage.setSenderId(senderName);  // 사용자 이름을 senderId에 저장
+        chatMessage.setSenderEmail(senderEmail);
         chatMessage.setMessage(chatMessageDto.getMessage());
         chatMessage.setMessageType(chatMessageDto.getMessageType());
 
         messageRepository.save(chatMessage);
     }
+
 
 
     // 모든 채팅방 조회
@@ -156,6 +169,7 @@ public class ChatService {
                         message.getMessageType(),
                         message.getChatRoom().getChatRoomId(),
                         message.getSenderId(),
+                        message.getSenderEmail(),
                         message.getMessage(),
                         message.getImageUrl()))
                 .collect(Collectors.toList());

@@ -4,6 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -11,9 +15,13 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import ultimatum.project.domain.dto.chatDTO.ChatMessageDto;
 import ultimatum.project.domain.dto.chatDTO.MessageType;
+import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.service.chat.ChatService;
+import ultimatum.project.service.chat.JwtTokenService;
 
 import java.io.*;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Slf4j
@@ -23,6 +31,8 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
     private  final ObjectMapper mapper;
 
     private final ChatService chatService;
+
+    private final JwtTokenService jwtTokenService;
 
     // 현재 연결된 세션들
     private final Set<WebSocketSession> sessions = new HashSet<>();
@@ -36,10 +46,50 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
 
     // 소켓 연결 확인
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception{
-        // TODO Auto-generated method stub
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        String query = session.getUri().getQuery();
+        Map<String, String> queryParams = parseQuery(query);
+        String token = queryParams.get("token");
+
+        // 'Bearer ' 접두사 제거
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
+        if (token == null || !jwtTokenService.validateToken(token)) {
+            log.warn("Invalid or missing token for session id {}", session.getId());
+            session.close();
+            return;
+        }
+
+        Member member = jwtTokenService.parseToken(token);
+        if (member == null) {
+            log.warn("Invalid token data for session id {}", session.getId());
+            session.close();
+            return;
+        }
+
         log.info("{} 연결됨", session.getId());
         sessions.add(session);
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(member, null, member.getAuthorities());
+        context.setAuthentication(authentication);
+        session.getAttributes().put("SPRING_SECURITY_CONTEXT", context);
+    }
+
+    // 유틸리티 메소드: 쿼리 파라미터 파싱
+    private Map<String, String> parseQuery(String query) {
+        Map<String, String> queryParams = new HashMap<>();
+        if (query != null) {
+            String[] pairs = query.split("&");
+            for (String pair : pairs) {
+                int idx = pair.indexOf("=");
+                queryParams.put(URLDecoder.decode(pair.substring(0, idx), StandardCharsets.UTF_8),
+                        URLDecoder.decode(pair.substring(idx + 1), StandardCharsets.UTF_8));
+            }
+        }
+        return queryParams;
     }
 
 
@@ -49,15 +99,26 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
         String payload = message.getPayload();
         ChatMessageDto chatMessageDto = mapper.readValue(payload, ChatMessageDto.class);
 
+        SecurityContext context = (SecurityContext) session.getAttributes().get("SPRING_SECURITY_CONTEXT");
+
+        // SecurityContext와 Authentication 검증
+        if (context == null || context.getAuthentication() == null || !context.getAuthentication().isAuthenticated()) {
+            log.warn("No authentication information available for session id {}", session.getId());
+            return; // 인증 정보 없이는 처리하지 않음
+        }
+
+        Authentication authentication = context.getAuthentication();
+        Member member = (Member) context.getAuthentication().getPrincipal();
         Long chatRoomId = chatMessageDto.getChatRoomId();
         if (!chatRoomSessionMap.containsKey(chatRoomId)) {
             chatRoomSessionMap.put(chatRoomId, new HashSet<>());
         }
 
+        // 메시지 타입에 따른 처리
         switch (chatMessageDto.getMessageType()) {
             case ENTER:
                 handleEnter(session, chatRoomId);
-                String enterMessageContent =  " 님이 입장하셨습니다.";
+                String enterMessageContent = " 님이 입장하셨습니다.";
                 ChatMessageDto enterMessage = ChatMessageDto.builder()
                         .messageType(MessageType.ENTER)
                         .chatRoomId(chatRoomId)
@@ -67,12 +128,11 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
                 sendMessageToChatRoom(enterMessage, chatRoomSessionMap.get(chatRoomId));
                 break;
             case TALK:
-                // 일반 채팅 메시지인 경우, 데이터베이스에 메시지 저장
-                chatService.saveMessage(chatMessageDto);
+                chatService.saveMessage(chatMessageDto, authentication);  // Modified to include authentication
+                chatMessageDto.setMessage(chatMessageDto.getMessage());
                 sendMessageToChatRoom(chatMessageDto, chatRoomSessionMap.get(chatRoomId));
                 break;
             case IMAGE:
-                // 이미지 메시지인 경우, 이미지 URL을 포함한 메시지 전송
                 if (chatMessageDto.getImageUrl() != null) {
                     sendMessageToChatRoom(chatMessageDto, chatRoomSessionMap.get(chatRoomId));
                 }
@@ -81,10 +141,12 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
                 handleLeave(session, chatRoomId);
                 break;
             default:
-                log.warn("Unhandled message type: " + chatMessageDto.getMessageType());
+                log.warn("Unhandled message type: {}", chatMessageDto.getMessageType());
                 break;
         }
     }
+
+
 
     public void broadcastImageLink(String imageUrl, Long chatRoomId) {
         ChatMessageDto messageDto = new ChatMessageDto();
@@ -137,9 +199,30 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
         chatRoomSession.removeIf(sess -> !sessions.contains(sess));
     }
 
-    private void sendMessageToChatRoom(ChatMessageDto chatMessageDto, Set<WebSocketSession> chatRoomSession) {
-        chatRoomSession.forEach(sess -> sendMessage(sess, chatMessageDto));
+    // 메시지를 생성하고 클라이언트에게 보내는 메서드
+    public void sendMessageToChatRoom(ChatMessageDto chatMessageDto, Set<WebSocketSession> sessions) {
+        try {
+            for (WebSocketSession session : sessions) {
+                if (session.isOpen()) {
+                    // session에서 SecurityContext를 가져옵니다.
+                    SecurityContext context = (SecurityContext) session.getAttributes().get("SPRING_SECURITY_CONTEXT");
+                    if (context != null) {
+                        Authentication auth = context.getAuthentication();  // Authentication 객체를 가져옵니다.
+                        if (auth != null && auth.getPrincipal() instanceof Member) {
+                            Member member = (Member) auth.getPrincipal();
+                            chatMessageDto.setSenderId(member.getMemberName()); // 사용자 이름 설정
+                            String messagePayload = mapper.writeValueAsString(chatMessageDto);
+                            session.sendMessage(new TextMessage(messagePayload));
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to send message", e);
+        }
     }
+
+
 
     public <T> void sendMessage(WebSocketSession session, T message) {
         try {

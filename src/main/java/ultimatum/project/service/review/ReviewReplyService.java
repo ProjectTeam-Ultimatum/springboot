@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ultimatum.project.domain.dto.reviewReplyDTO.*;
 import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewReply;
-import ultimatum.project.dto.reviewReplyDTO.*;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
 import ultimatum.project.repository.ReviewReplyRepository;
