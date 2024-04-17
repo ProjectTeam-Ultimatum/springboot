@@ -205,7 +205,7 @@ public class ReviewService {
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!member.getMemberEmail().equals(review.getAuthor())) {
-            throw new CustomException(ErrorCode.RESOURCE_NOT_YOURS);
+            throw new CustomException(ErrorCode.REVIEW_NOT_YOURS);
         }
 
         review.update(request.getReviewTitle(), request.getReviewSubtitle(), request.getReviewContent(), request.getReviewLocation());
@@ -243,7 +243,7 @@ public class ReviewService {
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!member.getMemberEmail().equals(review.getAuthor())) {
-            throw new CustomException(ErrorCode.RESOURCE_NOT_YOURS);
+            throw new CustomException(ErrorCode.REVIEW_NOT_YOURS);
         }
 
         // S3에서 연관된 이미지 모두 삭제

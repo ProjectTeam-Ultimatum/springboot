@@ -91,7 +91,7 @@ public class ReviewReplyService {
                         .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!member.getMemberEmail().equals(reviewReply.getReviewReplyer())) {
-            throw new CustomException(ErrorCode.RESOURCE_NOT_YOURS);
+            throw new CustomException(ErrorCode.REPLY_NOT_YOURS);
         }
         reviewReply.update(request.getReviewReplyContent());
 
@@ -119,7 +119,7 @@ public class ReviewReplyService {
                 .orElseThrow(()-> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if(!member.getMemberEmail().equals(reviewReply.getReviewReplyer())){
-            throw new CustomException(ErrorCode.RESOURCE_NOT_YOURS);
+            throw new CustomException(ErrorCode.REPLY_NOT_YOURS);
         }
 
         reviewReplyRepository.delete(reviewReply);

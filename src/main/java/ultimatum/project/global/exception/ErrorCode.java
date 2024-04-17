@@ -43,8 +43,9 @@ public enum ErrorCode {
     /* 500 INTERNAL_SERVER_ERROR : 파일 처리 오류 */
     FILE_PROCESSING_ERROR(500, "INTERNAL_SERVER_ERROR", "파일 처리 중 오류가 발생하였습니다."),
 
-    RESOURCE_NOT_YOURS(500, "RESOURCE_NOT_YOURS", "당신의 게시글이 아닙니다.");
+    REVIEW_NOT_YOURS(500, "RESOURCE_NOT_YOURS", "수정/삭제 불가능한 게시글 입니다."),
 
+    REPLY_NOT_YOURS(500, "RESOURCE_NOT_YOURS", "수정/삭제 불가능한 댓글입니다.");
 
 
     private int status;
