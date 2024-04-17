@@ -35,6 +35,6 @@ public class ReadAllReviewResponse {
 
     private LocalDateTime mod_date;
 
-
+    private String author;
 
 }

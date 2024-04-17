@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import ultimatum.project.domain.dto.reviewDTO.DeleteReviewResponse;
 import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewImage;
 import ultimatum.project.domain.dto.reviewDTO.UpdateReviewRequest;
@@ -24,7 +25,6 @@ import java.util.List;
 public class ReviewImageService {
     private final ReviewImageRepository imageRepository;
     private final ReviewRepository reviewRepository;
-
     private final S3Service s3Service;
 
 
@@ -97,9 +97,6 @@ public class ReviewImageService {
                     throw new RuntimeException("Failed to upload image: " + newImage.getOriginalFilename(), e);
                 }
             }
-
         }
-
     }
-
 }
