@@ -30,78 +30,59 @@ public class ReviewImageService {
 
 
     @Transactional
+    public void updateReviewImages(Long reviewId, UpdateReviewRequest request) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        // 이미지 삭제 로직
+        if (request.getDeleteImageIds() != null && !request.getDeleteImageIds().isEmpty()) {
+            deleteImages(request.getDeleteImageIds(), review);
+        }
+
+        // 새 이미지 추가 로직
+        if (request.getReviewImages() != null && !request.getReviewImages().isEmpty()) {
+            List<ReviewImage> addedImages = createReviewImages(request.getReviewImages(), review);
+            review.getReviewImages().addAll(addedImages);
+        }
+    }
+
     public List<ReviewImage> createReviewImages(List<MultipartFile> files, Review review) {
         List<ReviewImage> reviewImages = new ArrayList<>();
         for (MultipartFile file : files) {
             try {
-                String result = s3Service.uploadFileToS3(file);  // S3 업로드 로직을 서비스로 이동
+                String result = s3Service.uploadFileToS3(file);
                 String[] parts = result.split(",");
                 String fileUri = parts[0];
                 String uuid = parts[1];
 
-                // ReviewImage 객체 생성 및 저장
-                ReviewImage reviewImage = new ReviewImage();
-                reviewImage.setImageName(StringUtils.cleanPath(file.getOriginalFilename()));
-                reviewImage.setImageUri(fileUri); //s3 파일 uri 설정
-                reviewImage.setUuid(uuid);
-                reviewImage.setReview(review);
+                ReviewImage reviewImage = ReviewImage.builder()
+                        .review(review)
+                        .imageName(StringUtils.cleanPath(file.getOriginalFilename()))
+                        .imageUri(fileUri)
+                        .uuid(uuid)
+                        .build();
                 reviewImages.add(reviewImage);
-
+                imageRepository.save(reviewImage);
+                log.info("Uploaded and saved new image: {}", file.getOriginalFilename());
             } catch (IOException e) {
-                throw new RuntimeException("이미지 저장 실패" + file.getOriginalFilename(), e);
+                log.error("Failed to upload image: {}", file.getOriginalFilename(), e);
+                throw new RuntimeException("Failed to upload image: " + file.getOriginalFilename(), e);
             }
         }
         return reviewImages;
     }
 
-
-    @Transactional
-    public void updateImages(Long reviewId, UpdateReviewRequest request) {
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
-
-
-        //삭제할 이미지 ID처리
-        if (request.getDeleteImageIds() != null) {
-            for (String imageIdStr : request.getDeleteImageIds()) {
-                Long imageId = Long.parseLong(imageIdStr);
-                //이미지 존재확인
-                ReviewImage image = imageRepository.findById(imageId)
-                        .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
-                log.info("삭제할 이미지 id : " + imageId);
-
-
-                // Review 엔티티에서 이미지 정보 삭제
-                review.getReviewImages().removeIf(img -> img.getReviewImageId().equals(imageId));
-
-                // 데이터베이스에서 이미지 정보 삭제
-                imageRepository.delete(image);
-
-                //S3 이미지 삭제 로직
-                s3Service.deleteFileFromS3(image.getImageUri());
-
-
-                log.info("Image with id: {} deleted from database", imageId);
-            }
-        }
-        // 새이미지 추가
-        if (request.getReviewImages() != null && !request.getReviewImages().isEmpty()) {
-            for (MultipartFile newImage : request.getReviewImages()) {
-                try {
-                    String imageUrl = s3Service.uploadFileToS3(newImage);
-                    ReviewImage image = ReviewImage.builder()
-                            .review(review)
-                            .imageName(newImage.getOriginalFilename())
-                            .imageUri(imageUrl)
-                            .build();
-                    imageRepository.save(image);
-                    log.info("Uploaded and saved image: {}", newImage.getOriginalFilename());
-                } catch (IOException e) {
-                    log.error("Failed to upload image: {}", newImage.getOriginalFilename(), e);
-                    // Optionally rethrow to manage transaction rollback
-                    throw new RuntimeException("Failed to upload image: " + newImage.getOriginalFilename(), e);
-                }
-            }
+    public void deleteImages(List<String> deleteImageIds, Review review) {
+        for (String imageIdStr : deleteImageIds) {
+            Long imageId = Long.parseLong(imageIdStr);
+            ReviewImage image = imageRepository.findById(imageId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+            review.getReviewImages().removeIf(img -> img.getReviewImageId().equals(imageId));
+            imageRepository.delete(image);
+            s3Service.deleteFileFromS3(image.getImageUri());
+            log.info("Deleted image ID: {}", imageId);
         }
     }
+
+
 }

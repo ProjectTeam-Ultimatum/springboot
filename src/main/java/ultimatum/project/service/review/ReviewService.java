@@ -219,7 +219,7 @@ public class ReviewService {
         review.update(request.getReviewTitle(), request.getReviewSubtitle(), request.getReviewContent(), request.getReviewLocation());
 
         reviewRepository.save(review);
-        imageService.updateImages(reviewId, request);
+        imageService.updateReviewImages(reviewId, request);
 
         List<ReviewImageResponse> imageResponses = review.getReviewImages().stream()
                 .map(image -> new ReviewImageResponse(image.getReviewImageId(), image.getImageName(), image.getImageUri(), image.getUuid()))
