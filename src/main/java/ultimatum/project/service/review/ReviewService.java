@@ -196,12 +196,12 @@ public class ReviewService {
         String email = authentication.getName();
         Member member = memberRepository.findByMemberEmail(email);
 
-        if (member == null) {
-            throw new IOException("Member with email " + email + " not found.");
-        }
-
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        if (!member.getMemberEmail().equals(review.getAuthor())) {
+            throw new IOException("사용자가 등록한 게시물이 아니오!!");
+        }
 
         review.update(request.getReviewTitle(), request.getReviewSubtitle(), request.getReviewContent(), request.getReviewLocation());
 
@@ -223,18 +223,23 @@ public class ReviewService {
 
 
     @Transactional
-    public DeleteReviewResponse deleteReview(Authentication authentication,Long reviewId)  {
+    public DeleteReviewResponse deleteReview(Authentication authentication,Long reviewId) throws IOException {
 
 
         if (authentication == null || !authentication.isAuthenticated())  {
             throw new CustomException(ErrorCode.BAD_REQUSET_USER);
         }
         String email = authentication.getName();
-        memberRepository.findByMemberEmail(email);
+        Member member = memberRepository.findByMemberEmail(email);
+
 
 
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new EntityNotFoundException("사용자 게시글 ID를 찾을 수 없습니다." + reviewId));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        if (!member.getMemberEmail().equals(review.getAuthor())) {
+            throw new IOException("사용자가 등록한 게시물이 아니오!!");
+        }
 
         // S3에서 연관된 이미지 모두 삭제
         review.getReviewImages().forEach(image -> {
@@ -245,7 +250,6 @@ public class ReviewService {
                 throw new RuntimeException("Failed to delete image from S3: " + image.getImageUri(), e);
             }
         });
-
         // 리뷰 삭제
         reviewRepository.delete(review);
         return new DeleteReviewResponse(reviewId);
