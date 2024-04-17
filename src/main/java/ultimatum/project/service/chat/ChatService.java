@@ -86,15 +86,13 @@ public class ChatService {
         // 채팅방 참여자에게 새 메시지 알림
     }
 
-    public ChatRoomDto createChatRoom(ChatRoomDto chatRoomDto) {
+    public ChatRoom createChatRoom(ChatRoomDto chatRoomDto, Member member) {
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setChatRoomName(chatRoomDto.getChatRoomName());
-        chatRoom.setChatRoomContent(chatRoomDto.getChatRoomContent()); // 채팅방 내용 설정을 추가해주세요
-        chatRoom.setTravelStyleTags(chatRoomDto.getTravelStyleTags()); // 여행 스타일 태그 설정
-
-        ChatRoom savedRoom = chatRoomRepository.save(chatRoom);
-
-        return new ChatRoomDto(savedRoom.getChatRoomId(), savedRoom.getChatRoomName(), savedRoom.getChatRoomContent(), savedRoom.getTravelStyleTags());
+        chatRoom.setChatRoomContent(chatRoomDto.getChatRoomContent());
+        chatRoom.setTravelStyleTags(chatRoomDto.getTravelStyleTags());
+        chatRoom.setMember(member); // 채팅방 개설 회원 설정
+        return chatRoomRepository.save(chatRoom);
     }
 
     //채팅방 삭제

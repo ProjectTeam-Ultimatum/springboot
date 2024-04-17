@@ -1,10 +1,14 @@
 package ultimatum.project.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ultimatum.project.domain.dto.chatDTO.ChatMessageDto;
 import ultimatum.project.domain.dto.chatDTO.ChatRoomDto;
+import ultimatum.project.domain.entity.chat.ChatRoom;
+import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.service.chat.ChatService;
 
 import java.util.List;
@@ -21,11 +25,27 @@ public class ChatController {
 
     // 채팅방 생성
     @PostMapping("/create")
-    public ResponseEntity<ChatRoomDto> createChatRoom(@RequestBody ChatRoomDto chatRoomDto) {
+    public ResponseEntity<ChatRoomDto> createChatRoom(@RequestBody ChatRoomDto chatRoomDto,
+                                                      Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
 
-        // chatService를 사용하여 채팅방 생성
-        ChatRoomDto createdRoom = chatService.createChatRoom(chatRoomDto);
-        return ResponseEntity.ok(createdRoom);
+        try {
+            Member member = (Member) authentication.getPrincipal();
+            ChatRoom createdRoom = chatService.createChatRoom(chatRoomDto, member);
+
+            ChatRoomDto savedRoomDto = new ChatRoomDto(
+                    createdRoom.getChatRoomId(),
+                    createdRoom.getChatRoomName(),
+                    createdRoom.getChatRoomContent(),
+                    createdRoom.getTravelStyleTags()
+            );
+
+            return new ResponseEntity<>(savedRoomDto, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
