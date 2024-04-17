@@ -3,6 +3,8 @@ package ultimatum.project.domain.entity.review;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Entity
 @Builder
 @Getter
@@ -18,6 +20,9 @@ public class ReviewImage {
     private String imageName;
 
     private String imageUri;
+
+
+    private String uuid ;
 
     /**
      * fetchType.LAZY : 지연로딩

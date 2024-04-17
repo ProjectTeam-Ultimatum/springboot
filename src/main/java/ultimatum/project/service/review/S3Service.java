@@ -18,6 +18,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -41,8 +42,11 @@ public class S3Service {
         // 파일의 이름이 null 인 경우 예외 발생
         String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename(), "File name cannot be null"));
 
+        String uuid = UUID.randomUUID().toString();
+        String fileNameWithUUID = uuid + "_" + originalFileName;
+
         // S3에 파일 업로드: 파일의 저장 위치와 파일 이름
-        String s3Key = "uploads/" + originalFileName;
+        String s3Key = "uploads/" + fileNameWithUUID;
 
         // 업로드할 파일의 메타데이터를 설정하는데 사용 (파일의 크기 설정)
         ObjectMetadata metadata = new ObjectMetadata();
@@ -50,10 +54,10 @@ public class S3Service {
 
         // 파일 스트림과 메타데이터를 함께 S3에 업로드
         amazonS3.putObject(new PutObjectRequest(bucketName, s3Key, file.getInputStream(), metadata));
-        log.info("업데이트 이미지파일 Uploading file to S3: {}", file.getOriginalFilename());
+        log.info("업데이트 이미지파일 Uploading file to S3: {}", fileNameWithUUID);
 
         // 성공적인 업로드 후 파일에 접근할 수 있는 URI 생성
-        return amazonS3.getUrl(bucketName, s3Key).toString();
+        return String.format("%s,%s", amazonS3.getUrl(bucketName, s3Key).toString(),uuid);
     }
 
     /**
