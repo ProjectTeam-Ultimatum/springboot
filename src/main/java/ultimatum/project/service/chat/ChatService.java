@@ -27,8 +27,6 @@ import java.util.stream.Collectors;
 public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final MessageRepository messageRepository;
-    private final ModelMapper modelMapper; // ModelMapper 라이브러리를 사용한 예시
-
     private final Map<Long, Set<WebSocketSession>> chatRoomSessionMap = new HashMap<>();
     private final ObjectMapper mapper;
 
