@@ -108,7 +108,6 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
         }
 
         Authentication authentication = context.getAuthentication();
-        Member member = (Member) context.getAuthentication().getPrincipal();
         Long chatRoomId = chatMessageDto.getChatRoomId();
         if (!chatRoomSessionMap.containsKey(chatRoomId)) {
             chatRoomSessionMap.put(chatRoomId, new HashSet<>());
