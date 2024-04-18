@@ -63,7 +63,7 @@ public class RestApiController {
     public ResponseEntity<String> join(
             @RequestPart("member") MemberRequestDto memberRequestDto,
             @RequestPart("files") List<MultipartFile> files) {
-        memberRequestDto.setFiles(files); // 파일 정보 설정
+        memberRequestDto.setFiles(files);
         String result = memberService.createMember(memberRequestDto);
         return ResponseEntity.ok(result);
     }

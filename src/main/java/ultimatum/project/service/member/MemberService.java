@@ -28,6 +28,7 @@ public class MemberService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final MemberImageService memberImageService;
 
+    @Transactional
     public String createMember(MemberRequestDto memberRequestDto) {
         // 회원 정보 생성
         Member member = Member.builder()
@@ -40,13 +41,17 @@ public class MemberService {
                 .memberRole("ROLE_USER")
                 .build();
 
-        memberRepository.save(member);
+        // 초기 회원 정보 저장
+        member = memberRepository.save(member);
 
-        if (memberRequestDto.getFiles() != null && !memberRequestDto.getFiles().isEmpty()) {
-            List<MemberImage> images = memberImageService.createMemberImages(memberRequestDto.getFiles(), member);
-            member.setMemberImages(images);
-            memberRepository.save(member);
-        }
+        // 파일 처리 및 MemberImage 객체 리스트 생성
+        List<MemberImage> memberImages = memberImageService.createMemberImages(memberRequestDto.getFiles(), member);
+
+        // 이미지 객체들을 회원 엔티티에 설정
+        member.setMemberImages(memberImages);
+
+        // 변경된 회원 객체를 다시 저장 (이미지 정보 포함)
+        memberRepository.save(member);
 
         // 회원가입 완료 메시지 반환
         return "회원가입 완료: " + member.getMemberName();
