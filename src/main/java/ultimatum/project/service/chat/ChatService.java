@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import ultimatum.project.domain.dto.chatDTO.ChatRoomListDto;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.repository.MessageRepository;
 import ultimatum.project.domain.dto.chatDTO.ChatMessageDto;
@@ -58,10 +59,19 @@ public class ChatService {
 
 
     // 모든 채팅방 조회
-    public List<ChatRoomDto> getChatRooms() {
+    public List<ChatRoomListDto> getChatRooms() {
         return chatRoomRepository.findAll().stream()
-                .map(chatRoom -> new ChatRoomDto(chatRoom.getChatRoomId(), chatRoom.getChatRoomName(), chatRoom.getChatRoomContent(),chatRoom.getTravelStyleTags()))
-                .collect(Collectors.toList());
+                .map(chatRoom -> {
+                    Member member = chatRoom.getMember();
+                    return new ChatRoomListDto(
+                            chatRoom.getChatRoomId(),
+                            chatRoom.getChatRoomName(),
+                            chatRoom.getChatRoomContent(),
+                            member.getMemberName(),  // 작성자 이름
+                            member.getMemberAge(),   // 작성자 나이
+                            chatRoom.getTravelStyleTags()
+                    );
+                }).collect(Collectors.toList());
     }
 
     // 특정 채팅방에 입장
@@ -87,12 +97,17 @@ public class ChatService {
     }
 
     public ChatRoom createChatRoom(ChatRoomDto chatRoomDto, Member member) {
-        ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setChatRoomName(chatRoomDto.getChatRoomName());
-        chatRoom.setChatRoomContent(chatRoomDto.getChatRoomContent());
-        chatRoom.setTravelStyleTags(chatRoomDto.getTravelStyleTags());
-        chatRoom.setMember(member); // 채팅방 개설 회원 설정
-        return chatRoomRepository.save(chatRoom);
+        try {
+            ChatRoom chatRoom = new ChatRoom();
+            chatRoom.setChatRoomName(chatRoomDto.getChatRoomName());
+            chatRoom.setChatRoomContent(chatRoomDto.getChatRoomContent());
+            chatRoom.setTravelStyleTags(chatRoomDto.getTravelStyleTags());
+            chatRoom.setMember(member); // 채팅방 개설 회원 설정
+            return chatRoomRepository.save(chatRoom);
+        } catch (Exception e) {
+            log.error("Failed to create chat room: ", e);
+            throw e;
+        }
     }
 
     //채팅방 삭제
