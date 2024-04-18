@@ -11,11 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDto;
 import ultimatum.project.domain.dto.logInDTO.MemberRequestDto;
 import ultimatum.project.domain.entity.member.Member;
+import ultimatum.project.domain.entity.member.MemberImage;
 import ultimatum.project.global.config.Security.jwt.JwtProperties;
 import ultimatum.project.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Transactional
@@ -24,6 +26,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final MemberImageService memberImageService;
 
     public String createMember(MemberRequestDto memberRequestDto) {
         // 회원 정보 생성
@@ -38,6 +41,12 @@ public class MemberService {
                 .build();
 
         memberRepository.save(member);
+
+        if (memberRequestDto.getFiles() != null && !memberRequestDto.getFiles().isEmpty()) {
+            List<MemberImage> images = memberImageService.createMemberImages(memberRequestDto.getFiles(), member);
+            member.setMemberImages(images);
+            memberRepository.save(member);
+        }
 
         // 회원가입 완료 메시지 반환
         return "회원가입 완료: " + member.getMemberName();

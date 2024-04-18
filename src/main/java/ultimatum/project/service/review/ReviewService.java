@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.dto.reviewDTO.*;
 import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewImage;
-import ultimatum.project.dto.reviewDTO.*;
 import ultimatum.project.domain.dto.reviewReplyDTO.ReadReplyResponse;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;

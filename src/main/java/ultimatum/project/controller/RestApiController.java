@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDto;
 import ultimatum.project.domain.dto.logInDTO.MemberRequestDto;
 import ultimatum.project.domain.entity.member.Member;
@@ -59,9 +60,12 @@ public class RestApiController {
     }
 
     @PostMapping("/join")
-    public String join(@RequestBody @Valid MemberRequestDto memberRequestDto) {
-        String resultMessage = memberService.createMember(memberRequestDto);
-        return resultMessage; // 회원가입 결과 메시지 반환
+    public ResponseEntity<String> join(
+            @RequestPart("member") MemberRequestDto memberRequestDto,
+            @RequestPart("files") List<MultipartFile> files) {
+        memberRequestDto.setFiles(files); // 파일 정보 설정
+        String result = memberService.createMember(memberRequestDto);
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/accessToken")
