@@ -128,9 +128,19 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
                 sendMessageToChatRoom(enterMessage, chatRoomSessionMap.get(chatRoomId));
                 break;
             case TALK:
+                // TALK 메시지 처리 전 로그 추가
+                log.info("Received TALK message: sessionId={}, senderId={}, message={}",
+                        session.getId(), chatMessageDto.getSenderId(), chatMessageDto.getMessage());
+
                 chatService.saveMessage(chatMessageDto, authentication);  // Modified to include authentication
                 chatMessageDto.setMessage(chatMessageDto.getMessage());
+                // TALK 메시지 브로드캐스트하기 전 로그 추가
+                log.info("Broadcasting TALK message: sessionId={}, senderId={}, message={}",
+                        session.getId(), chatMessageDto.getSenderId(), chatMessageDto.getMessage());
+
                 sendMessageToChatRoom(chatMessageDto, chatRoomSessionMap.get(chatRoomId));
+                log.info("Broadcasted TALK message: sessionId={}, senderId={}, message={}",
+                        session.getId(), chatMessageDto.getSenderId(), chatMessageDto.getMessage());
                 break;
             case IMAGE:
                 if (chatMessageDto.getImageUrl() != null) {
@@ -139,6 +149,13 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
                 break;
             case LEAVE:
                 handleLeave(session, chatRoomId);
+                ChatMessageDto leaveMessage = ChatMessageDto.builder()
+                        .messageType(MessageType.LEAVE)
+                        .chatRoomId(chatRoomId)
+                        .senderId(chatMessageDto.getSenderId())
+                        .message(chatMessageDto.getSenderId() + "님이 퇴장하셨습니다.")
+                        .build();
+                sendMessageToChatRoom(leaveMessage, chatRoomSessionMap.get(chatRoomId));
                 break;
             default:
                 log.warn("Unhandled message type: {}", chatMessageDto.getMessageType());
@@ -189,9 +206,39 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
 
 
     private void handleLeave(WebSocketSession session, Long chatRoomId) {
-        chatRoomSessionMap.getOrDefault(chatRoomId, new HashSet<>()).remove(session);
+        // 채팅방에서 세션 제거
+        Set<WebSocketSession> chatRoomSessions = chatRoomSessionMap.getOrDefault(chatRoomId, new HashSet<>());
+        chatRoomSessions.remove(session);
+
+        // 세션과 채팅방 매핑 제거
         sessionChatRoomMap.remove(session);
+
+        // SecurityContext에서 사용자 정보 가져오기
+        SecurityContext context = (SecurityContext) session.getAttributes().get("SPRING_SECURITY_CONTEXT");
+        if (context != null) {
+            Authentication authentication = context.getAuthentication();
+            if (authentication != null && authentication.getPrincipal() instanceof Member) {
+                Member member = (Member) authentication.getPrincipal();
+
+                // 퇴장 메시지 생성
+                ChatMessageDto leaveMessage = ChatMessageDto.builder()
+                        .messageType(MessageType.LEAVE)
+                        .chatRoomId(chatRoomId)
+                        .senderId(member.getMemberName())  // 사용자 이름으로 senderId 설정
+                        .message(member.getMemberName() + "님이 퇴장하셨습니다.")
+                        .build();
+
+                // 채팅방의 모든 세션에 퇴장 메시지 방송
+                sendMessageToChatRoom(leaveMessage, chatRoomSessions);
+            }
+        }
+
+        // 채팅방 세션 목록 업데이트
+        if (chatRoomSessions.isEmpty()) {
+            chatRoomSessionMap.remove(chatRoomId);
+        }
     }
+
 
     // ============채팅 관련 메소드==============
 
@@ -200,27 +247,22 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
     }
 
     // 메시지를 생성하고 클라이언트에게 보내는 메서드
+    // 메시지를 생성하고 클라이언트에게 보내는 메서드
+    // 메시지를 생성하고 클라이언트에게 보내는 메서드
     public void sendMessageToChatRoom(ChatMessageDto chatMessageDto, Set<WebSocketSession> sessions) {
         try {
             for (WebSocketSession session : sessions) {
                 if (session.isOpen()) {
-                    // session에서 SecurityContext를 가져옵니다.
-                    SecurityContext context = (SecurityContext) session.getAttributes().get("SPRING_SECURITY_CONTEXT");
-                    if (context != null) {
-                        Authentication auth = context.getAuthentication();  // Authentication 객체를 가져옵니다.
-                        if (auth != null && auth.getPrincipal() instanceof Member) {
-                            Member member = (Member) auth.getPrincipal();
-                            chatMessageDto.setSenderId(member.getMemberName()); // 사용자 이름 설정
-                            String messagePayload = mapper.writeValueAsString(chatMessageDto);
-                            session.sendMessage(new TextMessage(messagePayload));
-                        }
-                    }
+                    String messagePayload = mapper.writeValueAsString(chatMessageDto);
+                    session.sendMessage(new TextMessage(messagePayload));
                 }
             }
         } catch (Exception e) {
             log.error("Failed to send message", e);
         }
     }
+
+
 
 
 
