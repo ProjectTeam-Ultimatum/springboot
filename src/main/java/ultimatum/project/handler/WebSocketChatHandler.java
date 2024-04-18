@@ -128,18 +128,18 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
                 break;
             case TALK:
                 // TALK 메시지 처리 전 로그 추가
-                log.info("Received TALK message: sessionId={}, senderId={}, message={}",
-                        session.getId(), chatMessageDto.getSenderId(), chatMessageDto.getMessage());
+                //log.info("Received TALK message: sessionId={}, senderId={}, message={}",
+                        //session.getId(), chatMessageDto.getSenderId(), chatMessageDto.getMessage());
 
                 chatService.saveMessage(chatMessageDto, authentication);  // Modified to include authentication
                 chatMessageDto.setMessage(chatMessageDto.getMessage());
                 // TALK 메시지 브로드캐스트하기 전 로그 추가
-                log.info("Broadcasting TALK message: sessionId={}, senderId={}, message={}",
-                        session.getId(), chatMessageDto.getSenderId(), chatMessageDto.getMessage());
+                //log.info("Broadcasting TALK message: sessionId={}, senderId={}, message={}",
+                        //session.getId(), chatMessageDto.getSenderId(), chatMessageDto.getMessage());
 
                 sendMessageToChatRoom(chatMessageDto, chatRoomSessionMap.get(chatRoomId));
-                log.info("Broadcasted TALK message: sessionId={}, senderId={}, message={}",
-                        session.getId(), chatMessageDto.getSenderId(), chatMessageDto.getMessage());
+                //log.info("Broadcasted TALK message: sessionId={}, senderId={}, message={}",
+                        //session.getId(), chatMessageDto.getSenderId(), chatMessageDto.getMessage());
                 break;
             case IMAGE:
                 if (chatMessageDto.getImageUrl() != null) {
