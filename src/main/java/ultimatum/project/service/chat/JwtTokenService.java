@@ -27,7 +27,7 @@ public class JwtTokenService {
         }
     }
 
-    // 토큰의 유효성 검사
+    // 토큰의 유효성 검사 //
     public boolean validateToken(String token) {
         try {
             JWTVerifier verifier = JWT.require(algorithm).build();
