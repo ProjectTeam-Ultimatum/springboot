@@ -1,11 +1,11 @@
-package ultimatum.project.dto.food;
+package ultimatum.project.domain.dto.food;
 
 //import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ultimatum.project.dto.image.RecommendImageFoodResponse;
+import ultimatum.project.domain.dto.image.RecommendImageFoodResponse;
 
 import java.sql.Time;
 import java.util.List;

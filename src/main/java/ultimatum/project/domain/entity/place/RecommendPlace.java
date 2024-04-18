@@ -17,7 +17,6 @@ public class RecommendPlace {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "recommend_place_id")
     private Long recommendPlaceId;
 
     private String recommendPlaceTitle;

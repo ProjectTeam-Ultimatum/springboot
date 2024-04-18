@@ -1,4 +1,4 @@
-package ultimatum.project.dto.image;
+package ultimatum.project.domain.dto.image;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

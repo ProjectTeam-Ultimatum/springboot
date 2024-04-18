@@ -17,7 +17,6 @@ public class RecommendHotel {
 
     @Id
     @GeneratedValue
-    @Column(name = "recommend_hotel_id")
     private Long recommendHotelId;
 
     private String recommendHotelTitle;

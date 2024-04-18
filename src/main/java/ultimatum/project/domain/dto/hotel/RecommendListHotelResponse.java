@@ -1,4 +1,4 @@
-package ultimatum.project.dto.hotel;
+package ultimatum.project.domain.dto.hotel;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +14,6 @@ import java.sql.Time;
 public class RecommendListHotelResponse {
 
     private Long recommendHotelId;
-    //private String recommendHotelContentsId;
     private String recommendHotelTitle;
     private String recommendHotelIntroduction;
     private String recommendHotelAllTag;
@@ -24,9 +23,11 @@ public class RecommendListHotelResponse {
     private String recommendHotelRegion;
     private Time recommendHotelOpentime;
     private Time recommendHotelClosetime;
+    private Long recommendHotelStar;
+    private Long recommendHotelLike;
     private String recommendHotelLatitude;
     private String recommendHotelLongitude;
     private String recommendHotelPhoneNo;
     private String recommendHotelImgPath;
-
+    private Long recommendHotelBudget;
 }

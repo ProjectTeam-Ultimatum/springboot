@@ -15,6 +15,7 @@ public class RecommendListPlace {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "recommend_place_id")
     private Long recommendPlaceId;
     private String recommendPlaceContentsId;
     private String recommendPlaceTitle;
@@ -35,5 +36,5 @@ public class RecommendListPlace {
     private String recommendPlaceLongitude;
     private String recommendPlacePhoneNo;
     private String recommendPlaceImgPath;
-    private String recommendPlaceBudget;
+    private Long recommendPlaceBudget;
 }

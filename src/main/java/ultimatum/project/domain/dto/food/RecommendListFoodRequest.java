@@ -1,20 +1,21 @@
-package ultimatum.project.dto.food;
+package ultimatum.project.domain.dto.food;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ultimatum.project.domain.dto.image.RecommendImageFoodResponse;
 
 import java.sql.Time;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RecommendListFoodResponse {
+public class RecommendListFoodRequest {
 
     private Long recommendFoodId;
-    //private String recommendFoodContentsId;
     private String recommendFoodTitle;
     private String recommendFoodIntroduction;
     private String recommendFoodAllTag;
@@ -27,5 +28,7 @@ public class RecommendListFoodResponse {
     private String recommendFoodLatitude;
     private String recommendFoodLongitude;
     private String recommendFoodPhoneNo;
+    private Long recommendFoodStar;
+    private Long recommendFoodLike;
     private String recommendFoodImgPath;
 }

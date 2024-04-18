@@ -19,7 +19,6 @@ public class RecommendFood {
 
     @Id
     @GeneratedValue
-    @Column(name = "recommend_food_id")
     private Long recommendFoodId;
 
     private String recommendFoodTitle;

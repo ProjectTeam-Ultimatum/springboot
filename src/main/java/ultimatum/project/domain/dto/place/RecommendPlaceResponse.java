@@ -1,10 +1,10 @@
-package ultimatum.project.dto.place;
+package ultimatum.project.domain.dto.place;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ultimatum.project.dto.image.RecommendImagePlaceResponse;
+import ultimatum.project.domain.dto.image.RecommendImagePlaceResponse;
 
 import java.util.List;
 

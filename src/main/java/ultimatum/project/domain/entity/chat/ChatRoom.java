@@ -17,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatRoom {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long chatRoomId;

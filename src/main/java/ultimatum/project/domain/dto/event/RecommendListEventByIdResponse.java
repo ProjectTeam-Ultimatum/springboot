@@ -1,4 +1,4 @@
-package ultimatum.project.dto.event;
+package ultimatum.project.domain.dto.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,10 +11,8 @@ import java.sql.Time;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RecommendListEventResponse {
-
+public class RecommendListEventByIdResponse {
     private Long recommendEventId;
-    //private String recommendEventContentsId;
     private String recommendEventTitle;
     private String recommendEventIntroduction;
     private String recommendEventAllTag;
@@ -24,8 +22,11 @@ public class RecommendListEventResponse {
     private String recommendEventRegion;
     private Time recommendEventOpentime;
     private Time recommendEventClosetime;
+    private Long recommendEventStar;
+    private Long recommendEventLike;
     private String recommendEventLatitude;
     private String recommendEventLongitude;
     private String recommendEventPhoneNo;
     private String recommendEventImgPath;
+    private Long recommendEventBudget;
 }

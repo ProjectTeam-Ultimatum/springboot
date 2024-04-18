@@ -1,10 +1,10 @@
-package ultimatum.project.dto.hotel;
+package ultimatum.project.domain.dto.hotel;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ultimatum.project.dto.image.RecommendImageHotelResponse;
+import ultimatum.project.domain.dto.image.RecommendImageHotelResponse;
 
 import java.util.List;
 
