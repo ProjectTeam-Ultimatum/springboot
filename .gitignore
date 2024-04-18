@@ -36,6 +36,7 @@ out/
 ### VS Code ###
 .vscode/
 
-aws.yml
-
+## yml 파일 secret info ##
+src/main/resources/application.yml
 application.yml
+aws.yml
