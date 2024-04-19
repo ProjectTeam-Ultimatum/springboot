@@ -88,7 +88,10 @@ public class ReviewService {
                 review.getReviewLocation(),
                 reviewImages.stream().map(image ->
                         new ReviewImageResponse(
-                                image.getReviewImageId(), image.getImageName(), image.getImageUri()
+                                image.getReviewImageId(),
+                                image.getImageName(),
+                                image.getImageUri(),
+                                image.getUuid()
                         )
                 ).collect(Collectors.toList()),
                 email //작성자 이메일 추가
@@ -122,7 +125,10 @@ public class ReviewService {
             //이미지중 하나씩만가져오기
             List<ReviewImageResponse> imageResponses = review.getReviewImages().stream()
                     .map(image -> new ReviewImageResponse(
-                            image.getReviewImageId(), image.getImageName(), image.getImageUri()
+                            image.getReviewImageId(),
+                            image.getImageName(),
+                            image.getImageUri(),
+                            image.getUuid()
                     )).collect(Collectors.toList());
 
             long replyCount = replyRepository.countByReview(review);
@@ -161,7 +167,10 @@ public class ReviewService {
 
         List<ReviewImageResponse> images = review.getReviewImages().stream()
                 .map(image -> new ReviewImageResponse(
-                        image.getReviewImageId(), image.getImageName(), image.getImageUri()
+                        image.getReviewImageId(),
+                        image.getImageName(),
+                        image.getImageUri(),
+                        image.getUuid()
                 )).collect(Collectors.toList());
 
         List<ReadReplyResponse> replies = review.getReviewReplies().stream()
@@ -210,10 +219,10 @@ public class ReviewService {
         review.update(request.getReviewTitle(), request.getReviewSubtitle(), request.getReviewContent(), request.getReviewLocation());
 
         reviewRepository.save(review);
-        imageService.updateImages(reviewId, request);
+        imageService.updateReviewImages(reviewId, request);
 
         List<ReviewImageResponse> imageResponses = review.getReviewImages().stream()
-                .map(image -> new ReviewImageResponse(image.getReviewImageId(), image.getImageName(), image.getImageUri()))
+                .map(image -> new ReviewImageResponse(image.getReviewImageId(), image.getImageName(), image.getImageUri(), image.getUuid()))
                 .collect(Collectors.toList());
 
         return new UpdateReviewResponse(
