@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDto;
+import ultimatum.project.domain.dto.logInDTO.MemberFindPasswordRequestDto;
 import ultimatum.project.domain.dto.logInDTO.MemberRequestDto;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.global.exception.CustomException;
@@ -143,6 +144,26 @@ public class RestApiController {
                         ", 주소: " + member.getMemberAddress();
 
         return ResponseEntity.ok(userDetails);
+    }
+
+    @PostMapping("/user/password")
+    public ResponseEntity<String> changePassword(
+            @RequestParam String currentPassword,
+            @RequestParam String newPassword) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.badRequest().body("인증되지 않은 사용자입니다.");
+        }
+
+        String userEmail = authentication.getName();
+        String result = memberService.changePassword(userEmail, currentPassword, newPassword);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/user/findpassword")
+    public String findPassword(@RequestBody MemberFindPasswordRequestDto memberFindPasswordRequestDto) {
+        memberService.memberCheck(memberFindPasswordRequestDto);
+        return "success!";
     }
 
 }

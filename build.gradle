@@ -65,6 +65,8 @@ dependencies {
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
     compileOnly 'commons-io:commons-io:2.11.0'
 
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
 }
 
 // Lombok 설정
