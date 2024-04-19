@@ -10,7 +10,7 @@ import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.domain.entity.member.MemberImage;
 import ultimatum.project.repository.MemberImageRepository;
 import ultimatum.project.repository.MemberRepository;
-import ultimatum.project.service.review.S3Service;
+import ultimatum.project.service.member.MemberS3Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class MemberImageService {
     private final MemberImageRepository imageRepository;
     private final MemberRepository memberRepository;
 
-    private final S3Service s3Service;
+    private final MemberS3Service memberS3Service;
 
     @Transactional
     public List<MemberImage> createMemberImages(List<MultipartFile> files, Member member) {
@@ -32,7 +32,7 @@ public class MemberImageService {
 
         for (MultipartFile file : files) {
             try {
-                String fileUri = s3Service.uploadFileToS3(file);  // S3 업로드 로직을 서비스로 이동
+                String fileUri = memberS3Service.uploadFileToS3(file);  // S3 업로드 로직을 서비스로 이동
 
                 // MemberImage 객체 생성 및 저장
                 MemberImage memberImage = new MemberImage();

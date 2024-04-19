@@ -37,6 +37,8 @@ public class RestApiController {
         return "<h1>home</h1>";
     }
 
+    // 로그아웃은 localstorage를 비워버리면 로그아웃 가능.
+    // vue에서 Controller 없이도 가능하다.
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
