@@ -117,14 +117,6 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
         switch (chatMessageDto.getMessageType()) {
             case ENTER:
                 handleEnter(session, chatRoomId);
-                String enterMessageContent = " 님이 입장하셨습니다.";
-                ChatMessageDto enterMessage = ChatMessageDto.builder()
-                        .messageType(MessageType.ENTER)
-                        .chatRoomId(chatRoomId)
-                        .senderId(chatMessageDto.getSenderId())
-                        .message(enterMessageContent)
-                        .build();
-                sendMessageToChatRoom(enterMessage, chatRoomSessionMap.get(chatRoomId));
                 break;
             case TALK:
                 // TALK 메시지 처리 전 로그 추가
@@ -148,13 +140,6 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
                 break;
             case LEAVE:
                 handleLeave(session, chatRoomId);
-                ChatMessageDto leaveMessage = ChatMessageDto.builder()
-                        .messageType(MessageType.LEAVE)
-                        .chatRoomId(chatRoomId)
-                        .senderId(chatMessageDto.getSenderId())
-                        .message(chatMessageDto.getSenderId() + "님이 퇴장하셨습니다.")
-                        .build();
-                sendMessageToChatRoom(leaveMessage, chatRoomSessionMap.get(chatRoomId));
                 break;
             default:
                 log.warn("Unhandled message type: {}", chatMessageDto.getMessageType());
@@ -162,29 +147,6 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
         }
     }
 
-
-
-    public void broadcastImageLink(String imageUrl, Long chatRoomId) {
-        ChatMessageDto messageDto = new ChatMessageDto();
-        messageDto.setImageUrl(imageUrl);
-        messageDto.setMessageType(MessageType.IMAGE);
-        Set<WebSocketSession> sessions = chatRoomSessionMap.get(chatRoomId);
-
-        if (sessions != null) {
-            sessions.forEach(session -> {
-                try {
-                    String messageJson = mapper.writeValueAsString(messageDto);
-                    session.sendMessage(new TextMessage(messageJson));
-                } catch (JsonProcessingException e) {
-                    log.error("Failed to serialize chat message", e);
-                } catch (IOException e) {
-                    log.error("Failed to send message", e);
-                }
-            });
-        } else {
-            log.warn("No sessions found for chat room ID: {}", chatRoomId);
-        }
-    }
 
 
     // 소켓 종료 확인
@@ -199,9 +161,33 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
     }
 
     private void handleEnter(WebSocketSession session, Long chatRoomId) {
+        // 채팅방에 세션 추가
         sessionChatRoomMap.put(session, chatRoomId);
-        chatRoomSessionMap.get(chatRoomId).add(session);
+        Set<WebSocketSession> sessions = chatRoomSessionMap.get(chatRoomId);
+        if (sessions == null) {
+            sessions = new HashSet<>();
+            chatRoomSessionMap.put(chatRoomId, sessions);
+        }
+        sessions.add(session);
+
+        // 인증 정보에서 사용자 이름 가져오기
+        SecurityContext context = (SecurityContext) session.getAttributes().get("SPRING_SECURITY_CONTEXT");
+        if (context != null && context.getAuthentication() != null && context.getAuthentication().isAuthenticated()) {
+            String username = ((Member) context.getAuthentication().getPrincipal()).getMemberName();
+            // 입장 메시지 생성 및 브로드캐스트
+            String enterMessageContent = username + " 님이 입장하셨습니다.";
+            ChatMessageDto enterMessage = ChatMessageDto.builder()
+                    .messageType(MessageType.ENTER)
+                    .chatRoomId(chatRoomId)
+                    .senderId(username)
+                    .message(enterMessageContent)
+                    .build();
+            broadcastMessageToAllUsers(enterMessage);
+        } else {
+            log.warn("No valid authentication information available for session id {}", session.getId());
+        }
     }
+
 
 
     private void handleLeave(WebSocketSession session, Long chatRoomId) {
@@ -241,12 +227,7 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
 
     // ============채팅 관련 메소드==============
 
-    private void removeClosedSession(Set<WebSocketSession> chatRoomSession) {
-        chatRoomSession.removeIf(sess -> !sessions.contains(sess));
-    }
 
-    // 메시지를 생성하고 클라이언트에게 보내는 메서드
-    // 메시지를 생성하고 클라이언트에게 보내는 메서드
     // 메시지를 생성하고 클라이언트에게 보내는 메서드
     public void sendMessageToChatRoom(ChatMessageDto chatMessageDto, Set<WebSocketSession> sessions) {
         try {
@@ -261,18 +242,22 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
         }
     }
 
-
-
-
-
-    public <T> void sendMessage(WebSocketSession session, T message) {
-        try {
-            session.sendMessage(new TextMessage(mapper.writeValueAsString(message)));
-        } catch (IOException e) {
-            log.error("메시지 전송 실패", e);
+    // 채팅방 전체메시지 메소드
+    public void broadcastMessageToAllUsers(ChatMessageDto message) {
+        // 모든 채팅방의 세션을 반복하여 메시지 전송
+        for (Map.Entry<Long, Set<WebSocketSession>> entry : chatRoomSessionMap.entrySet()) {
+            for (WebSocketSession session : entry.getValue()) {
+                if (session.isOpen()) {
+                    try {
+                        session.sendMessage(new TextMessage(new ObjectMapper().writeValueAsString(message)));
+                    } catch (IOException e) {
+                        // 오류 처리 로직
+                        System.err.println("Failed to send message to " + session.getId());
+                    }
+                }
+            }
         }
     }
-
     //  ==========================================
 }
 
