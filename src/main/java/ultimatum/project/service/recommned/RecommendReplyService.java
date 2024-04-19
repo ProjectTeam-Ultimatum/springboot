@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ultimatum.project.domain.dto.food.RecommendListFoodByIdResponse;
+import ultimatum.project.domain.dto.place.RecommendListPlaceByIdResponse;
 import ultimatum.project.domain.dto.recommendReply.*;
 import ultimatum.project.domain.entity.food.RecommendListFood;
+import ultimatum.project.domain.entity.place.RecommendListPlace;
 import ultimatum.project.domain.entity.recommendReply.RecommendReply;
 import ultimatum.project.repository.event.RecommendListEventRepository;
 import ultimatum.project.repository.food.RecommendFoodRepository;
@@ -20,6 +22,7 @@ import ultimatum.project.repository.reply.RecommendReplyRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Log4j2
 @Service
@@ -69,41 +72,42 @@ public class RecommendReplyService {
         );
     }
 
-//    public List<ReadReplyFoodByIdResponse> getRepliesByFoodId(Long recommendFoodId) {
-//        // 모든 후기를 RecommendFoodId에 따라 조회합니다.
-//        List<RecommendReply> replies = recommendReplyRepository.findByRecommendFoodId_Id(recommendFoodId);
-//
-//        // 조회된 데이터를 ReadReplyFoodByIdResponse 리스트로 변환합니다.
-//        return replies.stream().map(reply -> new ReadReplyFoodByIdResponse(
-//                reply.getRecommendReplyStar(),
-//                convertJsonToTags(reply.getRecommendReplyTagValue()),
-//                reply.getRecommendFoodId() != null ? reply.getRecommendFoodId().getId() : null
-//        )).collect(Collectors.toList());
-//    }
-//
-//    // JSON 문자열을 List<String>으로 변환하는 유틸리티 메소드
-//    private List<String> convertJsonToTags(String jsonTags) {
-//        if (jsonTags == null || jsonTags.isEmpty()) {
-//            return new ArrayList<>();
-//        }
-//        try {
-//            ObjectMapper mapper = new ObjectMapper();
-//            return mapper.readValue(jsonTags, new TypeReference<List<String>>() {});
-//        } catch (JsonProcessingException e) {
-//            return new ArrayList<>(); // JSON 파싱 실패 시 빈 리스트 반환
-//        }
-//    }
+    //음식 평점 조회
+    public List<ReadReplyFoodByIdResponse> getRepliesByFoodId(Long recommendFoodId) {
+        // 요청에서 제공된 음식 ID를 기반으로 모든 후기를 조회합니다.
+        List<RecommendReply> replies = recommendReplyRepository.findByRecommendFoodId_RecommendFoodId(recommendFoodId);
 
-    //후기 저장
-    public RecommendReplyResponse saveReply(RecommendReplyRequest request) {
-        RecommendReply recommendReply = recommendReplyRepository.findById(request.getRecommendReplyId())
-                .orElseThrow(() -> new IllegalArgumentException("후기를 찾을 수 없습니다."));
-
-        modelMapper.map(request, recommendReply);
-        recommendReplyRepository.save(recommendReply);
-
-        return modelMapper.map(recommendReply, RecommendReplyResponse.class);
+        // 조회된 후기들을 ReadReplyFoodByIdResponse DTO로 변환합니다.
+        return replies.stream()
+                .map(reply -> new ReadReplyFoodByIdResponse(
+                        reply.getRecommendReplyStar(),
+                        reply.getRecommendReplyTagValue(), // JSON을 List<String>로 변환
+                        reply.getRecommendFoodId() != null ? reply.getRecommendFoodId().getRecommendFoodId() : null // 적절한 ID 접근 방식으로 수정
+                ))
+                .collect(Collectors.toList());
     }
+
+//    public List<ReadReplyFoodByIdResponse> getRepliesByFoodId(ReadReplyFoodByIdResponse response,Long recommendFoodId) {
+//        // 요청에서 제공된 음식 ID를 기반으로 기존의 추천 후기를 가져옵니다.
+//        RecommendReply recommendReply = recommendReplyRepository.findById(response.getRecommendFoodId())
+//                .orElseThrow(() -> new IllegalArgumentException("음식점 평점 정보 없음"));
+//
+//        // RecommendListFood의 실제 ID를 사용하여 모든 후기를 조회합니다.
+//        RecommendListFood recommendListFood = recommendListFoodRepository.findByRecommendFoodId(recommendFoodId);
+//        recommendReply.setRecommendFoodId(recommendListFood); // RecommendListFood 엔티티 설정
+//
+//        // 수정된 엔티티를 저장합니다.
+//        recommendReply = recommendReplyRepository.save(recommendReply);
+//
+//    return new List<ReadReplyFoodByIdResponse>(
+//            recommendReply.getRecommendReplyStar(),
+//            recommendReply.getRecommendReplyTagValue() != null
+//                    ? recommendReply.getRecommendReplyTagValue() // JSON을 List<String>로 변환
+//                    : List.of(),
+//            recommendReply.getRecommendFoodId() != null
+//                    ? recommendReply.getRecommendFoodId().getRecommendFoodId() // 음식 ID만을 보내도록 보장
+//                    : null);
+//    }
 
 
     // 후기 전체 조회

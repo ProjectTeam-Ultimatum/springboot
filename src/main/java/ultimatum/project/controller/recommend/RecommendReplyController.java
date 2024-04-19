@@ -87,6 +87,7 @@ public class RecommendReplyController {
 //        return new ResponseEntity<>(response, HttpStatus.CREATED);
 //    }
 
+    //음식점 평점 작성
     @PostMapping("/saveFoodReply")
     @Operation(summary = "음식점 평점 작성", description = "입력 항목")
     public ResponseEntity<CreateReplyFoodResponse> saveRecommendFoodReply(
@@ -103,11 +104,21 @@ public class RecommendReplyController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    //음식점 평점 조회
+    @GetMapping("/{recommend_food_id}")
+    @Operation(summary = "음식점 평점 조회")
+    public ResponseEntity<List<ReadReplyFoodByIdResponse>> getFoodReplies(@PathVariable Long recommend_food_id) {
+        List<ReadReplyFoodByIdResponse> responses = recommendReplyService.getRepliesByFoodId(recommend_food_id);
+        if (responses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(responses);
+    }
 
     // 모든 후기 조회
     @GetMapping
     @Operation(summary = "평점 전체 조회")
-    public ResponseEntity<List<ReadRecommendReplyAllResponse>> getAllReplies() {
+    public ResponseEntity<List<ReadRecommendReplyAllResponse>> getFoodIdReplies() {
         List<ReadRecommendReplyAllResponse> allReplies = recommendReplyService.getReplyAll();
         return ResponseEntity.ok(allReplies);
     }
