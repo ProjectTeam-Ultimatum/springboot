@@ -19,6 +19,8 @@ public enum ErrorCode {
 
     BAD_REQUSET_USER(400, "BAD_REQUEST", "JWT 인증되지 않은 사용자 정보를 요청했습니다."),
 
+    INVALID_MEMBER(400, "BAD_REQUEST", "로그인 후 이용할 수 있습니다."),
+
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
     UNAUTHENTICATED_USERS(401, "UNAUTHORIZED","인증이 필요합니다."),
 
@@ -36,7 +38,14 @@ public enum ErrorCode {
     DUPLICATE_RESOURCE(409, "CONFLICT","데이터가 이미 존재합니다"),
 
     /* 500 INTERNAL_SERVER_ERROR */
-    SERVER_ERROR(500, "INTERNAL_SERVER_ERROR", "예기치 못한 오류가 발생하였습니다.");
+    SERVER_ERROR(500, "INTERNAL_SERVER_ERROR", "예기치 못한 오류가 발생하였습니다."),
+
+    /* 500 INTERNAL_SERVER_ERROR : 파일 처리 오류 */
+    FILE_PROCESSING_ERROR(500, "INTERNAL_SERVER_ERROR", "파일 처리 중 오류가 발생하였습니다."),
+
+    REVIEW_NOT_YOURS(500, "RESOURCE_NOT_YOURS", "수정/삭제 불가능한 게시글 입니다."),
+
+    REPLY_NOT_YOURS(500, "RESOURCE_NOT_YOURS", "수정/삭제 불가능한 댓글입니다.");
 
 
     private int status;

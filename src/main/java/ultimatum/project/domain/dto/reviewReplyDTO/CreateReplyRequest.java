@@ -10,6 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateReplyRequest {
 
-    private String reviewReplyer;
     private String reviewReplyContent;
 }

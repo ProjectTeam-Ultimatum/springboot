@@ -10,11 +10,13 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import ultimatum.project.domain.entity.review.ReviewImage;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.List;
 import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -69,10 +71,10 @@ public class S3Service {
             // S3 키가 URL 인코딩되어 있을 수 있으므로, 정확한 키를 얻기 위해 UTF-8 인코딩을 사용하여 디코딩
             key = URLDecoder.decode(key, UTF_8);
             // S3에서 객체 삭제
-            amazonS3.deleteObject(bucketName,key);
+            amazonS3.deleteObject(bucketName, key);
             log.info("File deleted from S3: {}", imageUri);
 
-        }  catch (AmazonServiceException e) {
+        } catch (AmazonServiceException e) {
             log.error("Error deleting object {} from S3 bucket {}: {}", imageUri, bucketName, e.getErrorMessage());
             // AmazonServiceException 처리
         } catch (SdkClientException e) {
@@ -82,5 +84,7 @@ public class S3Service {
             log.error("Invalid URL for object {}: {}", imageUri, e.getMessage());
             // MalformedURLException 처리
         }
-        }
+    }
+
 }
+

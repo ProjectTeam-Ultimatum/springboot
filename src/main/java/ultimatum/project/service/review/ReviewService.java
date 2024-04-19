@@ -5,15 +5,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.dto.reviewDTO.*;
+import ultimatum.project.domain.dto.reviewReplyDTO.ReadReplyResponse;
+import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewImage;
-import ultimatum.project.domain.dto.reviewReplyDTO.ReadReplyResponse;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
+import ultimatum.project.repository.MemberRepository;
 import ultimatum.project.repository.ReviewImageRepository;
 import ultimatum.project.repository.ReviewReplyRepository;
 import ultimatum.project.repository.ReviewRepository;
@@ -32,28 +35,47 @@ public class ReviewService {
     private final ReviewReplyRepository replyRepository;
     private final S3Service s3Service;
     private final ReviewImageService imageService;
+    private final MemberRepository memberRepository;
 
 
     @Transactional
-    public CreateReviewResponse createReview(CreateReviewRequest request, List<MultipartFile> files) {
-        // Review 객체 생성 및 저장
+    public CreateReviewResponse createReview(Authentication authentication,
+                                             CreateReviewRequest request,
+                                             List<MultipartFile> files) {
+
+        if (authentication == null || !authentication.isAuthenticated())  {
+            throw new CustomException(ErrorCode.BAD_REQUSET_USER);
+        }
+        String email = authentication.getName();
+        Member member = memberRepository.findByMemberEmail(email);
+
+        if (member == null) {
+            throw new CustomException(ErrorCode.INVALID_MEMBER);
+        }
+
+        //  Review 객체 생성 및 저장
         Review review = new Review();
         review.setReviewTitle(request.getReviewTitle());
         review.setReviewSubtitle(request.getReviewSubtitle());
         review.setReviewContent(request.getReviewContent());
         review.setReviewLocation(request.getReviewLocation());
+        review.setAuthor(email); //멤버 계정 이메일
+
         review = reviewRepository.save(review); // 저장하고 리턴받음으로써 ID를 획득
 
 
 
         // 이미지 파일 처리 및 ReviewImage 객체 리스트 생성
         List<ReviewImage> reviewImages = imageService.createReviewImages(files, review);
+        if(reviewImages.isEmpty() && !files.isEmpty()) {
+            throw new CustomException(ErrorCode.FILE_PROCESSING_ERROR);
+        }
 
         review.setReviewImages(reviewImages);
         reviewRepository.save(review);  // 변경된 review 객체를 다시 저장
 
         // 이미지 객체들을 DB에 저장
-        reviewImages.forEach(reviewImageRepository::save);
+        reviewImageRepository.saveAll(reviewImages);
 
 
         // CreateReviewResponse 객체 생성 및 반환
@@ -68,16 +90,17 @@ public class ReviewService {
                         new ReviewImageResponse(
                                 image.getReviewImageId(), image.getImageName(), image.getImageUri()
                         )
-                ).collect(Collectors.toList())
+                ).collect(Collectors.toList()),
+                email //작성자 이메일 추가
         );
 
     }
 
 
-    public Page<ReadAllReviewResponse> getAllReviews(String reviewLocation, String keyword, Pageable pageable) {
+    public Page<ReadAllReviewResponse> getAllReviews(String reviewLocation,
+                                                     String keyword, Pageable pageable) {
 
         Page<Review> reviewPage;
-
 
         // 지역 정보만 사용하는 경우
          if (reviewLocation != null && !reviewLocation.isEmpty()) {
@@ -88,13 +111,11 @@ public class ReviewService {
             reviewPage = reviewRepository
                     .findByReviewTitleContainingIgnoreCaseOrReviewSubtitleContainingIgnoreCaseOrReviewContentContainingIgnoreCaseOrReviewLocationContainingIgnoreCase
                             (keyword,keyword,keyword,keyword,pageable);
-
         }
         // 파라미터가 없는 경우
         else {
             reviewPage = reviewRepository.findAll(pageable);
         }
-
 
         //Review 엔티티들을 ReadReviewResponse DTO로 변환
         return reviewPage.map(review -> {
@@ -126,7 +147,8 @@ public class ReviewService {
                     replyCount,
                     replyResponses,
                     review.getReg_date(),
-                    review.getMod_date()
+                    review.getMod_date(),
+                    review.getAuthor()
             );
         });
     }
@@ -144,7 +166,11 @@ public class ReviewService {
 
         List<ReadReplyResponse> replies = review.getReviewReplies().stream()
                 .map(reply -> new ReadReplyResponse(
-                        reply.getReviewReplyId(), reply.getReviewReplyer(), reply.getReviewReplyContent(), reply.getReg_date(), reply.getMod_date()
+                        reply.getReviewReplyId(),
+                        reply.getReviewReplyer(),
+                        reply.getReviewReplyContent(),
+                        reply.getReg_date(),
+                        reply.getMod_date()
                 )).collect(Collectors.toList());
 
         return new ReadReviewByIdResponse(
@@ -157,22 +183,33 @@ public class ReviewService {
                 images,
                 replies,
                 review.getReg_date(),
-                review.getMod_date()
+                review.getMod_date(),
+                review.getAuthor()
         );
 
     }
 
     @Transactional
-    public UpdateReviewResponse updateReview(Long reviewId, UpdateReviewRequest request
-    ) throws CustomException {
+    public UpdateReviewResponse updateReview(Authentication authentication,
+                                             Long reviewId,
+                                             UpdateReviewRequest request) throws CustomException {
+
+        if (authentication == null || !authentication.isAuthenticated())  {
+            throw new CustomException(ErrorCode.BAD_REQUSET_USER);
+        }
+        String email = authentication.getName();
+        Member member = memberRepository.findByMemberEmail(email);
 
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
+        if (!member.getMemberEmail().equals(review.getAuthor())) {
+            throw new CustomException(ErrorCode.REVIEW_NOT_YOURS);
+        }
+
         review.update(request.getReviewTitle(), request.getReviewSubtitle(), request.getReviewContent(), request.getReviewLocation());
 
         reviewRepository.save(review);
-
         imageService.updateImages(reviewId, request);
 
         List<ReviewImageResponse> imageResponses = review.getReviewImages().stream()
@@ -190,9 +227,23 @@ public class ReviewService {
 
 
     @Transactional
-    public DeleteReviewResponse deleteReview(Long reviewId) {
+    public DeleteReviewResponse deleteReview(Authentication authentication, Long reviewId){
+
+
+        if (authentication == null || !authentication.isAuthenticated())  {
+            throw new CustomException(ErrorCode.BAD_REQUSET_USER);
+        }
+        String email = authentication.getName();
+        Member member = memberRepository.findByMemberEmail(email);
+
+
+
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new EntityNotFoundException("사용자 게시글 ID를 찾을 수 없습니다." + reviewId));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        if (!member.getMemberEmail().equals(review.getAuthor())) {
+            throw new CustomException(ErrorCode.REVIEW_NOT_YOURS);
+        }
 
         // S3에서 연관된 이미지 모두 삭제
         review.getReviewImages().forEach(image -> {
@@ -203,7 +254,6 @@ public class ReviewService {
                 throw new RuntimeException("Failed to delete image from S3: " + image.getImageUri(), e);
             }
         });
-
         // 리뷰 삭제
         reviewRepository.delete(review);
         return new DeleteReviewResponse(reviewId);
@@ -213,7 +263,7 @@ public class ReviewService {
     @Transactional
     public ReviewLikeResponse updateReviewLike(Long reviewId, ReviewLikeRequest request) {
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("리뷰 아이디를 못찾음!"));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
         review.setReviewLike(request.getReviewLike());
         reviewRepository.save(review);
 

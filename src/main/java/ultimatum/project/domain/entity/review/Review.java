@@ -33,6 +33,8 @@ public class Review {
 
     private String reviewLocation;
 
+    private String author;
+
     /**
      * 왜 @OneToMany 를 써서 양방향으로 사용했는가?
      *      1. 연관된 데이터 접근의 편의성을 위해(하나의 엔티티가 여러관련 엔티티의 컬렉션을 직접 가질 때 유용
