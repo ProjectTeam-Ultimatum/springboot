@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDto;
 import ultimatum.project.domain.dto.logInDTO.MemberRequestDto;
 import ultimatum.project.domain.entity.member.Member;
@@ -36,6 +37,8 @@ public class RestApiController {
         return "<h1>home</h1>";
     }
 
+    // 로그아웃은 localstorage를 비워버리면 로그아웃 가능.
+    // vue에서 Controller 없이도 가능하다.
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
@@ -59,9 +62,12 @@ public class RestApiController {
     }
 
     @PostMapping("/join")
-    public String join(@RequestBody @Valid MemberRequestDto memberRequestDto) {
-        String resultMessage = memberService.createMember(memberRequestDto);
-        return resultMessage; // 회원가입 결과 메시지 반환
+    public ResponseEntity<String> join(
+            @RequestPart("member") MemberRequestDto memberRequestDto,
+            @RequestPart("files") List<MultipartFile> files) {
+        memberRequestDto.setFiles(files);
+        String result = memberService.createMember(memberRequestDto);
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/accessToken")

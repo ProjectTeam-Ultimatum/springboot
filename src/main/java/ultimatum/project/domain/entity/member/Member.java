@@ -1,12 +1,10 @@
 package ultimatum.project.domain.entity.member;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import ultimatum.project.domain.entity.review.ReviewImage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +39,9 @@ public class Member {
     private String memberStyle;
 
     private String memberRole;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberImage> memberImages = new ArrayList<>();
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = Arrays.stream(this.memberRole.split(","))
