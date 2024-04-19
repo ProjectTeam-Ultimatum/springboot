@@ -15,10 +15,17 @@ public class MemberImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberImageId;
 
+    private String memberImageName;
+
     private String memberImageUrl;
 
-    @ManyToOne
+    /**
+     * fetchType.LAZY : 지연로딩
+     *                  연관된 엔티티를 필요로 할때까지 로딩하지 않음
+     *                  응답속도와 효율성을 높인다.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    private Member memberId;
+    private Member member;
 
 }
