@@ -10,6 +10,8 @@ public interface RecommendListFoodRepository extends JpaRepository<RecommendList
 
     Page<RecommendListFood> findByRecommendFoodTagContainingIgnoreCase(String tag, Pageable pageable);
     Page<RecommendListFood> findByRecommendFoodRegionContainingIgnoreCase(String region, Pageable pageable);
+
+    RecommendListFood findByRecommendFoodId(Long id); //ReplyService 음심점 평점 등록
 }
 
 

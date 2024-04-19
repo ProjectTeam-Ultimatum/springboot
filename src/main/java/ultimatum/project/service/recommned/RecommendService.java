@@ -46,16 +46,13 @@ public class RecommendService {
     private RecommendListHotelRepository recommendListHotelRepository;
     private RecommendListEventRepository recommendListEventRepository;
     private ModelMapper modelMapper;
-    private RecommendImageRepository recommendImageRepository;
 
     @Autowired
-    public void RecommendImageService(RecommendImageRepository recommendImageRepository,
-                                      RecommendListFoodRepository recommendListFoodRepository,
+    public void RecommendImageService(RecommendListFoodRepository recommendListFoodRepository,
                                       RecommendListPlaceRepository recommendListPlaceRepository,
                                       RecommendListHotelRepository recommendListHotelRepository,
                                       RecommendListEventRepository recommendListEventRepository,
                                       ModelMapper modelMapper) {
-        this.recommendImageRepository = recommendImageRepository;
         this.recommendListFoodRepository = recommendListFoodRepository;
         this.recommendListPlaceRepository = recommendListPlaceRepository;
         this.recommendListHotelRepository = recommendListHotelRepository;
