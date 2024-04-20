@@ -1,4 +1,4 @@
-package ultimatum.project.domain.dto.recommendReply;
+package ultimatum.project.domain.dto.recommendReply.food;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

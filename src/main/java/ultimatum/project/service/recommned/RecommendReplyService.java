@@ -1,6 +1,5 @@
 package ultimatum.project.service.recommned;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -9,16 +8,29 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ultimatum.project.domain.dto.food.RecommendListFoodByIdResponse;
-import ultimatum.project.domain.dto.place.RecommendListPlaceByIdResponse;
 import ultimatum.project.domain.dto.recommendReply.*;
+import ultimatum.project.domain.dto.recommendReply.event.CreateReplyEventRequest;
+import ultimatum.project.domain.dto.recommendReply.event.CreateReplyEventResponse;
+import ultimatum.project.domain.dto.recommendReply.event.ReadReplyEventAllResponse;
+import ultimatum.project.domain.dto.recommendReply.event.ReadReplyEventByIdResponse;
+import ultimatum.project.domain.dto.recommendReply.food.CreateReplyFoodRequest;
+import ultimatum.project.domain.dto.recommendReply.food.CreateReplyFoodResponse;
+import ultimatum.project.domain.dto.recommendReply.food.ReadReplyFoodAllResponse;
+import ultimatum.project.domain.dto.recommendReply.food.ReadReplyFoodByIdResponse;
+import ultimatum.project.domain.dto.recommendReply.hotel.CreateReplyHotelRequest;
+import ultimatum.project.domain.dto.recommendReply.hotel.CreateReplyHotelResponse;
+import ultimatum.project.domain.dto.recommendReply.hotel.ReadReplyHotelAllResponse;
+import ultimatum.project.domain.dto.recommendReply.hotel.ReadReplyHotelByIdResponse;
+import ultimatum.project.domain.dto.recommendReply.place.CreateReplyPlaceRequest;
+import ultimatum.project.domain.dto.recommendReply.place.CreateReplyPlaceResponse;
+import ultimatum.project.domain.dto.recommendReply.place.ReadReplyPlaceAllResponse;
+import ultimatum.project.domain.dto.recommendReply.place.ReadReplyPlaceByIdResponse;
 import ultimatum.project.domain.entity.event.RecommendListEvent;
 import ultimatum.project.domain.entity.food.RecommendListFood;
 import ultimatum.project.domain.entity.hotel.RecommendListHotel;
 import ultimatum.project.domain.entity.place.RecommendListPlace;
 import ultimatum.project.domain.entity.recommendReply.RecommendReply;
 import ultimatum.project.repository.event.RecommendListEventRepository;
-import ultimatum.project.repository.food.RecommendFoodRepository;
 import ultimatum.project.repository.food.RecommendListFoodRepository;
 import ultimatum.project.repository.hotel.RecommendListHotelRepository;
 import ultimatum.project.repository.place.RecommendListPlaceRepository;
@@ -217,6 +229,7 @@ public class RecommendReplyService {
         // 조회된 후기들을 ReadReplyFoodByIdResponse DTO로 변환합니다.
         return replies.stream()
                 .map(reply -> new ReadReplyFoodByIdResponse(
+                        reply.getRecommendReply(),
                         reply.getRecommendReplyStar(),
                         reply.getRecommendReplyTagValue(), // JSON을 List<String>로 변환
                         reply.getRecommendFoodId() != null ? reply.getRecommendFoodId().getRecommendFoodId() : null // 적절한 ID 접근 방식으로 수정
@@ -232,6 +245,7 @@ public class RecommendReplyService {
         // 조회된 후기들을 ReadReplyPlaceByIdResponse DTO로 변환합니다.
         return replies.stream()
                 .map(reply -> new ReadReplyPlaceByIdResponse(
+                        reply.getRecommendReply(),
                         reply.getRecommendReplyStar(),
                         reply.getRecommendReplyTagValue(), // JSON을 List<String>로 변환
                         reply.getRecommendPlaceId() != null ? reply.getRecommendPlaceId().getRecommendPlaceId() : null // 적절한 ID 접근 방식으로 수정
@@ -247,6 +261,7 @@ public class RecommendReplyService {
         // 조회된 후기들을 ReadReplyHotelByIdResponse DTO로 변환합니다.
         return replies.stream()
                 .map(reply -> new ReadReplyHotelByIdResponse(
+                        reply.getRecommendReply(),
                         reply.getRecommendReplyStar(),
                         reply.getRecommendReplyTagValue(), // JSON을 List<String>로 변환
                         reply.getRecommendHotelId() != null ? reply.getRecommendHotelId().getRecommendHotelId() : null // 적절한 ID 접근 방식으로 수정
@@ -262,6 +277,7 @@ public class RecommendReplyService {
         // 조회된 후기들을 ReadReplyEventByIdResponse DTO로 변환합니다.
         return replies.stream()
                 .map(reply -> new ReadReplyEventByIdResponse(
+                        reply.getRecommendReply(),
                         reply.getRecommendReplyStar(),
                         reply.getRecommendReplyTagValue(), // JSON을 List<String>로 변환
                         reply.getRecommendEventId() != null ? reply.getRecommendEventId().getRecommendEventId() : null // 적절한 ID 접근 방식으로 수정
@@ -270,8 +286,8 @@ public class RecommendReplyService {
     }
 
 
-    // 음식점 전체 조회 및 태그 기반 필터링
-    public List<ReadReplyFoodAllResponse> findAllRepliesByTag(String recommendReplyTagValue, Pageable pageable) {
+    // 음식점 전체조회 및 태그 필터링
+    public List<ReadReplyFoodAllResponse> findAllReplyFoodTag(String recommendReplyTagValue, Pageable pageable) {
         Page<RecommendReply> replies = recommendReplyRepository.findByRecommendReplyTagValueContainingIgnoreCase(recommendReplyTagValue, pageable);
 
         return replies.stream()
@@ -283,6 +299,49 @@ public class RecommendReplyService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    // 관광지 전체조회 및 태그 필터링
+    public List<ReadReplyPlaceAllResponse> findAllReplyPlaceTag(String recommendReplyTagValue, Pageable pageable) {
+        Page<RecommendReply> replies = recommendReplyRepository.findByRecommendReplyTagValueContainingIgnoreCase(recommendReplyTagValue, pageable);
+
+        return replies.stream()
+                .map(reply -> new ReadReplyPlaceAllResponse(
+                        reply.getRecommendReply(),
+                        reply.getRecommendReplyStar(),
+                        reply.getRecommendReplyTagValue(),
+                        reply.getRecommendPlaceId() != null ? reply.getRecommendPlaceId().getRecommendPlaceId() : null
+                ))
+                .collect(Collectors.toList());
+    }
+
+    // 숙박 전체조회 및 태그 필터링
+    public List<ReadReplyHotelAllResponse> findAllReplyHotelTag(String recommendReplyTagValue, Pageable pageable) {
+        Page<RecommendReply> replies = recommendReplyRepository.findByRecommendReplyTagValueContainingIgnoreCase(recommendReplyTagValue, pageable);
+
+        return replies.stream()
+                .map(reply -> new ReadReplyHotelAllResponse(
+                        reply.getRecommendReply(),
+                        reply.getRecommendReplyStar(),
+                        reply.getRecommendReplyTagValue(),
+                        reply.getRecommendHotelId() != null ? reply.getRecommendHotelId().getRecommendHotelId() : null
+                ))
+                .collect(Collectors.toList());
+    }
+
+    // 축제행사 전체조회 및 태그 필터링
+    public List<ReadReplyEventAllResponse> findAllReplyEventTag(String recommendReplyTagValue, Pageable pageable) {
+        Page<RecommendReply> replies = recommendReplyRepository.findByRecommendReplyTagValueContainingIgnoreCase(recommendReplyTagValue, pageable);
+
+        return replies.stream()
+                .map(reply -> new ReadReplyEventAllResponse(
+                        reply.getRecommendReply(),
+                        reply.getRecommendReplyStar(),
+                        reply.getRecommendReplyTagValue(),
+                        reply.getRecommendEventId() != null ? reply.getRecommendEventId().getRecommendEventId() : null
+                ))
+                .collect(Collectors.toList());
+    }
+
 
     // 후기 전체 조회
     @Transactional(readOnly = true)

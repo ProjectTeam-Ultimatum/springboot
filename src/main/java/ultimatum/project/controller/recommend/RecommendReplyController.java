@@ -6,17 +6,24 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import ultimatum.project.domain.dto.place.RecommendListPlaceByIdResponse;
 import ultimatum.project.domain.dto.recommendReply.*;
-import ultimatum.project.domain.dto.reviewDTO.CreateReviewRequest;
-import ultimatum.project.domain.dto.reviewDTO.CreateReviewResponse;
-import ultimatum.project.domain.entity.event.RecommendListEvent;
-import ultimatum.project.domain.entity.food.RecommendListFood;
-import ultimatum.project.domain.entity.hotel.RecommendListHotel;
-import ultimatum.project.domain.entity.place.RecommendListPlace;
+import ultimatum.project.domain.dto.recommendReply.event.CreateReplyEventRequest;
+import ultimatum.project.domain.dto.recommendReply.event.CreateReplyEventResponse;
+import ultimatum.project.domain.dto.recommendReply.event.ReadReplyEventAllResponse;
+import ultimatum.project.domain.dto.recommendReply.event.ReadReplyEventByIdResponse;
+import ultimatum.project.domain.dto.recommendReply.food.CreateReplyFoodRequest;
+import ultimatum.project.domain.dto.recommendReply.food.CreateReplyFoodResponse;
+import ultimatum.project.domain.dto.recommendReply.food.ReadReplyFoodAllResponse;
+import ultimatum.project.domain.dto.recommendReply.food.ReadReplyFoodByIdResponse;
+import ultimatum.project.domain.dto.recommendReply.hotel.CreateReplyHotelRequest;
+import ultimatum.project.domain.dto.recommendReply.hotel.CreateReplyHotelResponse;
+import ultimatum.project.domain.dto.recommendReply.hotel.ReadReplyHotelAllResponse;
+import ultimatum.project.domain.dto.recommendReply.hotel.ReadReplyHotelByIdResponse;
+import ultimatum.project.domain.dto.recommendReply.place.CreateReplyPlaceRequest;
+import ultimatum.project.domain.dto.recommendReply.place.CreateReplyPlaceResponse;
+import ultimatum.project.domain.dto.recommendReply.place.ReadReplyPlaceAllResponse;
+import ultimatum.project.domain.dto.recommendReply.place.ReadReplyPlaceByIdResponse;
 import ultimatum.project.service.recommned.RecommendReplyService;
 
 import java.util.List;
@@ -200,15 +207,46 @@ public class RecommendReplyController {
         return ResponseEntity.ok(responses);
     }
 
-    // 태그를 기반으로 모든 후기 조회
+    // 태그 기반 음식점 조회
     @Operation(summary = "음식점 평점 태그 필터링 조회")
     @GetMapping("/readAllFood/tag")
     public ResponseEntity<List<ReadReplyFoodAllResponse>> getAllRepliesByTag(
             @RequestParam(value = "recommendReplyTagValue", required = false) String recommendReplyTagValue) {
 
-        List<ReadReplyFoodAllResponse> responses = recommendReplyService.findAllRepliesByTag(recommendReplyTagValue, Pageable.unpaged());
+        List<ReadReplyFoodAllResponse> responses = recommendReplyService.findAllReplyFoodTag(recommendReplyTagValue, Pageable.unpaged());
         return ResponseEntity.ok(responses);
     }
+
+    // 태그 기반 관광지 조회
+    @Operation(summary = "관광지 평점 태그 필터링 조회")
+    @GetMapping("/readAllplace/tag")
+    public ResponseEntity<List<ReadReplyPlaceAllResponse>> findAllReplyPlaceTag(
+            @RequestParam(value = "recommendReplyTagValue", required = false) String recommendReplyTagValue) {
+
+        List<ReadReplyPlaceAllResponse> responses = recommendReplyService.findAllReplyPlaceTag(recommendReplyTagValue, Pageable.unpaged());
+        return ResponseEntity.ok(responses);
+    }
+
+    // 태그 기반 숙박 조회
+    @Operation(summary = "숙박 평점 태그 필터링 조회")
+    @GetMapping("/readAllhotel/tag")
+    public ResponseEntity<List<ReadReplyHotelAllResponse>> findAllReplyHotelTag(
+            @RequestParam(value = "recommendReplyTagValue", required = false) String recommendReplyTagValue) {
+
+        List<ReadReplyHotelAllResponse> responses = recommendReplyService.findAllReplyHotelTag(recommendReplyTagValue, Pageable.unpaged());
+        return ResponseEntity.ok(responses);
+    }
+
+    // 태그 기반 축제행사 조회
+    @Operation(summary = "축제행사 평점 태그 필터링 조회")
+    @GetMapping("/readAllevent/tag")
+    public ResponseEntity<List<ReadReplyEventAllResponse>> findAllReplyEventTag(
+            @RequestParam(value = "recommendReplyTagValue", required = false) String recommendReplyTagValue) {
+
+        List<ReadReplyEventAllResponse> responses = recommendReplyService.findAllReplyEventTag(recommendReplyTagValue, Pageable.unpaged());
+        return ResponseEntity.ok(responses);
+    }
+
 
     // 모든 후기 조회
     @GetMapping

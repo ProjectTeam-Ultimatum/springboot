@@ -1,4 +1,4 @@
-package ultimatum.project.domain.dto.recommendReply;
+package ultimatum.project.domain.dto.recommendReply.hotel;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,9 +11,9 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReadReplyPlaceByIdResponse {
-
+public class ReadReplyHotelAllResponse {
+    private String recommendReply; //Security
     private Long recommendReplyStar;
     private List<String> recommendReplyTagValue;
-    private Long recommendPlaceId;
+    private Long recommendHotelId;
 }

@@ -1,18 +1,19 @@
-package ultimatum.project.domain.dto.recommendReply;
+package ultimatum.project.domain.dto.recommendReply.food;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ultimatum.project.domain.entity.food.RecommendListFood;
+import lombok.Setter;
 
 import java.util.List;
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-public class CreateReplyFoodRequest {
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class ReadReplyFoodByIdResponse {
+    private String recommendReply; //Security
     private Long recommendReplyStar;
     private List<String> recommendReplyTagValue;
     private Long recommendFoodId;
-
 }
