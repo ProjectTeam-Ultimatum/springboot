@@ -10,4 +10,5 @@ import ultimatum.project.domain.entity.food.RecommendListFood;
 public interface RecommendListEventRepository extends JpaRepository<RecommendListEvent, Long> {
     Page<RecommendListEvent> findByRecommendEventTagContainingIgnoreCase(String tag, Pageable pageable);
     Page<RecommendListEvent> findByRecommendEventRegionContainingIgnoreCase(String region, Pageable pageable);
+    RecommendListEvent findByRecommendEventId(Long id); //ReplyService 축제행사 평점 등록
 }

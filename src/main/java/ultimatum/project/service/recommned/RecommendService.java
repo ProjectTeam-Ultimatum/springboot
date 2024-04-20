@@ -80,7 +80,7 @@ public class RecommendService {
             // recommendFoodRegion를 기준으로 필터링된 페이지 데이터를 반환
             results = recommendListFoodRepository.findByRecommendFoodRegionContainingIgnoreCase(region, pageable);
         } else {
-            // 관광지 리스트 데이터를 반환
+            // 음식점 리스트 데이터를 반환
             results = recommendListFoodRepository.findAll(pageable);
         }
 

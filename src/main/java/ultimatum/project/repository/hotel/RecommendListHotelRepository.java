@@ -11,4 +11,5 @@ public interface RecommendListHotelRepository extends JpaRepository<RecommendLis
 
     Page<RecommendListHotel> findByRecommendHotelTagContainingIgnoreCase(String tag, Pageable pageable);
     Page<RecommendListHotel> findByRecommendHotelRegionContainingIgnoreCase(String region, Pageable pageable);
+    RecommendListHotel findByRecommendHotelId(Long id); //ReplyService 숙박 평점 등록
 }

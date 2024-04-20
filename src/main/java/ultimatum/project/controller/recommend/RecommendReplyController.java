@@ -3,6 +3,7 @@ package ultimatum.project.controller.recommend;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -87,7 +88,7 @@ public class RecommendReplyController {
 //        return new ResponseEntity<>(response, HttpStatus.CREATED);
 //    }
 
-    //음식점 평점 작성
+    //음식점 평점 작성 - 최종
     @PostMapping("/saveFoodReply")
     @Operation(summary = "음식점 평점 작성", description = "입력 항목")
     public ResponseEntity<CreateReplyFoodResponse> saveRecommendFoodReply(
@@ -104,14 +105,108 @@ public class RecommendReplyController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    //음식점 평점 조회
-    @GetMapping("/{recommend_food_id}")
+    //관광지 평점 작성
+    @PostMapping("/savePlaceReply")
+    @Operation(summary = "관광지 평점 작성", description = "입력 항목")
+    public ResponseEntity<CreateReplyPlaceResponse> saveRecommendPlaceReply(
+            @RequestParam("recommendReplyStar") Long recommendReplyStar,
+            @RequestParam("recommendReplyTagValue") List<String> recommendReplyTagValue,
+            @RequestParam("recommendPlaceId") Long recommendPlaceId) {
+
+        // RecommendReplyRequest 객체를 생성하고 파라미터로 전달받은 값을 설정합니다.
+        CreateReplyPlaceRequest request = new CreateReplyPlaceRequest(
+                recommendReplyStar, recommendReplyTagValue, recommendPlaceId);
+
+        // 서비스를 호출하여 리뷰를 생성하고 응답 객체를 반환합니다.
+        CreateReplyPlaceResponse response = recommendReplyService.createPlaceReply(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    //숙박 평점 작성
+    @PostMapping("/saveHotelReply")
+    @Operation(summary = "숙박 평점 작성", description = "입력 항목")
+    public ResponseEntity<CreateReplyHotelResponse> saveRecommendHotelReply(
+            @RequestParam("recommendReplyStar") Long recommendReplyStar,
+            @RequestParam("recommendReplyTagValue") List<String> recommendReplyTagValue,
+            @RequestParam("recommendHotelId") Long recommendHotelId) {
+
+        // RecommendReplyRequest 객체를 생성하고 파라미터로 전달받은 값을 설정합니다.
+        CreateReplyHotelRequest request = new CreateReplyHotelRequest(
+                recommendReplyStar, recommendReplyTagValue, recommendHotelId);
+
+        // 서비스를 호출하여 리뷰를 생성하고 응답 객체를 반환합니다.
+        CreateReplyHotelResponse response = recommendReplyService.createHotelReply(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    //축제행사 평점 작성
+    @PostMapping("/saveEventReply")
+    @Operation(summary = "축제행사 평점 작성", description = "입력 항목")
+    public ResponseEntity<CreateReplyEventResponse> saveRecommendEventReply(
+            @RequestParam("recommendReplyStar") Long recommendReplyStar,
+            @RequestParam("recommendReplyTagValue") List<String> recommendReplyTagValue,
+            @RequestParam("recommendEventId") Long recommendEventId) {
+
+        // RecommendReplyRequest 객체를 생성하고 파라미터로 전달받은 값을 설정합니다.
+        CreateReplyEventRequest request = new CreateReplyEventRequest(
+                recommendReplyStar, recommendReplyTagValue, recommendEventId);
+
+        // 서비스를 호출하여 리뷰를 생성하고 응답 객체를 반환합니다.
+        CreateReplyEventResponse response = recommendReplyService.createEventReply(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    //음식점 평점 조회 - 최종
+    @GetMapping("/foodRead/{recommend_food_id}")
     @Operation(summary = "음식점 평점 조회")
     public ResponseEntity<List<ReadReplyFoodByIdResponse>> getFoodReplies(@PathVariable Long recommend_food_id) {
         List<ReadReplyFoodByIdResponse> responses = recommendReplyService.getRepliesByFoodId(recommend_food_id);
         if (responses.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
+        return ResponseEntity.ok(responses);
+    }
+
+    //관광지 평점 조회
+    @GetMapping("/placeRead/{recommend_place_id}")
+    @Operation(summary = "관광지 평점 조회")
+    public ResponseEntity<List<ReadReplyPlaceByIdResponse>> getPlaceReplies(@PathVariable Long recommend_place_id) {
+        List<ReadReplyPlaceByIdResponse> responses = recommendReplyService.getRepliesByPlaceId(recommend_place_id);
+        if (responses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(responses);
+    }
+
+    //숙박 평점 조회
+    @GetMapping("/placeHotel/{recommend_hotel_id}")
+    @Operation(summary = "숙박 평점 조회")
+    public ResponseEntity<List<ReadReplyHotelByIdResponse>> getHotelReplies(@PathVariable Long recommend_hotel_id) {
+        List<ReadReplyHotelByIdResponse> responses = recommendReplyService.getRepliesByHotelId(recommend_hotel_id);
+        if (responses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(responses);
+    }
+
+    //축제행사 평점 조회
+    @GetMapping("/placeEvent/{recommend_event_id}")
+    @Operation(summary = "축제행사 평점 조회")
+    public ResponseEntity<List<ReadReplyEventByIdResponse>> getEventReplies(@PathVariable Long recommend_event_id) {
+        List<ReadReplyEventByIdResponse> responses = recommendReplyService.getRepliesByEventId(recommend_event_id);
+        if (responses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(responses);
+    }
+
+    // 태그를 기반으로 모든 후기 조회
+    @Operation(summary = "음식점 평점 태그 필터링 조회")
+    @GetMapping("/readAllFood/tag")
+    public ResponseEntity<List<ReadReplyFoodAllResponse>> getAllRepliesByTag(
+            @RequestParam(value = "recommendReplyTagValue", required = false) String recommendReplyTagValue) {
+
+        List<ReadReplyFoodAllResponse> responses = recommendReplyService.findAllRepliesByTag(recommendReplyTagValue, Pageable.unpaged());
         return ResponseEntity.ok(responses);
     }
 

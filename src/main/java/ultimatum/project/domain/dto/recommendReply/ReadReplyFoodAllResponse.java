@@ -17,8 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ReadReplyFoodAllResponse {
 
-    private Long recommendReplyId;
-    private String recommendReply;
+    private String recommendReply; //Security
     private Long recommendReplyStar;
     private List<String> recommendReplyTagValue;
     private Long recommendFoodId;
