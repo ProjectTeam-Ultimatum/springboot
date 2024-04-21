@@ -1,29 +1,22 @@
-package ultimatum.project.domain.entity.food;
+package ultimatum.project.domain.dto.food;
 
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.sql.Time;
 
-@Entity
-@Builder
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RecommendListFood {
+@NoArgsConstructor
+public class RecommendListFoodResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "recommend_food_id")
     private Long recommendFoodId;
-    private String recommendFoodContentsId;
     private String recommendFoodTitle;
-    @Column(columnDefinition = "MEDIUMTEXT")
     private String recommendFoodIntroduction;
-    @Column(columnDefinition = "MEDIUMTEXT")
     private String recommendFoodAllTag;
-    @Column(columnDefinition = "MEDIUMTEXT")
     private String recommendFoodTag;
     private String recommendFoodCategory;
     private String recommendFoodAddress;
@@ -37,5 +30,4 @@ public class RecommendListFood {
     private String recommendFoodPhoneNo;
     private String recommendFoodImgPath;
     private Long recommendFoodBudget;
-
 }

@@ -1,29 +1,22 @@
-package ultimatum.project.domain.entity.event;
+package ultimatum.project.domain.dto.event;
 
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.sql.Time;
 
-@Entity
-@Builder
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RecommendListEvent {
+@NoArgsConstructor
+public class RecommendListEventResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "recommend_event_id")
     private Long recommendEventId;
-    private String recommendEventContentsId;
     private String recommendEventTitle;
-    @Column(columnDefinition = "MEDIUMTEXT")
     private String recommendEventIntroduction;
-    @Column(columnDefinition = "MEDIUMTEXT")
     private String recommendEventAllTag;
-    @Column(columnDefinition = "MEDIUMTEXT")
     private String recommendEventTag;
     private String recommendEventCategory;
     private String recommendEventAddress;

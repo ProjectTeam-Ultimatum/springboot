@@ -1,29 +1,22 @@
-package ultimatum.project.domain.entity.hotel;
+package ultimatum.project.domain.dto.hotel;
 
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.sql.Time;
 
-@Entity
-@Builder
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RecommendListHotel {
+@NoArgsConstructor
+public class RecommendListHotelResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "recommend_hotel_id")
     private Long recommendHotelId;
-    private String recommendHotelContentsId;
     private String recommendHotelTitle;
-    @Column(columnDefinition = "MEDIUMTEXT")
     private String recommendHotelIntroduction;
-    @Column(columnDefinition = "MEDIUMTEXT")
     private String recommendHotelAllTag;
-    @Column(columnDefinition = "MEDIUMTEXT")
     private String recommendHotelTag;
     private String recommendHotelCategory;
     private String recommendHotelAddress;

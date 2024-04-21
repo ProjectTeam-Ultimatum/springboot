@@ -1,40 +1,32 @@
-package ultimatum.project.domain.entity.place;
+package ultimatum.project.domain.dto.place;
 
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.sql.Time;
 
-@Entity
-@Builder
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RecommendListPlace {
+@NoArgsConstructor
+public class RecommendListPlaceResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "recommend_place_id")
     private Long recommendPlaceId;
-    private String recommendPlaceContentsId;
+    //private String recommendPlaceId;
     private String recommendPlaceTitle;
-    @Column(columnDefinition = "MEDIUMTEXT")
     private String recommendPlaceIntroduction;
-    @Column(columnDefinition = "MEDIUMTEXT")
     private String recommendPlaceAllTag;
-    @Column(columnDefinition = "MEDIUMTEXT")
     private String recommendPlaceTag;
     private String recommendPlaceCategory;
     private String recommendPlaceAddress;
     private String recommendPlaceRegion;
     private Time recommendPlaceOpentime;
     private Time recommendPlaceClosetime;
-    private Long recommendPlaceStar;
-    private Long recommendPlaceLike;
     private String recommendPlaceLatitude;
     private String recommendPlaceLongitude;
     private String recommendPlacePhoneNo;
     private String recommendPlaceImgPath;
-    private Long recommendPlaceBudget;
+
 }
