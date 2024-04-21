@@ -12,7 +12,8 @@ import ultimatum.project.domain.entity.place.RecommendPlace;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RecommendReply {
+public class
+RecommendReply {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

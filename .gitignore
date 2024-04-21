@@ -39,3 +39,5 @@ out/
 aws.yml
 
 application.yml
+## yml 파일 secret info ##
+src/main/resources/application.yml
