@@ -53,15 +53,27 @@ public class ChatController {
     }
 
 
-
-
-
     // 채팅방 목록 조회
     @GetMapping("/list")
     public ResponseEntity<List<ChatRoomListDto>> getChatRooms() {
         List<ChatRoomListDto> chatRooms = chatService.getChatRooms();
         return ResponseEntity.ok(chatRooms);
     }
+
+    // 로그인한 사용자의 채팅방 목록 조회
+
+    // ChatController.java
+    @GetMapping("/connected-rooms")
+    public ResponseEntity<List<Long>> getConnectedChatRooms(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        Member member = principalDetails.getUser();
+        List<Long> connectedRooms = chatService.getConnectedChatRooms(member.getMemberId());
+        return ResponseEntity.ok(connectedRooms);
+    }
+
 
     // 특정 채팅방 입장
     @GetMapping("/room/{roomId}")

@@ -3,7 +3,7 @@ package ultimatum.project.service.chat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
@@ -29,6 +29,9 @@ public class ChatService {
     private final MessageRepository messageRepository;
     private final Map<Long, Set<WebSocketSession>> chatRoomSessionMap = new HashMap<>();
     private final ObjectMapper mapper;
+
+    @Autowired
+    private ChatRoomSessionService chatRoomSessionService;
 
     // 채팅 메시지 저장
 // 채팅 메시지 저장
@@ -71,6 +74,15 @@ public class ChatService {
                     );
                 }).collect(Collectors.toList());
     }
+
+
+
+    // ChatService.java
+    public List<Long> getConnectedChatRooms(Long memberId) {
+        return chatRoomSessionService.getConnectedRoomsForMember(memberId);
+    }
+
+
 
     // 특정 채팅방에 입장
     public ChatRoomDto enterChatRoom(Long roomId) {
