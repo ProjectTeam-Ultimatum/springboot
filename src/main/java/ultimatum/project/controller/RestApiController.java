@@ -19,7 +19,10 @@ import ultimatum.project.service.member.MemberService;
 import ultimatum.project.repository.MemberRepository;
 import ultimatum.project.global.config.Security.auth.PrincipalDetails;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1")
@@ -119,28 +122,54 @@ public class RestApiController {
         }
     }
 
+//    @GetMapping("/user/info/detail")
+//    @SecurityRequirement(name = "bearerAuth")
+//    @ResponseBody
+//    public ResponseEntity<String> getUserInfoDetail(Authentication authentication) {
+//        if (authentication == null || !authentication.isAuthenticated()) {
+//            throw new CustomException(ErrorCode.BAD_REQUSET_USER);
+//        }
+//
+//        String memberEmail = authentication.getName();
+//
+//        Member member = memberRepository.findByMemberEmail(memberEmail);
+//
+//        if (member == null) {
+//            return ResponseEntity.badRequest().body("사용자 정보를 찾을 수 없습니다.");
+//        }
+//
+//        String userDetails =
+//                "사용자 이름: " + member.getMemberName() +
+//                        ", 이메일: " + member.getMemberEmail() +
+//                        ", 성별: " + member.getMemberGender() +
+//                        ", 나이: " + member.getMemberAge() +
+//                        ", 주소: " + member.getMemberAddress();
+//
+//        return ResponseEntity.ok(userDetails);
+//    }
+
+
     @GetMapping("/user/info/detail")
     @SecurityRequirement(name = "bearerAuth")
     @ResponseBody
-    public ResponseEntity<String> getUserInfoDetail(Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> getUserInfoDetail(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new CustomException(ErrorCode.BAD_REQUSET_USER);
         }
 
         String memberEmail = authentication.getName();
-
         Member member = memberRepository.findByMemberEmail(memberEmail);
 
         if (member == null) {
-            return ResponseEntity.badRequest().body("사용자 정보를 찾을 수 없습니다.");
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "사용자 정보를 찾을 수 없습니다."));
         }
 
-        String userDetails =
-                "사용자 이름: " + member.getMemberName() +
-                        ", 이메일: " + member.getMemberEmail() +
-                        ", 성별: " + member.getMemberGender() +
-                        ", 나이: " + member.getMemberAge() +
-                        ", 주소: " + member.getMemberAddress();
+        Map<String, Object> userDetails = new HashMap<>();
+        userDetails.put("userName", member.getMemberName());
+        userDetails.put("email", member.getMemberEmail());
+        userDetails.put("gender", member.getMemberGender());
+        userDetails.put("age", member.getMemberAge());
+        userDetails.put("address", member.getMemberAddress());
 
         return ResponseEntity.ok(userDetails);
     }

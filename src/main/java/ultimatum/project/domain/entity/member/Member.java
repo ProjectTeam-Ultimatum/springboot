@@ -4,12 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import ultimatum.project.domain.entity.review.ReviewImage;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
@@ -43,11 +38,20 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberImage> memberImages = new ArrayList<>();
 
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        List<GrantedAuthority> authorities = Arrays.stream(this.memberRole.split(","))
+//                .map(role -> new SimpleGrantedAuthority(role))
+//                .collect(Collectors.toList());
+//        return authorities;
+//    }
+
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities = Arrays.stream(this.memberRole.split(","))
-                .map(role -> new SimpleGrantedAuthority(role))
+        if (this.memberRole == null) {
+            return Collections.emptyList();  // 또는 기본 권한 설정
+        }
+        return Arrays.stream(this.memberRole.split(","))
+                .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
-        return authorities;
     }
 
     public List<String> getRoleList() {

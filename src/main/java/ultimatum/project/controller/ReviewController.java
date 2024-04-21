@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.dto.reviewDTO.*;
+import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.service.review.ReviewService;
 
 import java.util.List;
@@ -40,7 +41,7 @@ public class ReviewController {
         // CreateReviewRequest 객체를 생성하고 파라미터로 전달받은 값을 설정합니다.
         CreateReviewRequest request = new CreateReviewRequest(
                 reviewTitle, reviewSubtitle, reviewContent, reviewLocation, reviewImages);
-// 서비스를 호출하여 리뷰를 생성하고 응답 객체를 반환합니다.
+        // 서비스를 호출하여 리뷰를 생성하고 응답 객체를 반환합니다.
         CreateReviewResponse response = reviewService.createReview(authentication, request, reviewImages);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
