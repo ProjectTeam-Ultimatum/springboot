@@ -30,4 +30,5 @@ public class RecommendListEventResponse {
     private String recommendEventPhoneNo;
     private String recommendEventImgPath;
     private Long recommendEventBudget;
+
 }
