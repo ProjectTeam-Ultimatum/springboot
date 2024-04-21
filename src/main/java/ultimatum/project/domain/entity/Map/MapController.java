@@ -21,11 +21,14 @@ public class MapController {
 
     @PostMapping("/saveMap")
     public ResponseEntity<MapDTO> saveMap(@RequestBody MapDTO mapDTO){
-        log.info("😎 review : {}", mapDTO.review);
-        log.info("😎 title : {}", mapDTO.title);
-        log.info("😎 grade : {}", mapDTO.grade);
-        log.info("😎 lon : {}", mapDTO.lonCopy);
-        log.info("😎 lat : {}", mapDTO.latCopy);
+        log.info("title" + mapDTO.getTitle());
+        log.info("address" + mapDTO.getAddressCopy());
+        log.info("img" + mapDTO.getImage());
+        log.info("latitude" + mapDTO.getLatCopy());
+        log.info("longitude" + mapDTO.getLonCopy());
+        log.info("date" + mapDTO.getDate());
+        log.info("budget" + mapDTO.getBudget());
+        log.info("course" + mapDTO.getCourse());
         mapDTO.setId(null);
         MapDTO saveMap = mapService.savemap(mapDTO);
         return ResponseEntity.ok(saveMap);
@@ -38,22 +41,24 @@ public class MapController {
         return new ResponseEntity<>(readMap, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<MapDTO> updateMap(@PathVariable Long id, @RequestBody MapDTO mapDTO) {
-        MapDTO updateMap = mapService.updatemap(id, mapDTO);
-
-        return new ResponseEntity<>(updateMap, HttpStatus.OK);
-    }
-
-    @DeleteMapping("{id}")
-    public ResponseEntity<MapDTO> deleteMap(@PathVariable Long id) {
-        MapDTO deleteMap = mapService.deletemap(id);
-
-        return new ResponseEntity<>(deleteMap, HttpStatus.OK);
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<MapDTO> updateMap(@PathVariable Long id, @RequestBody MapDTO mapDTO) {
+//        MapDTO updateMap = mapService.updatemap(id, mapDTO);
+//
+//        return new ResponseEntity<>(updateMap, HttpStatus.OK);
+//    }
+//
+//    @DeleteMapping("{id}")
+//    public ResponseEntity<MapDTO> deleteMap(@PathVariable Long id) {
+//        MapDTO deleteMap = mapService.deletemap(id);
+//
+//        return new ResponseEntity<>(deleteMap, HttpStatus.OK);
+//    }
 
     @GetMapping("/listMap")
     public ResponseEntity<?> listMap() {
         return ResponseEntity.ok().body(mapService.listmap());
     }
+
 }
+

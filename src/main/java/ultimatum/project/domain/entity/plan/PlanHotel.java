@@ -6,7 +6,9 @@ import ultimatum.project.domain.entity.food.RecommendFood;
 import ultimatum.project.domain.entity.hotel.RecommendHotel;
 import ultimatum.project.domain.entity.plan.PlanDay;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +27,9 @@ public class PlanHotel {
 
     private LocalDateTime planHotelStayTime;
 
-    private LocalDateTime planHotelArriveTime;
+    private LocalTime planHotelArriveTime;
 
-    private LocalDateTime planHotelRouteTime;
+    private LocalTime planHotelRouteTime;
 
 //    @OneToMany
 //    @JoinColumn(name = "recommend_hotel_id")
@@ -40,4 +42,7 @@ public class PlanHotel {
     @JoinColumn(name = "plan_day_id")
     private PlanDay planDayId;
 
+    @ManyToOne
+    @JoinColumn(name = "plan_day_date")
+    private PlanDay plan_day_date; // 1일차, 2일차, 3일차로 표시
 }

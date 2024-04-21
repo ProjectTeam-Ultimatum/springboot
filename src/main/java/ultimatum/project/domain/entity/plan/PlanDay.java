@@ -24,4 +24,7 @@ public class PlanDay {
     @ManyToOne
     @JoinColumn(name = "plan_id")
     private Plan planId;
+
+
+    private String plan_day_date;
 }

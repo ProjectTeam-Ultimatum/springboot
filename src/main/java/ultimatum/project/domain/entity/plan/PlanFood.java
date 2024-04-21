@@ -40,4 +40,8 @@ public class PlanFood {
     @JoinColumn(name = "plan_day_id")
     private PlanDay planDayId;
 
+    @ManyToOne
+    @JoinColumn(name = "plan_day_date")
+    private PlanDay plan_day_date;
+
 }
