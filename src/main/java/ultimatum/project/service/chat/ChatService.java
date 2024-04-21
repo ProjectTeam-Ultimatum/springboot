@@ -29,12 +29,10 @@ public class ChatService {
     private final MessageRepository messageRepository;
     private final Map<Long, Set<WebSocketSession>> chatRoomSessionMap = new HashMap<>();
     private final ObjectMapper mapper;
-
     @Autowired
     private ChatRoomSessionService chatRoomSessionService;
 
     // 채팅 메시지 저장
-// 채팅 메시지 저장
     public void saveMessage(ChatMessageDto chatMessageDto, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new IllegalArgumentException("인증된 사용자가 아닙니다.");
@@ -56,8 +54,6 @@ public class ChatService {
 
         messageRepository.save(chatMessage);
     }
-
-
 
     // 모든 채팅방 조회
     public List<ChatRoomListDto> getChatRooms() {
