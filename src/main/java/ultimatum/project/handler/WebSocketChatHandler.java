@@ -113,7 +113,7 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
             chatRoomSessionMap.put(chatRoomId, new HashSet<>());
         }
 
-        // 메시지 타입에 따른 처리
+        // 메시지 타입에 따른 처리ㅎ
         switch (chatMessageDto.getMessageType()) {
             case ENTER:
                 handleEnter(session, chatRoomId);
