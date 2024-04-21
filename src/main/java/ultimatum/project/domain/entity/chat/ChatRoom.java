@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ultimatum.project.domain.entity.member.Member;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +18,14 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatRoom {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long chatRoomId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member; // 채팅방을 개설한 회원
 
     private String chatRoomName;
 

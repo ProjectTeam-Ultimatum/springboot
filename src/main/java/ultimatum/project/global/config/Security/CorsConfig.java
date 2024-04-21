@@ -32,6 +32,7 @@ public class CorsConfig {
       CorsConfiguration config = new CorsConfiguration();
       config.setAllowCredentials(true);
       config.addAllowedOriginPattern("http://localhost:8081"); // 실제 배포시에는 구체적인 도메인으로 제한하세요
+      config.addAllowedOriginPattern("http://localhost:8080");
       config.addAllowedHeader("*");
       config.addExposedHeader("Authorization"); // 이 부분이 중요
       config.addAllowedMethod("*");

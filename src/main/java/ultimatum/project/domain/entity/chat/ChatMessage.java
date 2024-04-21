@@ -20,6 +20,8 @@ public class ChatMessage {
 
     private String senderId; // 메시지를 보낸 사용자의 ID
 
+    private String senderEmail; // 메시지를 보낸 사용자의 EMAIL
+
     private String message; // 메시지 내용
 
     private String imageUrl;
