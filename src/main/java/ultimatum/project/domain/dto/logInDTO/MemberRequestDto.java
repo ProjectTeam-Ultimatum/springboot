@@ -20,6 +20,8 @@ public class MemberRequestDto {
 
     private String memberAddress;
 
+    private String memberFindPasswordAnswer;
+
     // 프로필 사진
     private List<MultipartFile> files;
 

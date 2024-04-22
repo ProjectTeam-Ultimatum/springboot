@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.global.config.Security.jwt.JwtProperties;
@@ -12,11 +13,17 @@ import ultimatum.project.global.config.Security.jwt.JwtProperties;
 @Service
 public class JwtTokenService {
 
-    private final Algorithm algorithm = Algorithm.HMAC512(JwtProperties.SECRET);
+    private final JwtProperties jwtProperties;
+
+    @Autowired
+    public JwtTokenService(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+    }
 
     // 토큰에서 사용자 정보를 파싱하여 반환
     public Member parseToken(String token) {
         try {
+            Algorithm algorithm = Algorithm.HMAC512(jwtProperties.getSecret());
             JWTVerifier verifier = JWT.require(algorithm).build();
             DecodedJWT jwt = verifier.verify(token);
             return buildMemberFromJWT(jwt);
@@ -30,6 +37,7 @@ public class JwtTokenService {
     // 토큰의 유효성 검사 //
     public boolean validateToken(String token) {
         try {
+            Algorithm algorithm = Algorithm.HMAC512(jwtProperties.getSecret());
             JWTVerifier verifier = JWT.require(algorithm).build();
             verifier.verify(token);
             return true;

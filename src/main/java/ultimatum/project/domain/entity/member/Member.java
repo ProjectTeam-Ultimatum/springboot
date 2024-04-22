@@ -31,6 +31,8 @@ public class Member {
 
     private String memberAddress;
 
+    private String memberFindPasswordAnswer;
+
     private String memberStyle;
 
     private String memberRole;
