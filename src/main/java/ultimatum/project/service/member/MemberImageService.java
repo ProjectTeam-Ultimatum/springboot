@@ -8,9 +8,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.domain.entity.member.MemberImage;
-import ultimatum.project.repository.MemberImageRepository;
-import ultimatum.project.repository.MemberRepository;
-import ultimatum.project.service.member.MemberS3Service;
+import ultimatum.project.repository.member.MemberImageRepository;
+import ultimatum.project.repository.member.MemberRepository;
 
 import java.io.IOException;
 import java.util.ArrayList;

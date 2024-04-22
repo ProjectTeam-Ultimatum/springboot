@@ -19,8 +19,8 @@ import ultimatum.project.domain.entity.member.MemberImage;
 import ultimatum.project.global.config.Security.jwt.JwtProperties;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
-import ultimatum.project.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import ultimatum.project.repository.member.MemberRepository;
 
 import java.util.Date;
 import java.util.List;

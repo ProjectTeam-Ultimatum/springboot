@@ -2,6 +2,7 @@ package ultimatum.project.domain.entity.hotel;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ultimatum.project.domain.entity.image.RecommendImage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +16,7 @@ import java.util.List;
 public class RecommendHotel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "recommend_hotel_id")
+    @GeneratedValue
     private Long recommendHotelId;
 
     private String recommendHotelTitle;
@@ -37,8 +37,9 @@ public class RecommendHotel {
 
     private String recommendHotelBudget;
 
-    @OneToMany
-    @JoinColumn(name = "hotel_base_tag_id")
-    private List<HotelTag> hotelTags = new ArrayList<>();
+    private String recommendHotelCategory;
+
+    @OneToMany(mappedBy = "recommendHotel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecommendImage> recommendImages = new ArrayList<>();
 
 }

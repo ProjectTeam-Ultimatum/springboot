@@ -3,16 +3,19 @@ package ultimatum.project.service.chat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import ultimatum.project.repository.MessageRepository;
+import ultimatum.project.domain.dto.chatDTO.ChatRoomListDto;
+import ultimatum.project.domain.entity.member.Member;
+import ultimatum.project.repository.member.MessageRepository;
 import ultimatum.project.domain.dto.chatDTO.ChatMessageDto;
 import ultimatum.project.domain.dto.chatDTO.ChatRoomDto;
 import ultimatum.project.domain.entity.chat.ChatMessage;
 import ultimatum.project.domain.entity.chat.ChatRoom;
-import ultimatum.project.repository.ChatRoomRepository;
+import ultimatum.project.repository.chat.ChatRoomRepository;
 
 import java.io.IOException;
 import java.util.*;
@@ -24,37 +27,79 @@ import java.util.stream.Collectors;
 public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final MessageRepository messageRepository;
-    private final ModelMapper modelMapper; // ModelMapper 라이브러리를 사용한 예시
-
     private final Map<Long, Set<WebSocketSession>> chatRoomSessionMap = new HashMap<>();
     private final ObjectMapper mapper;
+    @Autowired
+    private ChatRoomSessionService chatRoomSessionService;
 
     // 채팅 메시지 저장
-    public void saveMessage(ChatMessageDto chatMessageDto) {
+    public void saveMessage(ChatMessageDto chatMessageDto, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalArgumentException("인증된 사용자가 아닙니다.");
+        }
+
+        Member member = (Member) authentication.getPrincipal(); // Authentication 객체에서 Member 정보를 가져옴
+        String senderName = member.getMemberName(); // Member 객체에서 사용자 이름을 가져옴
+        String senderEmail = member.getMemberEmail();
+
         ChatRoom chatRoom = chatRoomRepository.findById(chatMessageDto.getChatRoomId())
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
 
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setChatRoom(chatRoom);
-        chatMessage.setSenderId(chatMessageDto.getSenderId());
+        chatMessage.setSenderId(senderName);  // 사용자 이름을 senderId에 저장
+        chatMessage.setSenderEmail(senderEmail);
         chatMessage.setMessage(chatMessageDto.getMessage());
         chatMessage.setMessageType(chatMessageDto.getMessageType());
 
         messageRepository.save(chatMessage);
     }
 
-
     // 모든 채팅방 조회
-    public List<ChatRoomDto> getChatRooms() {
+    public List<ChatRoomListDto> getChatRooms() {
         return chatRoomRepository.findAll().stream()
-                .map(chatRoom -> new ChatRoomDto(chatRoom.getChatRoomId(), chatRoom.getChatRoomName(), chatRoom.getChatRoomContent(),chatRoom.getTravelStyleTags()))
-                .collect(Collectors.toList());
+                .map(chatRoom -> {
+                    Member member = chatRoom.getMember();
+                    String imageUrl = member.getMemberImages().isEmpty() ? null : member.getMemberImages().get(0).getMemberImageUrl();
+                    return new ChatRoomListDto(
+                            chatRoom.getChatRoomId(),
+                            chatRoom.getChatRoomName(),
+                            chatRoom.getChatRoomContent(),
+                            member.getMemberName(),  // 작성자 이름
+                            member.getMemberAge(),   // 작성자 나이
+                            chatRoom.getTravelStyleTags(),
+                            chatRoom.getReviewLocation(),
+                            imageUrl, // 작성자 이미지 URL 추가
+                            chatRoom.getRegDate()
+                    );
+                }).collect(Collectors.toList());
     }
+
+
+
+    // ChatService.java
+    public List<ChatRoomListDto> getConnectedChatRooms(Long memberId) {
+        List<Long> roomIds = chatRoomSessionService.getConnectedRoomsForMember(memberId);
+        return chatRoomRepository.findAllById(roomIds).stream().map(room -> {
+            ChatRoomListDto dto = new ChatRoomListDto();
+            dto.setChatRoomId(room.getChatRoomId());
+            dto.setChatRoomName(room.getChatRoomName());
+            dto.setChatRoomContent(room.getChatRoomContent());
+            dto.setCreatorName(room.getMember().getMemberName());
+            dto.setCreatorAge(room.getMember().getMemberAge());
+            dto.setTravelStyleTags(room.getTravelStyleTags());
+            dto.setReviewLocation(room.getReviewLocation());
+            dto.setRegDate(room.getRegDate());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+
 
     // 특정 채팅방에 입장
     public ChatRoomDto enterChatRoom(Long roomId) {
         return chatRoomRepository.findById(roomId)
-                .map(chatRoom -> new ChatRoomDto(chatRoom.getChatRoomId(), chatRoom.getChatRoomName(), chatRoom.getChatRoomContent(), chatRoom.getTravelStyleTags()))
+                .map(chatRoom -> new ChatRoomDto(chatRoom.getChatRoomId(), chatRoom.getChatRoomName(), chatRoom.getChatRoomContent(), chatRoom.getTravelStyleTags(), chatRoom.getReviewLocation()))
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다!"));
     }
 
@@ -73,15 +118,19 @@ public class ChatService {
         // 채팅방 참여자에게 새 메시지 알림
     }
 
-    public ChatRoomDto createChatRoom(ChatRoomDto chatRoomDto) {
-        ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setChatRoomName(chatRoomDto.getChatRoomName());
-        chatRoom.setChatRoomContent(chatRoomDto.getChatRoomContent()); // 채팅방 내용 설정을 추가해주세요
-        chatRoom.setTravelStyleTags(chatRoomDto.getTravelStyleTags()); // 여행 스타일 태그 설정
-
-        ChatRoom savedRoom = chatRoomRepository.save(chatRoom);
-
-        return new ChatRoomDto(savedRoom.getChatRoomId(), savedRoom.getChatRoomName(), savedRoom.getChatRoomContent(), savedRoom.getTravelStyleTags());
+    public ChatRoom createChatRoom(ChatRoomDto chatRoomDto, Member member) {
+        try {
+            ChatRoom chatRoom = new ChatRoom();
+            chatRoom.setChatRoomName(chatRoomDto.getChatRoomName());
+            chatRoom.setChatRoomContent(chatRoomDto.getChatRoomContent());
+            chatRoom.setTravelStyleTags(chatRoomDto.getTravelStyleTags());
+            chatRoom.setReviewLocation(chatRoomDto.getReviewLocation());
+            chatRoom.setMember(member); // 채팅방 개설 회원 설정
+            return chatRoomRepository.save(chatRoom);
+        } catch (Exception e) {
+            log.error("Failed to create chat room: ", e);
+            throw e;
+        }
     }
 
     //채팅방 삭제
@@ -156,6 +205,7 @@ public class ChatService {
                         message.getMessageType(),
                         message.getChatRoom().getChatRoomId(),
                         message.getSenderId(),
+                        message.getSenderEmail(),
                         message.getMessage(),
                         message.getImageUrl()))
                 .collect(Collectors.toList());

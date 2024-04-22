@@ -14,7 +14,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import ultimatum.project.global.config.Security.jwt.JwtAuthenticationFilter;
 import ultimatum.project.global.config.Security.jwt.JwtAuthorizationFilter;
 import ultimatum.project.global.config.Security.jwt.JwtProperties;
-import ultimatum.project.repository.MemberRepository;
+import ultimatum.project.repository.member.MemberRepository;
+
 
 @Configuration
 @EnableWebSecurity

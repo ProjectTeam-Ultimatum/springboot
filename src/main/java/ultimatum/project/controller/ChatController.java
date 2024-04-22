@@ -1,10 +1,17 @@
 package ultimatum.project.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ultimatum.project.domain.dto.chatDTO.ChatMessageDto;
 import ultimatum.project.domain.dto.chatDTO.ChatRoomDto;
+import ultimatum.project.domain.dto.chatDTO.ChatRoomListDto;
+import ultimatum.project.domain.entity.chat.ChatRoom;
+import ultimatum.project.domain.entity.member.Member;
+import ultimatum.project.global.config.Security.auth.PrincipalDetails;
 import ultimatum.project.service.chat.ChatService;
 
 import java.util.List;
@@ -13,6 +20,7 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/chat")
+@Slf4j
 public class ChatController {
 
     private final ChatService chatService;
@@ -21,20 +29,52 @@ public class ChatController {
 
     // 채팅방 생성
     @PostMapping("/create")
-    public ResponseEntity<ChatRoomDto> createChatRoom(@RequestBody ChatRoomDto chatRoomDto) {
+    public ResponseEntity<ChatRoomDto> createChatRoom(@RequestBody ChatRoomDto chatRoomDto, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
 
-        // chatService를 사용하여 채팅방 생성
-        ChatRoomDto createdRoom = chatService.createChatRoom(chatRoomDto);
-        return ResponseEntity.ok(createdRoom);
+        try {
+            PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+            Member member = principalDetails.getUser();  // PrincipalDetails에서 Member 객체를 가져옵니다.
+
+            ChatRoom createdRoom = chatService.createChatRoom(chatRoomDto, member);
+            ChatRoomDto savedRoomDto = new ChatRoomDto(
+                    createdRoom.getChatRoomId(),
+                    createdRoom.getChatRoomName(),
+                    createdRoom.getChatRoomContent(),
+                    createdRoom.getTravelStyleTags(),
+                    createdRoom.getReviewLocation()
+            );
+
+            return ResponseEntity.ok(savedRoomDto);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
     // 채팅방 목록 조회
     @GetMapping("/list")
-    public ResponseEntity<?> getChatRooms() {
-        // chatService를 사용하여 채팅방 목록 조회
-        return ResponseEntity.ok().body(chatService.getChatRooms());
+    public ResponseEntity<List<ChatRoomListDto>> getChatRooms() {
+        List<ChatRoomListDto> chatRooms = chatService.getChatRooms();
+        return ResponseEntity.ok(chatRooms);
     }
+
+    // 로그인한 사용자의 채팅방 목록 조회
+
+    // ChatController.java
+    @GetMapping("/connected-rooms")
+    public ResponseEntity<List<ChatRoomListDto>> getConnectedChatRooms(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        Member member = principalDetails.getUser();
+        List<ChatRoomListDto> connectedRooms = chatService.getConnectedChatRooms(member.getMemberId());
+        return ResponseEntity.ok(connectedRooms);
+    }
+
 
     // 특정 채팅방 입장
     @GetMapping("/room/{roomId}")

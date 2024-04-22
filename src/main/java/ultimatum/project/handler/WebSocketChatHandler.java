@@ -1,9 +1,13 @@
 package ultimatum.project.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -11,10 +15,16 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import ultimatum.project.domain.dto.chatDTO.ChatMessageDto;
 import ultimatum.project.domain.dto.chatDTO.MessageType;
+import ultimatum.project.domain.entity.member.Member;
+import ultimatum.project.service.chat.ChatRoomSessionService;
 import ultimatum.project.service.chat.ChatService;
+import ultimatum.project.service.chat.JwtTokenService;
 
 import java.io.*;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+
 
 @Slf4j
 @Component
@@ -23,6 +33,8 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
     private  final ObjectMapper mapper;
 
     private final ChatService chatService;
+
+    private final JwtTokenService jwtTokenService;
 
     // 현재 연결된 세션들
     private final Set<WebSocketSession> sessions = new HashSet<>();
@@ -33,13 +45,56 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
     // 사용자가 현재 어떤 채팅방에 있는지 관리하는 Map
     private final Map<WebSocketSession, Long> sessionChatRoomMap = new HashMap<>();
 
+    @Autowired
+    private ChatRoomSessionService chatRoomSessionService;
+
 
     // 소켓 연결 확인
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception{
-        // TODO Auto-generated method stub
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+
+        String query = session.getUri().getQuery();
+        Map<String, String> queryParams = parseQuery(query);
+        String token = queryParams.get("token");
+
+        // 'Bearer ' 접두사 제거
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
+        if (token == null || !jwtTokenService.validateToken(token)) {
+            log.warn("Invalid or missing token for session id {}", session.getId());
+            session.close();
+            return;
+        }
+
+        Member member = jwtTokenService.parseToken(token);
+        if (member != null) {
+            // 사용자 ID를 세션 속성에 저장
+            session.getAttributes().put("userId", member.getMemberId());
+        }
+
         log.info("{} 연결됨", session.getId());
         sessions.add(session);
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(member, null, member.getAuthorities());
+        context.setAuthentication(authentication);
+        session.getAttributes().put("SPRING_SECURITY_CONTEXT", context);
+    }
+
+    // 유틸리티 메소드: 쿼리 파라미터 파싱
+    private Map<String, String> parseQuery(String query) {
+        Map<String, String> queryParams = new HashMap<>();
+        if (query != null) {
+            String[] pairs = query.split("&");
+            for (String pair : pairs) {
+                int idx = pair.indexOf("=");
+                queryParams.put(URLDecoder.decode(pair.substring(0, idx), StandardCharsets.UTF_8),
+                        URLDecoder.decode(pair.substring(idx + 1), StandardCharsets.UTF_8));
+            }
+        }
+        return queryParams;
     }
 
 
@@ -49,30 +104,36 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
         String payload = message.getPayload();
         ChatMessageDto chatMessageDto = mapper.readValue(payload, ChatMessageDto.class);
 
+        SecurityContext context = (SecurityContext) session.getAttributes().get("SPRING_SECURITY_CONTEXT");
+
+        // SecurityContext와 Authentication 검증
+        if (context == null || context.getAuthentication() == null || !context.getAuthentication().isAuthenticated()) {
+            log.warn("No authentication information available for session id {}", session.getId());
+            return; // 인증 정보 없이는 처리하지 않음
+        }
+
+        Authentication authentication = context.getAuthentication();
         Long chatRoomId = chatMessageDto.getChatRoomId();
         if (!chatRoomSessionMap.containsKey(chatRoomId)) {
             chatRoomSessionMap.put(chatRoomId, new HashSet<>());
         }
 
+        // 메시지 타입에 따른 처리ㅎ
         switch (chatMessageDto.getMessageType()) {
             case ENTER:
-                handleEnter(session, chatRoomId);
-                String enterMessageContent =  " 님이 입장하셨습니다.";
-                ChatMessageDto enterMessage = ChatMessageDto.builder()
-                        .messageType(MessageType.ENTER)
-                        .chatRoomId(chatRoomId)
-                        .senderId(chatMessageDto.getSenderId())
-                        .message(enterMessageContent)
-                        .build();
-                sendMessageToChatRoom(enterMessage, chatRoomSessionMap.get(chatRoomId));
+                chatRoomSessionService.addSessionToRoom(chatRoomId, session);
+                handleEnter(session, chatRoomId, authentication);
                 break;
             case TALK:
-                // 일반 채팅 메시지인 경우, 데이터베이스에 메시지 저장
-                chatService.saveMessage(chatMessageDto);
-                sendMessageToChatRoom(chatMessageDto, chatRoomSessionMap.get(chatRoomId));
+                // TALK 메시지 처리 전 로그 추가
+                //log.info("Received TALK message: sessionId={}, senderId={}, message={}",
+                        //session.getId(), chatMessageDto.getSenderId(), chatMessageDto.getMessage());
+
+                chatService.saveMessage(chatMessageDto, authentication);  // Modified to include authentication
+                chatRoomSessionService.getSessionsForRoom(chatRoomId)
+                        .forEach(s -> sendMessageToSession(chatMessageDto, s));
                 break;
             case IMAGE:
-                // 이미지 메시지인 경우, 이미지 URL을 포함한 메시지 전송
                 if (chatMessageDto.getImageUrl() != null) {
                     sendMessageToChatRoom(chatMessageDto, chatRoomSessionMap.get(chatRoomId));
                 }
@@ -81,32 +142,11 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
                 handleLeave(session, chatRoomId);
                 break;
             default:
-                log.warn("Unhandled message type: " + chatMessageDto.getMessageType());
+                log.warn("Unhandled message type: {}", chatMessageDto.getMessageType());
                 break;
         }
     }
 
-    public void broadcastImageLink(String imageUrl, Long chatRoomId) {
-        ChatMessageDto messageDto = new ChatMessageDto();
-        messageDto.setImageUrl(imageUrl);
-        messageDto.setMessageType(MessageType.IMAGE);
-        Set<WebSocketSession> sessions = chatRoomSessionMap.get(chatRoomId);
-
-        if (sessions != null) {
-            sessions.forEach(session -> {
-                try {
-                    String messageJson = mapper.writeValueAsString(messageDto);
-                    session.sendMessage(new TextMessage(messageJson));
-                } catch (JsonProcessingException e) {
-                    log.error("Failed to serialize chat message", e);
-                } catch (IOException e) {
-                    log.error("Failed to send message", e);
-                }
-            });
-        } else {
-            log.warn("No sessions found for chat room ID: {}", chatRoomId);
-        }
-    }
 
 
     // 소켓 종료 확인
@@ -120,35 +160,81 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
         sessions.remove(session);
     }
 
-    private void handleEnter(WebSocketSession session, Long chatRoomId) {
-        sessionChatRoomMap.put(session, chatRoomId);
-        chatRoomSessionMap.get(chatRoomId).add(session);
+    private void handleEnter(WebSocketSession session, Long chatRoomId, Authentication authentication) {
+        Member member = (Member) authentication.getPrincipal();
+        String username = member.getMemberName();
+        String enterMessageContent = username + " 님이 입장하셨습니다.";
+        ChatMessageDto enterMessage = ChatMessageDto.builder()
+                .messageType(MessageType.ENTER)
+                .chatRoomId(chatRoomId)
+                .senderId(username)
+                .message(enterMessageContent)
+                .build();
+
+        // 세션을 채팅방에 추가
+        chatRoomSessionService.addSessionToRoom(chatRoomId, session);
+
+        // 채팅방에 있는 모든 세션에게 입장 메시지 전송
+        chatRoomSessionService.getSessionsForRoom(chatRoomId)
+                .forEach(s -> sendMessageToSession(enterMessage, s));
+
+        log.info("User {} entered chat room {} with session ID: {}", username, chatRoomId, session.getId());
     }
+
 
 
     private void handleLeave(WebSocketSession session, Long chatRoomId) {
-        chatRoomSessionMap.getOrDefault(chatRoomId, new HashSet<>()).remove(session);
-        sessionChatRoomMap.remove(session);
+        chatRoomSessionService.removeSessionFromRoom(chatRoomId, session);
+        log.info("Session {} removed from chat room {}", session.getId(), chatRoomId);
     }
 
-    // ============채팅 관련 메소드==============
 
-    private void removeClosedSession(Set<WebSocketSession> chatRoomSession) {
-        chatRoomSession.removeIf(sess -> !sessions.contains(sess));
-    }
-
-    private void sendMessageToChatRoom(ChatMessageDto chatMessageDto, Set<WebSocketSession> chatRoomSession) {
-        chatRoomSession.forEach(sess -> sendMessage(sess, chatMessageDto));
-    }
-
-    public <T> void sendMessage(WebSocketSession session, T message) {
+    private void sendMessageToSession(ChatMessageDto message, WebSocketSession session) {
         try {
-            session.sendMessage(new TextMessage(mapper.writeValueAsString(message)));
+            if (session.isOpen()) {
+                String messagePayload = new ObjectMapper().writeValueAsString(message);
+                session.sendMessage(new TextMessage(messagePayload));
+                log.info("Message sent to session ID: {}", session.getId());
+            }
         } catch (IOException e) {
-            log.error("메시지 전송 실패", e);
+            log.error("Failed to send message to session ID: {}", session.getId(), e);
         }
     }
 
+
+    // ============채팅 관련 메소드==============
+
+
+    // 메시지를 생성하고 클라이언트에게 보내는 메서드
+    public void sendMessageToChatRoom(ChatMessageDto chatMessageDto, Set<WebSocketSession> sessions) {
+        try {
+            for (WebSocketSession session : sessions) {
+                if (session.isOpen()) {
+                    String messagePayload = mapper.writeValueAsString(chatMessageDto);
+                    session.sendMessage(new TextMessage(messagePayload));
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to send message", e);
+        }
+    }
+
+    // 채팅방 전체메시지 메소드
+    public void broadcastMessageToAllUsers(ChatMessageDto message) {
+        // 모든 채팅방의 세션을 반복하여 메시지 전송
+        for (Map.Entry<Long, Set<WebSocketSession>> entry : chatRoomSessionMap.entrySet()) {
+            for (WebSocketSession session : entry.getValue()) {
+                if (session.isOpen()) {
+                    try {
+                        session.sendMessage(new TextMessage(new ObjectMapper().writeValueAsString(message)));
+                    } catch (IOException e) {
+                        // 오류 처리 로직
+                        System.err.println("Failed to send message to " + session.getId());
+                    }
+                }
+            }
+        }
+    }
     //  ==========================================
 }
 

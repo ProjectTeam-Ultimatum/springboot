@@ -8,7 +8,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import ultimatum.project.domain.entity.member.Member;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +20,14 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatRoom {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long chatRoomId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member; // 채팅방을 개설한 회원
 
     private String chatRoomName;
 
@@ -32,6 +40,12 @@ public class ChatRoom {
 
     // 문자열로 태그 목록을 저장
     private String travelStyleTags;
+
+    private String reviewLocation;
+
+    @CreationTimestamp
+    private LocalDateTime regDate;  // 생성 시간 필드 추가
+
 
     // JSON 형태의 태그 목록을 가져오는 getter
     public List<String> getTravelStyleTags() {

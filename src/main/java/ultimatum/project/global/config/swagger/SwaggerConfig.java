@@ -75,6 +75,17 @@ public class SwaggerConfig {
                 .name("Authorization");
     }
 
+    @Bean
+    public GroupedOpenApi List(){
+        String[] path = {
+                "ultimatum.project.controller"
+        };
+        return GroupedOpenApi.builder()
+                .group("2. 리스트")
+                .packagesToScan(path)
+                .build();
+    }
+
     private SecurityRequirement getSecurityRequirement() {
         return new SecurityRequirement().addList("bearerAuth");
     }

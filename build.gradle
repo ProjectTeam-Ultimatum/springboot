@@ -83,3 +83,9 @@ tasks.named('bootBuildImage') {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+task copyGitSubmodule(type: Copy) {
+    from 'Submodule' // 복사할 디렉토리 경로
+    include '/*.yml' // 복사할 파일 패턴
+    into 'src/main/resources' // 복사할 대상 디렉토리 경로
+}

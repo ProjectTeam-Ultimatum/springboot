@@ -2,7 +2,9 @@ package ultimatum.project.domain.entity.food;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ultimatum.project.domain.entity.image.RecommendImage;
 
+import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +18,7 @@ import java.util.List;
 public class RecommendFood {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "recommend_food_id")
+    @GeneratedValue
     private Long recommendFoodId;
 
     private String recommendFoodTitle;
@@ -28,9 +29,9 @@ public class RecommendFood {
 
     private String recommendFoodContent;
 
-    private LocalDateTime recommendFoodOpentime;
+    private Time recommendFoodOpentime;
 
-    private LocalDateTime recommendFoodClosetime;
+    private Time recommendFoodClosetime;
 
     private Long recommendFoodStar;
 
@@ -40,8 +41,9 @@ public class RecommendFood {
 
     private String recommendFoodBudget;
 
-    @OneToMany
-    @JoinColumn(name = "food_base_tag_id")
-    private List<FoodTag> foodTags = new ArrayList<>();
+    private String recommendFoodCategory;
+
+    @OneToMany(mappedBy = "recommendFood", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecommendImage> recommendImages = new ArrayList<>();
 
 }

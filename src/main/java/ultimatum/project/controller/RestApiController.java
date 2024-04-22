@@ -2,7 +2,6 @@ package ultimatum.project.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,14 +12,19 @@ import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDto;
 import ultimatum.project.domain.dto.logInDTO.MemberFindPasswordRequestDto;
 import ultimatum.project.domain.dto.logInDTO.MemberRequestDto;
 import ultimatum.project.domain.entity.member.Member;
+import ultimatum.project.domain.entity.member.MemberImage;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
 import ultimatum.project.service.member.KakaoService;
 import ultimatum.project.service.member.MemberService;
-import ultimatum.project.repository.MemberRepository;
+import ultimatum.project.repository.member.MemberRepository;
 import ultimatum.project.global.config.Security.auth.PrincipalDetails;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/v1")
@@ -120,28 +124,61 @@ public class RestApiController {
         }
     }
 
+//    @GetMapping("/user/info/detail")
+//    @SecurityRequirement(name = "bearerAuth")
+//    @ResponseBody
+//    public ResponseEntity<String> getUserInfoDetail(Authentication authentication) {
+//        if (authentication == null || !authentication.isAuthenticated()) {
+//            throw new CustomException(ErrorCode.BAD_REQUSET_USER);
+//        }
+//
+//        String memberEmail = authentication.getName();
+//
+//        Member member = memberRepository.findByMemberEmail(memberEmail);
+//
+//        if (member == null) {
+//            return ResponseEntity.badRequest().body("사용자 정보를 찾을 수 없습니다.");
+//        }
+//
+//        String userDetails =
+//                "사용자 이름: " + member.getMemberName() +
+//                        ", 이메일: " + member.getMemberEmail() +
+//                        ", 성별: " + member.getMemberGender() +
+//                        ", 나이: " + member.getMemberAge() +
+//                        ", 주소: " + member.getMemberAddress();
+//
+//        return ResponseEntity.ok(userDetails);
+//    }
+
+
     @GetMapping("/user/info/detail")
     @SecurityRequirement(name = "bearerAuth")
     @ResponseBody
-    public ResponseEntity<String> getUserInfoDetail(Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> getUserInfoDetail(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new CustomException(ErrorCode.BAD_REQUSET_USER);
         }
 
         String memberEmail = authentication.getName();
-
+        // 멤버 정보와 함께 멤버 이미지 정보도 함께 로드합니다.
         Member member = memberRepository.findByMemberEmail(memberEmail);
 
         if (member == null) {
-            return ResponseEntity.badRequest().body("사용자 정보를 찾을 수 없습니다.");
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "사용자 정보를 찾을 수 없습니다."));
         }
 
-        String userDetails =
-                "사용자 이름: " + member.getMemberName() +
-                        ", 이메일: " + member.getMemberEmail() +
-                        ", 성별: " + member.getMemberGender() +
-                        ", 나이: " + member.getMemberAge() +
-                        ", 주소: " + member.getMemberAddress();
+        Map<String, Object> userDetails = new HashMap<>();
+        userDetails.put("userName", member.getMemberName());
+        userDetails.put("email", member.getMemberEmail());
+        userDetails.put("gender", member.getMemberGender());
+        userDetails.put("age", member.getMemberAge());
+        userDetails.put("address", member.getMemberAddress());
+
+        // 이미지 정보 추가: 멤버의 이미지 URL 리스트
+        List<String> imageUrls = member.getMemberImages().stream()
+                .map(MemberImage::getMemberImageUrl)
+                .collect(Collectors.toList());
+        userDetails.put("images", imageUrls);
 
         return ResponseEntity.ok(userDetails);
     }

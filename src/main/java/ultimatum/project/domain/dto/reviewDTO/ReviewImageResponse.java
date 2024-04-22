@@ -11,5 +11,6 @@ public class ReviewImageResponse {
     private Long reviewImageId;
     private String imageName;
     private String imageUri;
+    private String imageUuid;
 
 }
