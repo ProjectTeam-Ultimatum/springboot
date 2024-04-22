@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDto;
 import ultimatum.project.domain.dto.logInDTO.MemberRequestDto;
 import ultimatum.project.domain.entity.member.Member;
+import ultimatum.project.domain.entity.member.MemberImage;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
 import ultimatum.project.service.member.KakaoService;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/v1")
@@ -157,6 +159,7 @@ public class RestApiController {
         }
 
         String memberEmail = authentication.getName();
+        // 멤버 정보와 함께 멤버 이미지 정보도 함께 로드합니다.
         Member member = memberRepository.findByMemberEmail(memberEmail);
 
         if (member == null) {
@@ -169,6 +172,12 @@ public class RestApiController {
         userDetails.put("gender", member.getMemberGender());
         userDetails.put("age", member.getMemberAge());
         userDetails.put("address", member.getMemberAddress());
+
+        // 이미지 정보 추가: 멤버의 이미지 URL 리스트
+        List<String> imageUrls = member.getMemberImages().stream()
+                .map(MemberImage::getMemberImageUrl)
+                .collect(Collectors.toList());
+        userDetails.put("images", imageUrls);
 
         return ResponseEntity.ok(userDetails);
     }

@@ -60,6 +60,7 @@ public class ChatService {
         return chatRoomRepository.findAll().stream()
                 .map(chatRoom -> {
                     Member member = chatRoom.getMember();
+                    String imageUrl = member.getMemberImages().isEmpty() ? null : member.getMemberImages().get(0).getMemberImageUrl();
                     return new ChatRoomListDto(
                             chatRoom.getChatRoomId(),
                             chatRoom.getChatRoomName(),
@@ -68,6 +69,7 @@ public class ChatService {
                             member.getMemberAge(),   // 작성자 나이
                             chatRoom.getTravelStyleTags(),
                             chatRoom.getReviewLocation(),
+                            imageUrl, // 작성자 이미지 URL 추가
                             chatRoom.getRegDate()
                     );
                 }).collect(Collectors.toList());
