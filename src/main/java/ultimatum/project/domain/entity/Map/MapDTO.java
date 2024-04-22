@@ -1,6 +1,9 @@
 package ultimatum.project.domain.entity.Map;
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Data
 @Getter
@@ -9,11 +12,18 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class MapDTO {
-    Long id;
-    String title;
-    String addressCopy;
-    Integer grade;
-    String review;
-    Double lonCopy;
-    Double latCopy;
+    private Long id;
+    private String title;
+    private String addressCopy;
+    private Integer grade;
+    private String review;
+    private Double lonCopy;
+    private Double latCopy;
+    private String image;
+    private List<String> mapTag;
+    private String date;
+    private Integer budget;
+    private String course;
+    private String category;
+
 }

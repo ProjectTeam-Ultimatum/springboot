@@ -13,7 +13,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import ultimatum.project.global.config.Security.jwt.JwtAuthenticationFilter;
 import ultimatum.project.global.config.Security.jwt.JwtAuthorizationFilter;
+import ultimatum.project.global.config.Security.jwt.JwtProperties;
 import ultimatum.project.repository.member.MemberRepository;
+
 
 @Configuration
 @EnableWebSecurity
@@ -40,25 +42,21 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
+	public SecurityFilterChain filterChain(HttpSecurity http, JwtProperties jwtProperties) throws Exception {
 		return http
-				.csrf((csrfConfig) ->
-						csrfConfig.disable()
-				)
+				.csrf(csrf -> csrf.disable())
 				.addFilter(corsConfig.corsFilter())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.formLogin(form -> form.disable())
 				.httpBasic(httpBasic -> httpBasic.disable())
-				.addFilter(new JwtAuthenticationFilter(authenticationManager()))
-				.addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository))
+				.addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtProperties))
+				.addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository, jwtProperties))
 				.authorizeRequests()
-				.requestMatchers("/api/v1/user/info")
-				.access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
-				.requestMatchers("/api/v1/admin/**")
-				.access("hasRole('ROLE_ADMIN')")
+				.requestMatchers("/api/v1/user/info").access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+				.requestMatchers("/api/v1/admin/**").access("hasRole('ROLE_ADMIN')")
 				.anyRequest().permitAll()
-				.and().build();
-
+				.and()
+				.build();
 	}
+
 }
