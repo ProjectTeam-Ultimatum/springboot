@@ -1,4 +1,4 @@
-package ultimatum.project.repository;
+package ultimatum.project.repository.member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import ultimatum.project.domain.entity.member.Member;

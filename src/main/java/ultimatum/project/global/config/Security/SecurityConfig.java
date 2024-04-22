@@ -13,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import ultimatum.project.global.config.Security.jwt.JwtAuthenticationFilter;
 import ultimatum.project.global.config.Security.jwt.JwtAuthorizationFilter;
-import ultimatum.project.repository.MemberRepository;
+import ultimatum.project.repository.member.MemberRepository;
 
 @Configuration
 @EnableWebSecurity

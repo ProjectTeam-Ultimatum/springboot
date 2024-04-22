@@ -1,4 +1,4 @@
-package ultimatum.project.repository;
+package ultimatum.project.repository.review;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

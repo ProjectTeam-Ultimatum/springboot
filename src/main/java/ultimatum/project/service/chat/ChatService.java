@@ -3,19 +3,19 @@ package ultimatum.project.service.chat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import ultimatum.project.domain.dto.chatDTO.ChatRoomListDto;
 import ultimatum.project.domain.entity.member.Member;
-import ultimatum.project.repository.MessageRepository;
+import ultimatum.project.repository.member.MessageRepository;
 import ultimatum.project.domain.dto.chatDTO.ChatMessageDto;
 import ultimatum.project.domain.dto.chatDTO.ChatRoomDto;
 import ultimatum.project.domain.entity.chat.ChatMessage;
 import ultimatum.project.domain.entity.chat.ChatRoom;
-import ultimatum.project.repository.ChatRoomRepository;
+import ultimatum.project.repository.chat.ChatRoomRepository;
 
 import java.io.IOException;
 import java.util.*;
@@ -29,9 +29,10 @@ public class ChatService {
     private final MessageRepository messageRepository;
     private final Map<Long, Set<WebSocketSession>> chatRoomSessionMap = new HashMap<>();
     private final ObjectMapper mapper;
+    @Autowired
+    private ChatRoomSessionService chatRoomSessionService;
 
     // 채팅 메시지 저장
-// 채팅 메시지 저장
     public void saveMessage(ChatMessageDto chatMessageDto, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new IllegalArgumentException("인증된 사용자가 아닙니다.");
@@ -54,28 +55,51 @@ public class ChatService {
         messageRepository.save(chatMessage);
     }
 
-
-
     // 모든 채팅방 조회
     public List<ChatRoomListDto> getChatRooms() {
         return chatRoomRepository.findAll().stream()
                 .map(chatRoom -> {
                     Member member = chatRoom.getMember();
+                    String imageUrl = member.getMemberImages().isEmpty() ? null : member.getMemberImages().get(0).getMemberImageUrl();
                     return new ChatRoomListDto(
                             chatRoom.getChatRoomId(),
                             chatRoom.getChatRoomName(),
                             chatRoom.getChatRoomContent(),
                             member.getMemberName(),  // 작성자 이름
                             member.getMemberAge(),   // 작성자 나이
-                            chatRoom.getTravelStyleTags()
+                            chatRoom.getTravelStyleTags(),
+                            chatRoom.getReviewLocation(),
+                            imageUrl, // 작성자 이미지 URL 추가
+                            chatRoom.getRegDate()
                     );
                 }).collect(Collectors.toList());
     }
 
+
+
+    // ChatService.java
+    public List<ChatRoomListDto> getConnectedChatRooms(Long memberId) {
+        List<Long> roomIds = chatRoomSessionService.getConnectedRoomsForMember(memberId);
+        return chatRoomRepository.findAllById(roomIds).stream().map(room -> {
+            ChatRoomListDto dto = new ChatRoomListDto();
+            dto.setChatRoomId(room.getChatRoomId());
+            dto.setChatRoomName(room.getChatRoomName());
+            dto.setChatRoomContent(room.getChatRoomContent());
+            dto.setCreatorName(room.getMember().getMemberName());
+            dto.setCreatorAge(room.getMember().getMemberAge());
+            dto.setTravelStyleTags(room.getTravelStyleTags());
+            dto.setReviewLocation(room.getReviewLocation());
+            dto.setRegDate(room.getRegDate());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+
+
     // 특정 채팅방에 입장
     public ChatRoomDto enterChatRoom(Long roomId) {
         return chatRoomRepository.findById(roomId)
-                .map(chatRoom -> new ChatRoomDto(chatRoom.getChatRoomId(), chatRoom.getChatRoomName(), chatRoom.getChatRoomContent(), chatRoom.getTravelStyleTags()))
+                .map(chatRoom -> new ChatRoomDto(chatRoom.getChatRoomId(), chatRoom.getChatRoomName(), chatRoom.getChatRoomContent(), chatRoom.getTravelStyleTags(), chatRoom.getReviewLocation()))
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다!"));
     }
 
@@ -100,6 +124,7 @@ public class ChatService {
             chatRoom.setChatRoomName(chatRoomDto.getChatRoomName());
             chatRoom.setChatRoomContent(chatRoomDto.getChatRoomContent());
             chatRoom.setTravelStyleTags(chatRoomDto.getTravelStyleTags());
+            chatRoom.setReviewLocation(chatRoomDto.getReviewLocation());
             chatRoom.setMember(member); // 채팅방 개설 회원 설정
             return chatRoomRepository.save(chatRoom);
         } catch (Exception e) {

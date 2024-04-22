@@ -3,7 +3,6 @@ package ultimatum.project.domain.dto.chatDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.List;
 
 @Data
@@ -14,4 +13,5 @@ public class ChatRoomDto {
     private String chatRoomName; //채팅방 이름
     private String chatRoomContent; //채팅방 내용
     private List<String> travelStyleTags; // 여행 스타일 태그 목록
+    private String reviewLocation;
 }

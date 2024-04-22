@@ -1,9 +1,9 @@
 package ultimatum.project.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -16,6 +16,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import ultimatum.project.domain.dto.chatDTO.ChatMessageDto;
 import ultimatum.project.domain.dto.chatDTO.MessageType;
 import ultimatum.project.domain.entity.member.Member;
+import ultimatum.project.service.chat.ChatRoomSessionService;
 import ultimatum.project.service.chat.ChatService;
 import ultimatum.project.service.chat.JwtTokenService;
 
@@ -23,6 +24,7 @@ import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
 
 @Slf4j
 @Component
@@ -43,10 +45,14 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
     // 사용자가 현재 어떤 채팅방에 있는지 관리하는 Map
     private final Map<WebSocketSession, Long> sessionChatRoomMap = new HashMap<>();
 
+    @Autowired
+    private ChatRoomSessionService chatRoomSessionService;
+
 
     // 소켓 연결 확인
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+
         String query = session.getUri().getQuery();
         Map<String, String> queryParams = parseQuery(query);
         String token = queryParams.get("token");
@@ -63,10 +69,9 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
         }
 
         Member member = jwtTokenService.parseToken(token);
-        if (member == null) {
-            log.warn("Invalid token data for session id {}", session.getId());
-            session.close();
-            return;
+        if (member != null) {
+            // 사용자 ID를 세션 속성에 저장
+            session.getAttributes().put("userId", member.getMemberId());
         }
 
         log.info("{} 연결됨", session.getId());
@@ -116,7 +121,8 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
         // 메시지 타입에 따른 처리ㅎ
         switch (chatMessageDto.getMessageType()) {
             case ENTER:
-                handleEnter(session, chatRoomId);
+                chatRoomSessionService.addSessionToRoom(chatRoomId, session);
+                handleEnter(session, chatRoomId, authentication);
                 break;
             case TALK:
                 // TALK 메시지 처리 전 로그 추가
@@ -124,14 +130,8 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
                         //session.getId(), chatMessageDto.getSenderId(), chatMessageDto.getMessage());
 
                 chatService.saveMessage(chatMessageDto, authentication);  // Modified to include authentication
-                chatMessageDto.setMessage(chatMessageDto.getMessage());
-                // TALK 메시지 브로드캐스트하기 전 로그 추가
-                //log.info("Broadcasting TALK message: sessionId={}, senderId={}, message={}",
-                        //session.getId(), chatMessageDto.getSenderId(), chatMessageDto.getMessage());
-
-                sendMessageToChatRoom(chatMessageDto, chatRoomSessionMap.get(chatRoomId));
-                //log.info("Broadcasted TALK message: sessionId={}, senderId={}, message={}",
-                        //session.getId(), chatMessageDto.getSenderId(), chatMessageDto.getMessage());
+                chatRoomSessionService.getSessionsForRoom(chatRoomId)
+                        .forEach(s -> sendMessageToSession(chatMessageDto, s));
                 break;
             case IMAGE:
                 if (chatMessageDto.getImageUrl() != null) {
@@ -160,67 +160,44 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
         sessions.remove(session);
     }
 
-    private void handleEnter(WebSocketSession session, Long chatRoomId) {
-        // 채팅방에 세션 추가
-        sessionChatRoomMap.put(session, chatRoomId);
-        Set<WebSocketSession> sessions = chatRoomSessionMap.get(chatRoomId);
-        if (sessions == null) {
-            sessions = new HashSet<>();
-            chatRoomSessionMap.put(chatRoomId, sessions);
-        }
-        sessions.add(session);
+    private void handleEnter(WebSocketSession session, Long chatRoomId, Authentication authentication) {
+        Member member = (Member) authentication.getPrincipal();
+        String username = member.getMemberName();
+        String enterMessageContent = username + " 님이 입장하셨습니다.";
+        ChatMessageDto enterMessage = ChatMessageDto.builder()
+                .messageType(MessageType.ENTER)
+                .chatRoomId(chatRoomId)
+                .senderId(username)
+                .message(enterMessageContent)
+                .build();
 
-        // 인증 정보에서 사용자 이름 가져오기
-        SecurityContext context = (SecurityContext) session.getAttributes().get("SPRING_SECURITY_CONTEXT");
-        if (context != null && context.getAuthentication() != null && context.getAuthentication().isAuthenticated()) {
-            String username = ((Member) context.getAuthentication().getPrincipal()).getMemberName();
-            // 입장 메시지 생성 및 브로드캐스트
-            String enterMessageContent = username + " 님이 입장하셨습니다.";
-            ChatMessageDto enterMessage = ChatMessageDto.builder()
-                    .messageType(MessageType.ENTER)
-                    .chatRoomId(chatRoomId)
-                    .senderId(username)
-                    .message(enterMessageContent)
-                    .build();
-            broadcastMessageToAllUsers(enterMessage);
-        } else {
-            log.warn("No valid authentication information available for session id {}", session.getId());
-        }
+        // 세션을 채팅방에 추가
+        chatRoomSessionService.addSessionToRoom(chatRoomId, session);
+
+        // 채팅방에 있는 모든 세션에게 입장 메시지 전송
+        chatRoomSessionService.getSessionsForRoom(chatRoomId)
+                .forEach(s -> sendMessageToSession(enterMessage, s));
+
+        log.info("User {} entered chat room {} with session ID: {}", username, chatRoomId, session.getId());
     }
 
 
 
     private void handleLeave(WebSocketSession session, Long chatRoomId) {
-        // 채팅방에서 세션 제거
-        Set<WebSocketSession> chatRoomSessions = chatRoomSessionMap.getOrDefault(chatRoomId, new HashSet<>());
-        chatRoomSessions.remove(session);
+        chatRoomSessionService.removeSessionFromRoom(chatRoomId, session);
+        log.info("Session {} removed from chat room {}", session.getId(), chatRoomId);
+    }
 
-        // 세션과 채팅방 매핑 제거
-        sessionChatRoomMap.remove(session);
 
-        // SecurityContext에서 사용자 정보 가져오기
-        SecurityContext context = (SecurityContext) session.getAttributes().get("SPRING_SECURITY_CONTEXT");
-        if (context != null) {
-            Authentication authentication = context.getAuthentication();
-            if (authentication != null && authentication.getPrincipal() instanceof Member) {
-                Member member = (Member) authentication.getPrincipal();
-
-                // 퇴장 메시지 생성
-                ChatMessageDto leaveMessage = ChatMessageDto.builder()
-                        .messageType(MessageType.LEAVE)
-                        .chatRoomId(chatRoomId)
-                        .senderId(member.getMemberName())  // 사용자 이름으로 senderId 설정
-                        .message(member.getMemberName() + "님이 퇴장하셨습니다.")
-                        .build();
-
-                // 채팅방의 모든 세션에 퇴장 메시지 방송
-                sendMessageToChatRoom(leaveMessage, chatRoomSessions);
+    private void sendMessageToSession(ChatMessageDto message, WebSocketSession session) {
+        try {
+            if (session.isOpen()) {
+                String messagePayload = new ObjectMapper().writeValueAsString(message);
+                session.sendMessage(new TextMessage(messagePayload));
+                log.info("Message sent to session ID: {}", session.getId());
             }
-        }
-
-        // 채팅방 세션 목록 업데이트
-        if (chatRoomSessions.isEmpty()) {
-            chatRoomSessionMap.remove(chatRoomId);
+        } catch (IOException e) {
+            log.error("Failed to send message to session ID: {}", session.getId(), e);
         }
     }
 

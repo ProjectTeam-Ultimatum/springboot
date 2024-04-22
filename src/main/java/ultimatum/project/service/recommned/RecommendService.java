@@ -22,7 +22,6 @@ import ultimatum.project.domain.dto.event.RecommendListEventResponse;
 import ultimatum.project.domain.dto.food.RecommendListFoodResponse;
 import ultimatum.project.domain.dto.hotel.RecommendListHotelResponse;
 import ultimatum.project.domain.dto.place.RecommendListPlaceResponse;
-import ultimatum.project.repository.RecommendImageRepository;
 import ultimatum.project.repository.event.RecommendListEventRepository;
 import ultimatum.project.repository.food.RecommendFoodRepository;
 import ultimatum.project.repository.food.RecommendListFoodRepository;

@@ -13,7 +13,7 @@ import ultimatum.project.domain.dto.logInDTO.MemberRequestDto;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.domain.entity.member.MemberImage;
 import ultimatum.project.global.config.Security.jwt.JwtProperties;
-import ultimatum.project.repository.MemberRepository;
+import ultimatum.project.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
