@@ -22,11 +22,13 @@ spring:
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
+  jwt:
+    secret: abcdefgabcdefgabcdefgabcdefgabcdefg
   kakao:
     client_id: 100bde42d2ac4c0bf9cf54655e5395cc
     redirect_uri: http://localhost:8080/kakaologin
   config:
-    import: classpath:aws.yml
+    import: classpath:aws.yml, classpath:secretmanage.yml
   servlet:
     multipart:
       max-request-size: 100MB

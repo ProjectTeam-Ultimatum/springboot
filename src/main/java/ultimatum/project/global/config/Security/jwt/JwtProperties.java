@@ -1,7 +1,10 @@
 package ultimatum.project.global.config.Security.jwt;
 
+import org.springframework.beans.factory.annotation.Value;
+
 public interface JwtProperties {
-	String SECRET = "loose";  // 서버만 알고 있는 개인키
+	@Value("${jwt.secret}")
+	String SECRET = "";
 	int EXPIRATION_TIME = 864000000; // 10일 (1/1000초 단위)
 	String TOKEN_PREFIX = "Bearer ";
 	// JWT 토큰에는 통상적으로 앞에 "bearer "를 붙여주게 된다.
