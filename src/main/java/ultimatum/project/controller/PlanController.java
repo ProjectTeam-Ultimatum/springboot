@@ -11,10 +11,16 @@ import ultimatum.project.domain.dto.plan.PlanDetailDTO;
 import ultimatum.project.domain.dto.plan.PlanEventDTO;
 import ultimatum.project.domain.dto.plan.PlanFoodDTO;
 import ultimatum.project.domain.dto.plan.PlanPlaceDTO;
+import ultimatum.project.domain.entity.event.RecommendListEvent;
+import ultimatum.project.domain.entity.food.RecommendListFood;
+import ultimatum.project.domain.entity.place.RecommendListPlace;
 import ultimatum.project.domain.entity.plan.Plan;
 import ultimatum.project.domain.entity.plan.PlanEvent;
 import ultimatum.project.domain.entity.plan.PlanFood;
 import ultimatum.project.domain.entity.plan.PlanPlace;
+import ultimatum.project.repository.event.RecommendListEventRepository;
+import ultimatum.project.repository.food.RecommendListFoodRepository;
+import ultimatum.project.repository.place.RecommendListPlaceRepository;
 import ultimatum.project.service.PlanService;
 
 import java.time.format.DateTimeParseException;
@@ -27,6 +33,12 @@ public class PlanController {
 
     @Autowired
     private PlanService planService;
+    @Autowired
+    private RecommendListFoodRepository recommendFoodRepository;
+    @Autowired
+    private RecommendListEventRepository recommendEventRepository;
+    @Autowired
+    private RecommendListPlaceRepository recommendPlaceRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(PlanController.class);
 
@@ -61,15 +73,21 @@ public class PlanController {
         try {
             switch (category) {
                 case "food":
-                    PlanFoodDTO foodDTO = new PlanFoodDTO(planDetailDTO.getStayTime(), planDetailDTO.getRecommendFoodId(), new Plan(planDetailDTO.getPlanId()));
+                    RecommendListFood recommendFood = recommendFoodRepository.findById(planDetailDTO.getRecommendFoodId())
+                            .orElseThrow(() -> new IllegalArgumentException("Invalid Recommend Food ID"));
+                    PlanFoodDTO foodDTO = new PlanFoodDTO(planDetailDTO.getStayTime(), recommendFood, new Plan(planDetailDTO.getPlanId()));
                     planService.savePlanFood(foodDTO);
                     break;
                 case "event":
-                    PlanEventDTO eventDTO = new PlanEventDTO(planDetailDTO.getStayTime(), planDetailDTO.getRecommendEventId(), new Plan(planDetailDTO.getPlanId()));
+                    RecommendListEvent recommendEvent = recommendEventRepository.findById(planDetailDTO.getRecommendEventId())
+                            .orElseThrow(() -> new IllegalArgumentException("Invalid Recommend Event ID"));
+                    PlanEventDTO eventDTO = new PlanEventDTO(planDetailDTO.getStayTime(), recommendEvent, new Plan(planDetailDTO.getPlanId()));
                     planService.savePlanEvent(eventDTO);
                     break;
                 case "place":
-                    PlanPlaceDTO placeDTO = new PlanPlaceDTO(planDetailDTO.getStayTime(), planDetailDTO.getRecommendPlaceId(), new Plan(planDetailDTO.getPlanId()));
+                    RecommendListPlace recommendPlace = recommendPlaceRepository.findById(planDetailDTO.getRecommendPlaceId())
+                            .orElseThrow(() -> new IllegalArgumentException("Invalid Recommend Place ID"));
+                    PlanPlaceDTO placeDTO = new PlanPlaceDTO(planDetailDTO.getStayTime(), recommendPlace, new Plan(planDetailDTO.getPlanId()));
                     planService.savePlanPlace(placeDTO);
                     break;
                 default:
@@ -81,4 +99,5 @@ public class PlanController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
 }

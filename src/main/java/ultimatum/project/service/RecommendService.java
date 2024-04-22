@@ -32,7 +32,6 @@ public class RecommendService {
     private final RecommendListHotelRepository hotelRepository;
     private final RecommendListEventRepository eventRepository;
     private final ModelMapper modelMapper;
-    private PlanPlaceRepository planPlaceRepository;
     
 
     public List<RecommendListFoodResponse> searchFoodsByTitle(String title, Pageable pageable) {

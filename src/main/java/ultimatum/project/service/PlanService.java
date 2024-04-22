@@ -89,33 +89,30 @@ public class PlanService {
         }).collect(Collectors.toList());
     }
     public PlanFood savePlanFood(PlanFoodDTO planFoodDTO) {
-        RecommendListFood recommendFood = recommendFoodRepository.findById(planFoodDTO.getRecommendFoodId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Recommend Food ID"));
+        // DTO에서 직접 RecommendListFood 객체를 가져옵니다.
         PlanFood planFood = PlanFood.builder()
                 .planId(planFoodDTO.getPlanId())
-                .recommendListFoods(recommendFood)
+                .recommendListFoods(planFoodDTO.getRecommendFoodId())
                 .planFoodStayTime(planFoodDTO.getStayTime())
                 .build();
         return planFoodRepository.save(planFood);
     }
 
+
     public PlanEvent savePlanEvent(PlanEventDTO planEventDTO) {
-        RecommendListEvent recommendEvent = recommendEventRepository.findById(planEventDTO.getRecommendEventId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Recommend Event ID"));
         PlanEvent planEvent = PlanEvent.builder()
                 .planId(planEventDTO.getPlanId())
-                .recommendListEvents(recommendEvent)
+                .recommendListEvents(planEventDTO.getRecommendEventId())
                 .planEventStayTime(planEventDTO.getStayTime())
                 .build();
         return planEventRepository.save(planEvent);
     }
 
+
     public PlanPlace savePlanPlace(PlanPlaceDTO planPlaceDTO) {
-        RecommendListPlace recommendPlace = recommendPlaceRepository.findById(planPlaceDTO.getRecommendPlaceId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Recommend Place ID"));
         PlanPlace planPlace = PlanPlace.builder()
                 .planId(planPlaceDTO.getPlanId())
-                .recommendListPlaces(recommendPlace)
+                .recommendListPlaces(planPlaceDTO.getRecommendPlaceId())
                 .planPlaceStayTime(planPlaceDTO.getStayTime())
                 .build();
         return planPlaceRepository.save(planPlace);

@@ -20,12 +20,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class PlanDetailDTO {
     private LocalDateTime stayTime;
-    private Long recommendId;
+    private Long recommendFoodId;  // 음식점 추천 ID
+    private Long recommendEventId; // 이벤트 추천 ID
+    private Long recommendPlaceId; // 장소 추천 ID
     private Long planId;
 
     public PlanFood toPlanFood(RecommendListFood recommendFoodId) {
         return PlanFood.builder()
-                .planId(new Plan(planId))  // Assuming Plan class has a constructor accepting planId
+                .planId(new Plan(planId))
                 .recommendListFoods(recommendFoodId)
                 .planFoodStayTime(stayTime)
                 .build();
