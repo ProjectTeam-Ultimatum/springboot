@@ -26,12 +26,12 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi secondOpenApi(){
+    public GroupedOpenApi List(){
         String[] path = {
-                ""
+                "ultimatum.project.controller"
         };
         return GroupedOpenApi.builder()
-                .group("2. 아직 미정")
+                .group("2. 리스트")
                 .packagesToScan(path)
                 .build();
     }
@@ -46,4 +46,16 @@ public class SwaggerConfig {
                 .packagesToScan(path)
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi forthOpenApi(){
+        String[] path = {
+                "ultimatum.project.controller"
+        };
+        return GroupedOpenApi.builder()
+                .group("4. 여행계획")
+                .packagesToScan(path)
+                .build();
+    }
+
 }

@@ -2,7 +2,7 @@ package ultimatum.project.domain.entity.plan;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ultimatum.project.domain.entity.food.RecommendListFood;
+import ultimatum.project.domain.entity.event.RecommendListEvent;
 import ultimatum.project.domain.entity.place.RecommendListPlace;
 
 import java.time.LocalDateTime;
@@ -15,16 +15,16 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlanPlace {
+public class PlanEvent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long planPlaceId;
+    private Long planEventId;
 
-    private LocalDateTime planPlaceStayTime;
+    private LocalDateTime planEventStayTime;
 
     @ManyToOne
-    @JoinColumn(name = "recommend_place_id")
-    private RecommendListPlace recommendListPlaces;
+    @JoinColumn(name = "recommend_event_id")
+    private RecommendListEvent recommendListEvents;
 
     @ManyToOne
     @JoinColumn(name = "plan_id")

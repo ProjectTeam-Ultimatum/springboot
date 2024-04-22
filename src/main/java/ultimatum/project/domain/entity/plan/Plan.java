@@ -3,6 +3,7 @@ package ultimatum.project.domain.entity.plan;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,8 +19,13 @@ public class Plan {
 
     private String memberId;
 
-    private LocalDateTime travelPeriod;
+    private LocalDate planStartDay;
+
+    private LocalDate planEndDay;
 
     private String planTitle;
 
+    public Plan(Long planId) {
+        this.planId = planId;
+    }
 }

@@ -2,8 +2,8 @@ package ultimatum.project.domain.entity.plan;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ultimatum.project.domain.entity.food.RecommendFood;
-import ultimatum.project.domain.entity.plan.PlanDay;
+import ultimatum.project.domain.entity.food.RecommendListFood;
+import ultimatum.project.domain.entity.place.RecommendListPlace;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,28 +16,18 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PlanFood {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long planFoodId;
 
-    private LocalDateTime planFoodDate;
-
     private LocalDateTime planFoodStayTime;
 
-    private LocalDateTime planFoodArriveTime;
-
-    private LocalDateTime planFoodRouteTime;
-
-//    @OneToMany
-//    @JoinColumn(name = "recommend_food_id")
-//    private List<RecommendFood> recommendFoodId = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "recommend_food_id")
+    private RecommendListFood recommendListFoods;
 
     @ManyToOne
-    private RecommendFood recommendFood;
-
-    @ManyToOne
-    @JoinColumn(name = "plan_day_id")
-    private PlanDay planDayId;
+    @JoinColumn(name = "plan_id")
+    private Plan planId;
 
 }

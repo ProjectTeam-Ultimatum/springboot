@@ -3,6 +3,7 @@ package ultimatum.project.domain.entity.plan;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,7 +22,13 @@ public class PlanDay {
 
     private LocalDateTime planDayFinishTime;
 
+    private LocalDate planDate;
+
     @ManyToOne
     @JoinColumn(name = "plan_id")
     private Plan planId;
+
+    public void setPlan(Plan plan) {
+        this.planId = plan;
+    }
 }
