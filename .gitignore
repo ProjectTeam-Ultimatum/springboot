@@ -41,5 +41,6 @@ src/main/resources/application.yml
 
 aws.yml
 
-
 application.yml
+
+secretmanage.yml
