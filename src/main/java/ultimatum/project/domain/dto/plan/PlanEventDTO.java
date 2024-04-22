@@ -7,14 +7,14 @@ import lombok.Setter;
 import ultimatum.project.domain.entity.event.RecommendListEvent;
 import ultimatum.project.domain.entity.plan.Plan;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlanEventDTO {
-    private LocalDateTime stayTime;
+    private LocalTime stayTime;
     private RecommendListEvent recommendEventId;
     private Plan planId;
 }

@@ -12,14 +12,14 @@ import ultimatum.project.domain.entity.plan.PlanEvent;
 import ultimatum.project.domain.entity.plan.PlanFood;
 import ultimatum.project.domain.entity.plan.PlanPlace;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlanDetailDTO {
-    private LocalDateTime stayTime;
+    private LocalTime stayTime;
     private Long recommendFoodId;  // 음식점 추천 ID
     private Long recommendEventId; // 이벤트 추천 ID
     private Long recommendPlaceId; // 장소 추천 ID

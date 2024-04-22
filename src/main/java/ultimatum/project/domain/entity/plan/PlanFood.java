@@ -6,6 +6,7 @@ import ultimatum.project.domain.entity.food.RecommendListFood;
 import ultimatum.project.domain.entity.place.RecommendListPlace;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class PlanFood {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long planFoodId;
 
-    private LocalDateTime planFoodStayTime;
+    private LocalTime planFoodStayTime;
 
     @ManyToOne
     @JoinColumn(name = "recommend_food_id")

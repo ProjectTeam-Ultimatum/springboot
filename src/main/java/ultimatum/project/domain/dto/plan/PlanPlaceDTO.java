@@ -7,14 +7,14 @@ import lombok.Setter;
 import ultimatum.project.domain.entity.plan.Plan;
 import ultimatum.project.domain.entity.place.RecommendListPlace;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlanPlaceDTO {
-    private LocalDateTime stayTime;
+    private LocalTime stayTime;
     private RecommendListPlace recommendPlaceId;
     private Plan planId;
 }

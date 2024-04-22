@@ -37,21 +37,34 @@ public class RecommendService {
     public List<RecommendListFoodResponse> searchFoodsByTitle(String title, Pageable pageable) {
         return foodRepository.findByRecommendFoodTitleContainingIgnoreCase(title, pageable)
                 .stream()
-                .map(food -> modelMapper.map(food, RecommendListFoodResponse.class))
+                .map(food -> {
+                    RecommendListFoodResponse response = modelMapper.map(food, RecommendListFoodResponse.class);
+                    response.setRecommendFoodId(food.getRecommendFoodId()); // 수동으로 ID 설정
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
 
     public List<RecommendListPlaceResponse> searchPlacesByTitle(String title, Pageable pageable) {
         return placeRepository.findByRecommendPlaceTitleContainingIgnoreCase(title, pageable)
                 .stream()
-                .map(place -> modelMapper.map(place, RecommendListPlaceResponse.class))
+                .map(place -> {
+                    RecommendListPlaceResponse response = modelMapper.map(place, RecommendListPlaceResponse.class);
+                    response.setRecommendPlaceId(place.getRecommendPlaceId()); // 수동으로 ID 설정
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
+
 
     public List<RecommendListEventResponse> searchEventsByTitle(String title, Pageable pageable) {
         return eventRepository.findByRecommendEventTitleContainingIgnoreCase(title, pageable)
                 .stream()
-                .map(event -> modelMapper.map(event, RecommendListEventResponse.class))
+                .map(event -> {
+                    RecommendListEventResponse response = modelMapper.map(event, RecommendListEventResponse.class);
+                    response.setRecommendEventId(event.getRecommendEventId()); // 수동으로 ID 설정
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
 

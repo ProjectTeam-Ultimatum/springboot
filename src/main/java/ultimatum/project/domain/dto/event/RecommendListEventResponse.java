@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RecommendListEventResponse {
 
+    private Long recommendEventId;
     private String recommendEventContentsId;
     private String recommendEventTitle;
     private String recommendEventIntroduction;

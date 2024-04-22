@@ -3,11 +3,9 @@ package ultimatum.project.domain.entity.plan;
 import jakarta.persistence.*;
 import lombok.*;
 import ultimatum.project.domain.entity.event.RecommendListEvent;
-import ultimatum.project.domain.entity.place.RecommendListPlace;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalTime;
+
 
 @Entity
 @Builder
@@ -20,7 +18,7 @@ public class PlanEvent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long planEventId;
 
-    private LocalDateTime planEventStayTime;
+    private LocalTime planEventStayTime;
 
     @ManyToOne
     @JoinColumn(name = "recommend_event_id")

@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RecommendListPlaceResponse {
 
+    private Long recommendPlaceId;
     private String recommendPlaceTitle;
     private String recommendPlaceIntroduction;
     private String recommendPlaceAllTag;

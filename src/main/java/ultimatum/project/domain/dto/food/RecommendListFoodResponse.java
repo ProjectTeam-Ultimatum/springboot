@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RecommendListFoodResponse {
 
+    private Long recommendFoodId;
     private String recommendFoodContentsId;
     private String recommendFoodTitle;
     private String recommendFoodIntroduction;
