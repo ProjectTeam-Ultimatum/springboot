@@ -10,12 +10,12 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import ultimatum.project.domain.dto.chatDTO.ChatRoomListDto;
 import ultimatum.project.domain.entity.member.Member;
-import ultimatum.project.repository.MessageRepository;
+import ultimatum.project.repository.member.MessageRepository;
 import ultimatum.project.domain.dto.chatDTO.ChatMessageDto;
 import ultimatum.project.domain.dto.chatDTO.ChatRoomDto;
 import ultimatum.project.domain.entity.chat.ChatMessage;
 import ultimatum.project.domain.entity.chat.ChatRoom;
-import ultimatum.project.repository.ChatRoomRepository;
+import ultimatum.project.repository.chat.ChatRoomRepository;
 
 import java.io.IOException;
 import java.util.*;
@@ -66,7 +66,9 @@ public class ChatService {
                             chatRoom.getChatRoomContent(),
                             member.getMemberName(),  // 작성자 이름
                             member.getMemberAge(),   // 작성자 나이
-                            chatRoom.getTravelStyleTags()
+                            chatRoom.getTravelStyleTags(),
+                            chatRoom.getReviewLocation(),
+                            chatRoom.getRegDate()
                     );
                 }).collect(Collectors.toList());
     }
@@ -74,8 +76,20 @@ public class ChatService {
 
 
     // ChatService.java
-    public List<Long> getConnectedChatRooms(Long memberId) {
-        return chatRoomSessionService.getConnectedRoomsForMember(memberId);
+    public List<ChatRoomListDto> getConnectedChatRooms(Long memberId) {
+        List<Long> roomIds = chatRoomSessionService.getConnectedRoomsForMember(memberId);
+        return chatRoomRepository.findAllById(roomIds).stream().map(room -> {
+            ChatRoomListDto dto = new ChatRoomListDto();
+            dto.setChatRoomId(room.getChatRoomId());
+            dto.setChatRoomName(room.getChatRoomName());
+            dto.setChatRoomContent(room.getChatRoomContent());
+            dto.setCreatorName(room.getMember().getMemberName());
+            dto.setCreatorAge(room.getMember().getMemberAge());
+            dto.setTravelStyleTags(room.getTravelStyleTags());
+            dto.setReviewLocation(room.getReviewLocation());
+            dto.setRegDate(room.getRegDate());
+            return dto;
+        }).collect(Collectors.toList());
     }
 
 
@@ -83,7 +97,7 @@ public class ChatService {
     // 특정 채팅방에 입장
     public ChatRoomDto enterChatRoom(Long roomId) {
         return chatRoomRepository.findById(roomId)
-                .map(chatRoom -> new ChatRoomDto(chatRoom.getChatRoomId(), chatRoom.getChatRoomName(), chatRoom.getChatRoomContent(), chatRoom.getTravelStyleTags()))
+                .map(chatRoom -> new ChatRoomDto(chatRoom.getChatRoomId(), chatRoom.getChatRoomName(), chatRoom.getChatRoomContent(), chatRoom.getTravelStyleTags(), chatRoom.getReviewLocation()))
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다!"));
     }
 
@@ -108,6 +122,7 @@ public class ChatService {
             chatRoom.setChatRoomName(chatRoomDto.getChatRoomName());
             chatRoom.setChatRoomContent(chatRoomDto.getChatRoomContent());
             chatRoom.setTravelStyleTags(chatRoomDto.getTravelStyleTags());
+            chatRoom.setReviewLocation(chatRoomDto.getReviewLocation());
             chatRoom.setMember(member); // 채팅방 개설 회원 설정
             return chatRoomRepository.save(chatRoom);
         } catch (Exception e) {

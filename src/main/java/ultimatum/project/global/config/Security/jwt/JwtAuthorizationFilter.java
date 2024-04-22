@@ -13,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.global.config.Security.auth.PrincipalDetails;
-import ultimatum.project.repository.MemberRepository;
+import ultimatum.project.repository.member.MemberRepository;
 
 import java.io.IOException;
 

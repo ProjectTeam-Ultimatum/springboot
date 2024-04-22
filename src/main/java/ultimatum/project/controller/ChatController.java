@@ -43,7 +43,8 @@ public class ChatController {
                     createdRoom.getChatRoomId(),
                     createdRoom.getChatRoomName(),
                     createdRoom.getChatRoomContent(),
-                    createdRoom.getTravelStyleTags()
+                    createdRoom.getTravelStyleTags(),
+                    createdRoom.getReviewLocation()
             );
 
             return ResponseEntity.ok(savedRoomDto);
@@ -64,13 +65,13 @@ public class ChatController {
 
     // ChatController.java
     @GetMapping("/connected-rooms")
-    public ResponseEntity<List<Long>> getConnectedChatRooms(Authentication authentication) {
+    public ResponseEntity<List<ChatRoomListDto>> getConnectedChatRooms(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         Member member = principalDetails.getUser();
-        List<Long> connectedRooms = chatService.getConnectedChatRooms(member.getMemberId());
+        List<ChatRoomListDto> connectedRooms = chatService.getConnectedChatRooms(member.getMemberId());
         return ResponseEntity.ok(connectedRooms);
     }
 

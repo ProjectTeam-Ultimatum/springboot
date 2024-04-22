@@ -1,20 +1,19 @@
 package ultimatum.project.service.review;
 
-import com.nimbusds.jose.JOSEObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import ultimatum.project.domain.dto.reviewDTO.DeleteReviewResponse;
 import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewImage;
 import ultimatum.project.domain.dto.reviewDTO.UpdateReviewRequest;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
-import ultimatum.project.repository.ReviewImageRepository;
-import ultimatum.project.repository.ReviewRepository;
+import ultimatum.project.repository.image.ReviewImageRepository;
+import ultimatum.project.repository.review.ReviewRepository;
+import ultimatum.project.service.S3.S3Service;
 
 import java.io.IOException;
 import java.util.ArrayList;

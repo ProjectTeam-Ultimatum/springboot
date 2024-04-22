@@ -1,4 +1,4 @@
-package ultimatum.project.service.review;
+package ultimatum.project.service.S3;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;

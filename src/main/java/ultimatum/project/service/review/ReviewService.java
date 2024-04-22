@@ -16,10 +16,11 @@ import ultimatum.project.domain.entity.review.Review;
 import ultimatum.project.domain.entity.review.ReviewImage;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
-import ultimatum.project.repository.MemberRepository;
-import ultimatum.project.repository.ReviewImageRepository;
-import ultimatum.project.repository.ReviewReplyRepository;
-import ultimatum.project.repository.ReviewRepository;
+import ultimatum.project.repository.member.MemberRepository;
+import ultimatum.project.repository.image.ReviewImageRepository;
+import ultimatum.project.repository.review.ReviewReplyRepository;
+import ultimatum.project.repository.review.ReviewRepository;
+import ultimatum.project.service.S3.S3Service;
 
 import java.util.List;
 import java.util.stream.Collectors;

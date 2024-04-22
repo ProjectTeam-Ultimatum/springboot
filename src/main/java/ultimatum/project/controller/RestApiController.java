@@ -15,7 +15,7 @@ import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
 import ultimatum.project.service.member.KakaoService;
 import ultimatum.project.service.member.MemberService;
-import ultimatum.project.repository.MemberRepository;
+import ultimatum.project.repository.member.MemberRepository;
 import ultimatum.project.global.config.Security.auth.PrincipalDetails;
 
 import java.util.Collections;
