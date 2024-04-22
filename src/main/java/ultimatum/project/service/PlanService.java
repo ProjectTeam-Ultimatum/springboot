@@ -21,6 +21,7 @@ import ultimatum.project.repository.plan.PlanPlaceRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,8 +76,8 @@ public class PlanService {
     private List<PlanDay> createPlanDays(Plan plan, List<PlanRequest.PlanDayRequest> planDaysRequest) {
         return planDaysRequest.stream().map(dayRequest -> {
             LocalDate date = dayRequest.getDate();
-            LocalDateTime startTime = dayRequest.getStartTime();
-            LocalDateTime endTime = dayRequest.getEndTime();
+            LocalTime startTime = dayRequest.getStartTime();
+            LocalTime endTime = dayRequest.getEndTime();
 
             PlanDay planDay = PlanDay.builder()
                     .planDate(date)

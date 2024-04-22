@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Getter
@@ -25,9 +26,9 @@ public class PlanRequest {
         @JsonFormat(pattern = "yyyy-MM-dd")
         private LocalDate date;
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        private LocalDateTime startTime;
+        private LocalTime startTime;
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        private LocalDateTime endTime;
+        private LocalTime endTime;
     }
     @Override
     public String toString() {

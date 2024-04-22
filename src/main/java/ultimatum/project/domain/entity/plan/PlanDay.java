@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Builder
@@ -18,9 +19,9 @@ public class PlanDay {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long planDayId;
 
-    private LocalDateTime planDayStartTime;
+    private LocalTime planDayStartTime;
 
-    private LocalDateTime planDayFinishTime;
+    private LocalTime planDayFinishTime;
 
     private LocalDate planDate;
 
