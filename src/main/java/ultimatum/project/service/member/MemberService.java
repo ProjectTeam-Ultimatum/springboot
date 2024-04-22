@@ -33,6 +33,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final MemberImageService memberImageService;
+    private final JwtProperties jwtProperties;
 
     @Autowired
     private JavaMailSender javaMailSender;
@@ -115,7 +116,7 @@ public class MemberService {
                 .withClaim("id", member.getMemberId())
                 .withClaim("username", member.getMemberName())
                 .withClaim("userid", member.getMemberEmail())
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+                .sign(Algorithm.HMAC512(jwtProperties.getSecret()));
 
         return ResponseEntity.ok()
                 .header(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtToken)
