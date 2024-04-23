@@ -17,7 +17,7 @@ import java.util.List;
 @Entity
 @Builder
 @Getter
-@Setter
+@Setter //엔티티에는 빼기
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecommendReply {
@@ -25,7 +25,6 @@ public class RecommendReply {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long recommendReplyId;
-
     private String recommendReply;
     private Long recommendReplyStar;
     private String recommendReplyTagValue;  // JSON 형태의 태그 목록을 저장

@@ -1,5 +1,9 @@
 package ultimatum.project.service.recommned;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -36,9 +40,9 @@ import ultimatum.project.repository.hotel.RecommendListHotelRepository;
 import ultimatum.project.repository.place.RecommendListPlaceRepository;
 import ultimatum.project.repository.reply.RecommendReplyRepository;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @Log4j2
 @Service
@@ -70,9 +74,12 @@ public class RecommendReplyService {
 
     //음식 평점 저장 - 최종
     public CreateReplyFoodResponse createFoodReply(CreateReplyFoodRequest request) {
-        // 요청에서 제공된 음식 ID를 기반으로 기존의 추천 후기를 가져옵니다.
-        RecommendReply recommendReply = recommendReplyRepository.findById(request.getRecommendFoodId())
-                .orElseThrow(() -> new IllegalArgumentException("음식점 평점 정보 없음"));
+        // 요청에서 제공된 음식 ID를 기반으로 RecommendListFood를 가져옵니다.
+        RecommendListFood recommendFood = recommendListFoodRepository.findByRecommendFoodId(request.getRecommendFoodId());
+        if (recommendFood == null) {
+            log.error("RecommendListFood with ID {} not found.", request.getRecommendFoodId());
+            throw new IllegalArgumentException("RecommendListFood 정보 없음");
+        }
 
         // 평점 값이 1에서 5 사이인지 검증합니다.
         int recommendReplyStar = Math.toIntExact(request.getRecommendReplyStar());
@@ -83,13 +90,12 @@ public class RecommendReplyService {
             return null; // 또는 적절한 예외 처리 및 에러 응답 반환
         }
 
-        // 요청에서 제공된 음식 ID를 기반으로 RecommendListFood를 가져옵니다.
-        RecommendListFood recommendFood = recommendListFoodRepository.findByRecommendFoodId(request.getRecommendFoodId());
-
-        // 요청 데이터를 기존의 RecommendReply 엔티티로 매핑합니다.
-        recommendReply.setRecommendReplyStar(request.getRecommendReplyStar());
-        recommendReply.setRecommendReplyTagValue(request.getRecommendReplyTagValue());
-        recommendReply.setRecommendFoodId(recommendFood); // RecommendListFood 엔티티 설정
+        // Builder 패턴을 사용하여 RecommendReply 객체를 생성합니다.
+        RecommendReply recommendReply = RecommendReply.builder()
+                .recommendReplyStar((long) recommendReplyStar)
+                .recommendReplyTagValue(request.getRecommendReplyTagValue().toString())
+                .recommendFoodId(recommendFood)
+                .build();
 
         // 수정된 엔티티를 저장합니다.
         recommendReply = recommendReplyRepository.save(recommendReply);

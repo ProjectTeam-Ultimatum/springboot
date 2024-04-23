@@ -16,9 +16,10 @@ public interface RecommendReplyRepository extends JpaRepository<RecommendReply, 
     List<RecommendReply> findByRecommendHotelId_RecommendHotelId(Long recommendHotelId);
     List<RecommendReply> findByRecommendEventId_RecommendEventId(Long recommendEventId);
 
+
+
     //태그 받기
     Page<RecommendReply> findByRecommendReplyTagValueContainingIgnoreCase(String recommendReplyTagValue, Pageable pageable);
-
 
 }
 

@@ -15,6 +15,7 @@ import java.util.List;
 public class CreateReplyFoodResponse {
 
     //private String recommendReply;
+//    private Long recommendReplyId;
     private Long recommendReplyStar;
     private List<String> recommendReplyTagValue;
     private Long recommendFoodId;

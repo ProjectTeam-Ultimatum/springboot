@@ -8,7 +8,6 @@ import java.sql.Time;
 @Entity
 @Builder
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RecommendListFood {
