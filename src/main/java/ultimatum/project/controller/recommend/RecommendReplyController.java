@@ -108,6 +108,7 @@ public class RecommendReplyController {
                 recommendReplyStar, recommendReplyTagValue, recommendFoodId);
 
         // 서비스를 호출하여 리뷰를 생성하고 응답 객체를 반환합니다.
+        //CreateReplyFoodResponse response = recommendReplyService.createFoodReply(request);
         CreateReplyFoodResponse response = recommendReplyService.createFoodReply(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }

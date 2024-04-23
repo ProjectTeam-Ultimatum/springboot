@@ -93,7 +93,7 @@ public class RecommendReplyService {
         // Builder 패턴을 사용하여 RecommendReply 객체를 생성합니다.
         RecommendReply recommendReply = RecommendReply.builder()
                 .recommendReplyStar(recommendReplyStar)
-                .recommendReplyTagValue(request.getRecommendReplyTagValue().toString())
+                .recommendReplyTagValue(request.getRecommendReplyTagValue().toString()) //string, List<string> 타입 맞춤
                 .recommendFoodId(recommendFood)
                 .build();
 
@@ -114,12 +114,15 @@ public class RecommendReplyService {
 
     //관광지 평점 저장
     public CreateReplyPlaceResponse createPlaceReply(CreateReplyPlaceRequest request) {
-        // 요청에서 제공된 관광지 ID를 기반으로 기존의 추천 후기를 가져옵니다.
-        RecommendReply recommendReply = recommendReplyRepository.findById(request.getRecommendPlaceId())
-                .orElseThrow(() -> new IllegalArgumentException("관광지점 평점 정보 없음"));
+        // 요청에서 제공된 관광지 ID를 기반으로 RecommendListPlace를 가져옵니다.
+        RecommendListPlace recommendPlace = recommendListPlaceRepository.findByRecommendPlaceId(request.getRecommendPlaceId());
+        if (recommendPlace == null) {
+            log.error("RecommendListPlace ID 찾을수 없음", request.getRecommendPlaceId());
+            throw new IllegalArgumentException("RecommendListPlace 정보 없음");
+        }
 
         // 평점 값이 1에서 5 사이인지 검증합니다.
-        int recommendReplyStar = Math.toIntExact(request.getRecommendReplyStar());
+        long recommendReplyStar = Math.toIntExact(request.getRecommendReplyStar());
         if (recommendReplyStar < 1 || recommendReplyStar > 5) {
             //throw new IllegalArgumentException("The recommend reply star must be between 1 and 5.");
             log.error("------------ 관광지 평점을 잘못 입력했습니다 --------------- ");
@@ -127,13 +130,12 @@ public class RecommendReplyService {
             return null; // 또는 적절한 예외 처리 및 에러 응답 반환
         }
 
-        // 요청에서 제공된 관광지 ID를 기반으로 RecommendListPlace를 가져옵니다.
-        RecommendListPlace recommendPlace = recommendListPlaceRepository.findByRecommendPlaceId(request.getRecommendPlaceId());
-
-        // 요청 데이터를 기존의 RecommendReply 엔티티로 매핑합니다.
-        recommendReply.setRecommendReplyStar(request.getRecommendReplyStar());
-        recommendReply.setRecommendReplyTagValue(request.getRecommendReplyTagValue());
-        recommendReply.setRecommendPlaceId(recommendPlace); // RecommendListPlace 엔티티 설정
+        // Builder 패턴을 사용하여 RecommendReply 객체를 생성합니다.
+        RecommendReply recommendReply = RecommendReply.builder()
+                .recommendReplyStar(recommendReplyStar)
+                .recommendReplyTagValue(request.getRecommendReplyTagValue().toString()) //string, List<string> 타입 맞춤
+                .recommendPlaceId(recommendPlace)
+                .build();
 
         // 수정된 엔티티를 저장합니다.
         recommendReply = recommendReplyRepository.save(recommendReply);
@@ -152,12 +154,15 @@ public class RecommendReplyService {
 
     //숙박 평점 저장
     public CreateReplyHotelResponse createHotelReply(CreateReplyHotelRequest request) {
-        // 요청에서 제공된 숙박 ID를 기반으로 기존의 추천 후기를 가져옵니다.
-        RecommendReply recommendReply = recommendReplyRepository.findById(request.getRecommendHotelId())
-                .orElseThrow(() -> new IllegalArgumentException("숙박 평점 정보 없음"));
+        // 요청에서 제공된 숙박 ID를 기반으로 RecommendListHotel를 가져옵니다.
+        RecommendListHotel recommendHotel = recommendListHotelRepository.findByRecommendHotelId(request.getRecommendHotelId());
+        if (recommendHotel == null) {
+            log.error("RecommendListHotel ID 찾을수 없음", request.getRecommendHotelId());
+            throw new IllegalArgumentException("RecommendListHotel 정보 없음");
+        }
 
         // 평점 값이 1에서 5 사이인지 검증합니다.
-        int recommendReplyStar = Math.toIntExact(request.getRecommendReplyStar());
+        long recommendReplyStar = Math.toIntExact(request.getRecommendReplyStar());
         if (recommendReplyStar < 1 || recommendReplyStar > 5) {
             //throw new IllegalArgumentException("The recommend reply star must be between 1 and 5.");
             log.error("------------ 숙박 평점을 잘못 입력했습니다 --------------- ");
@@ -165,13 +170,12 @@ public class RecommendReplyService {
             return null; // 또는 적절한 예외 처리 및 에러 응답 반환
         }
 
-        // 요청에서 제공된 숙박 ID를 기반으로 RecommendListHotel를 가져옵니다.
-        RecommendListHotel recommendHotel = recommendListHotelRepository.findByRecommendHotelId(request.getRecommendHotelId());
-
-        // 요청 데이터를 기존의 RecommendReply 엔티티로 매핑합니다.
-        recommendReply.setRecommendReplyStar(request.getRecommendReplyStar());
-        recommendReply.setRecommendReplyTagValue(request.getRecommendReplyTagValue());
-        recommendReply.setRecommendHotelId(recommendHotel); // RecommendListHotel 엔티티 설정
+        // Builder 패턴을 사용하여 RecommendReply 객체를 생성합니다.
+        RecommendReply recommendReply = RecommendReply.builder()
+                .recommendReplyStar(recommendReplyStar)
+                .recommendReplyTagValue(request.getRecommendReplyTagValue().toString()) //string, List<string> 타입 맞춤
+                .recommendHotelId(recommendHotel)
+                .build();
 
         // 수정된 엔티티를 저장합니다.
         recommendReply = recommendReplyRepository.save(recommendReply);
@@ -190,12 +194,15 @@ public class RecommendReplyService {
 
     //축제행사 평점 저장
     public CreateReplyEventResponse createEventReply(CreateReplyEventRequest request) {
-        // 요청에서 제공된 축제행사 ID를 기반으로 기존의 추천 후기를 가져옵니다.
-        RecommendReply recommendReply = recommendReplyRepository.findById(request.getRecommendEventId())
-                .orElseThrow(() -> new IllegalArgumentException("축제행사 평점 정보 없음"));
+        // 요청에서 제공된 축제행사 ID를 기반으로 RecommendListEvent를 가져옵니다.
+        RecommendListEvent recommendEvent = recommendListEventRepository.findByRecommendEventId(request.getRecommendEventId());
+        if (recommendEvent == null) {
+            log.error("RecommendListEvent ID 찾을수 없음", request.getRecommendEventId());
+            throw new IllegalArgumentException("RecommendListEvent 정보 없음");
+        }
 
         // 평점 값이 1에서 5 사이인지 검증합니다.
-        int recommendReplyStar = Math.toIntExact(request.getRecommendReplyStar());
+        long recommendReplyStar = Math.toIntExact(request.getRecommendReplyStar());
         if (recommendReplyStar < 1 || recommendReplyStar > 5) {
             //throw new IllegalArgumentException("The recommend reply star must be between 1 and 5.");
             log.error("------------ 축제행사 평점을 잘못 입력했습니다 --------------- ");
@@ -203,13 +210,12 @@ public class RecommendReplyService {
             return null; // 또는 적절한 예외 처리 및 에러 응답 반환
         }
 
-        // 요청에서 제공된 축제행사 ID를 기반으로 RecommendListEvent를 가져옵니다.
-        RecommendListEvent recommendEvent = recommendListEventRepository.findByRecommendEventId(request.getRecommendEventId());
-
-        // 요청 데이터를 기존의 RecommendReply 엔티티로 매핑합니다.
-        recommendReply.setRecommendReplyStar(request.getRecommendReplyStar());
-        recommendReply.setRecommendReplyTagValue(request.getRecommendReplyTagValue());
-        recommendReply.setRecommendEventId(recommendEvent); // RecommendListEvent 엔티티 설정
+        // Builder 패턴을 사용하여 RecommendReply 객체를 생성합니다.
+        RecommendReply recommendReply = RecommendReply.builder()
+                .recommendReplyStar(recommendReplyStar)
+                .recommendReplyTagValue(request.getRecommendReplyTagValue().toString()) //string, List<string> 타입 맞춤
+                .recommendEventId(recommendEvent)
+                .build();
 
         // 수정된 엔티티를 저장합니다.
         recommendReply = recommendReplyRepository.save(recommendReply);

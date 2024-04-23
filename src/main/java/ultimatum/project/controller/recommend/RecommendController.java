@@ -37,6 +37,7 @@ public class RecommendController {
 
     //음식점 전체 조회
     @Tag(name = "recommend", description = "API 맛집 리스트")
+    @Operation(summary = "음식점 태그, 지역 조회")
     @GetMapping("/listfood")
     public ResponseEntity<Page<RecommendListFoodResponse>> getAllListFoods(
             @RequestParam(value = "tag", required = false) String tag,
@@ -60,6 +61,7 @@ public class RecommendController {
 
     //관광지 전체 조회
     @Tag(name = "recommend", description = "API 관광지 리스트")
+    @Operation(summary = "관광지 태그, 지역 조회")
     @GetMapping("/listplace")
     public ResponseEntity<Page<RecommendListPlaceResponse>> getAllListPlaces(
             @RequestParam(value = "tag", required = false) String tag,
@@ -83,6 +85,7 @@ public class RecommendController {
 
     //숙박 전체 조회
     @Tag(name = "recommend", description = "API 호텔리스트")
+    @Operation(summary = "관광지 태그, 지역 조회")
     @GetMapping("/listhotel")
     public ResponseEntity<Page<RecommendListHotelResponse>> getAllListHotels(
             @RequestParam(value = "tag", required = false) String tag,
@@ -107,6 +110,7 @@ public class RecommendController {
 
     // 축제행사 전체 조회
     @Tag(name = "recommend", description = "API 축제행사리스트")
+    @Operation(summary = "축제행사 태그, 지역 조회")
     @GetMapping("/listevent")
     public ResponseEntity<Page<RecommendListEventResponse>> getAllListEvents(
             @RequestParam(value = "tag", required = false) String tag,
