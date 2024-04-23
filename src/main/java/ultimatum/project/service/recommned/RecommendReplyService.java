@@ -82,7 +82,7 @@ public class RecommendReplyService {
         }
 
         // 평점 값이 1에서 5 사이인지 검증합니다.
-        int recommendReplyStar = Math.toIntExact(request.getRecommendReplyStar());
+        long recommendReplyStar = Math.toIntExact(request.getRecommendReplyStar());
         if (recommendReplyStar < 1 || recommendReplyStar > 5) {
             //throw new IllegalArgumentException("The recommend reply star must be between 1 and 5.");
             log.error("------------ 음식 평점을 잘못 입력했습니다 --------------- ");
@@ -92,7 +92,7 @@ public class RecommendReplyService {
 
         // Builder 패턴을 사용하여 RecommendReply 객체를 생성합니다.
         RecommendReply recommendReply = RecommendReply.builder()
-                .recommendReplyStar((long) recommendReplyStar)
+                .recommendReplyStar(recommendReplyStar)
                 .recommendReplyTagValue(request.getRecommendReplyTagValue().toString())
                 .recommendFoodId(recommendFood)
                 .build();
