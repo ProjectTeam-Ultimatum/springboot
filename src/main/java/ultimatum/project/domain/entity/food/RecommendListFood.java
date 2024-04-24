@@ -29,7 +29,7 @@ public class RecommendListFood {
     private String recommendFoodRegion;
     private Time recommendFoodOpentime;
     private Time recommendFoodClosetime;
-    private Long recommendFoodStar;
+    private Long recommendFoodStar; //평점
     private Long recommendFoodLike;
     private String recommendFoodLatitude;
     private String recommendFoodLongitude;

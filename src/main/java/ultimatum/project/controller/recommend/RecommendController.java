@@ -23,7 +23,7 @@ import ultimatum.project.service.recommned.RecommendService;
 @Tag(name = "recommend", description = "추천정보")
 @Log4j2
 @CrossOrigin(origins = "*") // 클라이언트 호스트 주소
-@RestController
+@RestController //Rest API
 @RequestMapping("/api/recommend")
 public class RecommendController {
 
