@@ -40,6 +40,12 @@ public class MemberService {
 
     @Transactional
     public String createMember(MemberRequestDto memberRequestDto) {
+
+        Member existingMember = memberRepository.findByMemberEmail(memberRequestDto.getMemberEmail());
+        if (existingMember != null) {
+            throw new CustomException(ErrorCode.MEMBER_ALREADY_EXISTS);
+        }
+
         // 회원 정보 생성
         Member member = Member.builder()
                 .memberName(memberRequestDto.getMemberName())
