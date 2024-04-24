@@ -17,6 +17,10 @@ public enum ErrorCode {
 
     INVALID_ANSWER_VALUE(400, "BAD_REQUEST", "질문에 관한 답변이 틀렸습니다."),
 
+    INVALID_PASSWORD(400, "BAD_REQUEST", "입력된 비밀번호가 틀렸습니다."),
+
+    INVALID_ANSWER(400, "BAD_REQUEST", "입력된 답변이 틀렸습니다."),
+
     BAD_REQUEST(400, "BAD_REQUEST","잘못된 요청입니다."),
 
     BAD_REQUSET_USER(400, "BAD_REQUEST", "JWT 인증되지 않은 사용자 정보를 요청했습니다."),

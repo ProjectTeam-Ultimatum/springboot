@@ -203,4 +203,27 @@ public class RestApiController {
         return "success!";
     }
 
+    @DeleteMapping("/user/delete")
+    public ResponseEntity<String> deleteMember(
+            @RequestParam String password,
+            @RequestParam String answer) {
+
+        // 현재 인증된 사용자 정보 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new CustomException(ErrorCode.BAD_REQUSET_USER);
+        }
+
+        String userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일 가져오기
+        ResponseEntity<String> response;
+
+        try {
+            response = memberService.deleteMember(userEmail, password, answer);
+        } catch (CustomException e) {
+            response = ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+        return response;
+    }
+
 }
