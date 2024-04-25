@@ -29,6 +29,6 @@ public class PlanFood {
 
     @ManyToOne
     @JoinColumn(name = "plan_id")
-    private Plan planId;
+    private Plan plan;
 
 }

@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RecommendListHotelResponse {
 
+    private Long recommendHotelId;
     private String recommendHotelContentsId;
     private String recommendHotelTitle;
     private String recommendHotelIntroduction;

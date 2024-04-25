@@ -15,6 +15,6 @@ import java.time.LocalTime;
 @AllArgsConstructor
 public class PlanPlaceDTO {
     private LocalTime stayTime;
-    private RecommendListPlace recommendPlaceId;
-    private Plan planId;
+    private Long  recommendPlaceId;
+    private Plan  planId;
 }

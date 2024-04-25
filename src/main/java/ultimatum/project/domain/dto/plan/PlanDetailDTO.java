@@ -7,10 +7,7 @@ import lombok.Setter;
 import ultimatum.project.domain.entity.food.RecommendListFood;
 import ultimatum.project.domain.entity.place.RecommendListPlace;
 import ultimatum.project.domain.entity.event.RecommendListEvent;
-import ultimatum.project.domain.entity.plan.Plan;
-import ultimatum.project.domain.entity.plan.PlanEvent;
-import ultimatum.project.domain.entity.plan.PlanFood;
-import ultimatum.project.domain.entity.plan.PlanPlace;
+import ultimatum.project.domain.entity.plan.*;
 
 import java.time.LocalTime;
 
@@ -23,29 +20,9 @@ public class PlanDetailDTO {
     private Long recommendFoodId;  // 음식점 추천 ID
     private Long recommendEventId; // 이벤트 추천 ID
     private Long recommendPlaceId; // 장소 추천 ID
+    private Long recommendHotelId;
+    private Long planDayId;
     private Long planId;
 
-    public PlanFood toPlanFood(RecommendListFood recommendFoodId) {
-        return PlanFood.builder()
-                .planId(new Plan(planId))
-                .recommendListFoods(recommendFoodId)
-                .planFoodStayTime(stayTime)
-                .build();
-    }
 
-    public PlanEvent toPlanEvent(RecommendListEvent recommendEventId) {
-        return PlanEvent.builder()
-                .planId(new Plan(planId))
-                .recommendListEvents(recommendEventId)
-                .planEventStayTime(stayTime)
-                .build();
-    }
-
-    public PlanPlace toPlanPlace(RecommendListPlace recommendPlaceId) {
-        return PlanPlace.builder()
-                .planId(new Plan(planId))
-                .recommendListPlaces(recommendPlaceId)
-                .planPlaceStayTime(stayTime)
-                .build();
-    }
 }
