@@ -63,6 +63,7 @@ public class RecommendReplyController {
 
         // 서비스를 호출하여 리뷰를 생성하고 응답 객체를 반환합니다.
         CreateReplyPlaceResponse response = recommendReplyService.createPlaceReply(request);
+        log.info(response.getRecommendReplyTagValue().toString());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -145,6 +146,7 @@ public class RecommendReplyController {
         return ResponseEntity.ok(responses);
     }
 
+    //관광지 태그 조회
     //관광지 태그 조회
     @GetMapping("/place/reads/tag/{recommend_place_id}")
     @Operation(summary = "관광지 태그 조회")

@@ -29,6 +29,7 @@ import ultimatum.project.repository.place.RecommendListPlaceRepository;
 import ultimatum.project.repository.reply.RecommendReplyRepository;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
@@ -126,8 +127,12 @@ public class RecommendReplyService {
                 .recommendPlaceId(recommendPlace)
                 .build();
 
+
         // 수정된 엔티티를 저장합니다.
         recommendReply = recommendReplyRepository.save(recommendReply);
+
+        log.info("request Service : {}", request.getRecommendReplyTagValue());
+        log.info("recommendReply Service : {}", recommendReply.getRecommendReplyTagValue());
 
         // 응답 객체를 수동으로 생성합니다.
         return new CreateReplyPlaceResponse(
@@ -136,9 +141,10 @@ public class RecommendReplyService {
                         ? recommendReply.getRecommendReplyTagValue() // JSON을 List<String>로 변환
                         : List.of(),
                 recommendReply.getRecommendPlaceId() != null
-                        ? recommendReply.getRecommendPlaceId().getRecommendPlaceId() // 관광지 ID만을 보내도록 보장
+                        ? recommendReply.getRecommendPlaceId().getRecommendPlaceId() // 숙박 ID만을 보내도록 보장
                         : null
         );
+
     }
 
     //숙박 평점 저장
@@ -299,6 +305,8 @@ public class RecommendReplyService {
                 .average();
         return average.isPresent() ? (int) Math.round(average.getAsDouble()) : 0; // 평균 평점을 반올림하여 정수로 반환
     }
+
+
 
     //숙박 평점 ID 조회
     public List<ReadReplyHotelByIdResponse> getRepliesByHotelId(Long recommendHotelId) {

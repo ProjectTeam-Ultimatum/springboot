@@ -16,8 +16,7 @@ import java.util.List;
 
 @Entity
 @Builder
-@Getter
-@Setter //엔티티에는 빼기
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecommendReply {
@@ -39,9 +38,10 @@ public class RecommendReply {
             return mapper.readValue(this.recommendReplyTagValue, new TypeReference<List<String>>() {});
         } catch (JsonProcessingException e) {
             // JSON 변환 실패 시 빈 리스트 반환
-            return new ArrayList<>();
+            return new ArrayList<>(); //문제... 현재 빈배열 출력
         }
     }
+
 
     // List<String> 형태의 태그 목록을 JSON 문자열로 설정하는 setter
     public void setRecommendReplyTagValue(List<String> tags) {

@@ -1,14 +1,10 @@
 package ultimatum.project.domain.dto.recommendReply.place;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
-
-@Getter
-@Setter
+import java.util.StringJoiner;
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReadReplyPlaceTagByIdResponse {
