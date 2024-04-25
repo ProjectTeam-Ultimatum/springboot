@@ -113,7 +113,7 @@ public class RecommendReplyController {
 
     //음식점 평균 평점 계산
     @GetMapping("/food/average/star/{recommend_food_id}")
-    @Operation(summary = "음식점 평균 평점 조회")
+    @Operation(summary = "음식점 평균 평점 계산")
     public ResponseEntity<?> getAverageFoodRating(@PathVariable("recommend_food_id") Long recommendFoodId) {
         double averageRating = recommendReplyService.getAverageRatingByFoodId(recommendFoodId);
         if (averageRating == 0.0) {
@@ -145,19 +145,6 @@ public class RecommendReplyController {
         return ResponseEntity.ok(responses);
     }
 
-    //관광지 평균 평점 계산
-    @GetMapping("/place/average/star/{recommend_place_id}")
-    @Operation(summary = "관광지 평균 평점 조회")
-    public ResponseEntity<?> getAveragePlaceRating(@PathVariable("recommend_place_id") Long recommendPlaceId) {
-        double averageRating = recommendReplyService.getAverageRatingByPlaceId(recommendPlaceId);
-        if (averageRating == 0.0) {
-            // 평균 평점이 없는 경우, 메시지 반환
-            return ResponseEntity.ok("평점을 기다리고 있어요");
-        }
-        return ResponseEntity.ok(averageRating);  // 평균 평점 반환
-    }
-
-
     //관광지 태그 조회
     @GetMapping("/place/reads/tag/{recommend_place_id}")
     @Operation(summary = "관광지 태그 조회")
@@ -168,6 +155,20 @@ public class RecommendReplyController {
         }
         return ResponseEntity.ok(responses);
     }
+
+
+    //관광지 평균 평점 계산
+    @GetMapping("/place/average/star/{recommend_place_id}")
+    @Operation(summary = "관광지 평균 평점 계산")
+    public ResponseEntity<?> getAveragePlaceRating(@PathVariable("recommend_place_id") Long recommendPlaceId) {
+        double averageRating = recommendReplyService.getAverageRatingByPlaceId(recommendPlaceId);
+        if (averageRating == 0.0) {
+            // 평균 평점이 없는 경우, 메시지 반환
+            return ResponseEntity.ok("평점을 기다리고 있어요");
+        }
+        return ResponseEntity.ok(averageRating);  // 평균 평점 반환
+    }
+
 
     //숙박 평점 조회
     @GetMapping("/hotel/reads/star/{recommend_hotel_id}")
@@ -180,7 +181,7 @@ public class RecommendReplyController {
         return ResponseEntity.ok(responses);
     }
 
-    //숙박 평점 조회
+    //숙박 태그 조회
     @GetMapping("/hotel/reads/tag/{recommend_hotel_id}")
     @Operation(summary = "숙박 태그 조회")
     public ResponseEntity<List<ReadReplyHotelTagByIdResponse>> getHotelTagReplies(@PathVariable Long recommend_hotel_id) {
@@ -189,6 +190,18 @@ public class RecommendReplyController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(responses);
+    }
+
+    //숙박 평균 평점 계산
+    @GetMapping("/hotel/average/star/{recommend_hotel_id}")
+    @Operation(summary = "숙박 평균 평점 계산")
+    public ResponseEntity<?> getAverageHotelRating(@PathVariable("recommend_hotel_id") Long recommendHotelId) {
+        double averageRating = recommendReplyService.getAverageRatingByHotelId(recommendHotelId);
+        if (averageRating == 0.0) {
+            // 평균 평점이 없는 경우, 메시지 반환
+            return ResponseEntity.ok("평점을 기다리고 있어요");
+        }
+        return ResponseEntity.ok(averageRating);  // 평균 평점 반환
     }
 
     //축제행사 평점 조회
@@ -212,6 +225,19 @@ public class RecommendReplyController {
         }
         return ResponseEntity.ok(responses);
     }
+
+    //축제행사 평균 평점 계산
+    @GetMapping("/event/average/star/{recommend_event_id}")
+    @Operation(summary = "축제행사 평균 평점 계산")
+    public ResponseEntity<?> getAverageEventRating(@PathVariable("recommend_event_id") Long recommendEventId) {
+        double averageRating = recommendReplyService.getAverageRatingByEventId(recommendEventId);
+        if (averageRating == 0.0) {
+            // 평균 평점이 없는 경우, 메시지 반환
+            return ResponseEntity.ok("평점을 기다리고 있어요");
+        }
+        return ResponseEntity.ok(averageRating);  // 평균 평점 반환
+    }
+    
 
     // 태그 기반 음식점 조회
     @Operation(summary = "음식점 평점 태그 필터링 조회")

@@ -261,7 +261,7 @@ public class RecommendReplyService {
                 .collect(Collectors.toList());
     }
 
-    //reply 관광지 평점 ID 조회
+    //관광지 평점 ID 조회
     public List<ReadReplyPlaceByIdResponse> getRepliesByPlaceId(Long recommendPlaceId) {
         // 요청에서 제공된 관광지 ID를 기반으로 모든 후기를 조회합니다.
         List<RecommendReply> replies = recommendReplyRepository.findByRecommendPlaceId_RecommendPlaceId(recommendPlaceId);
@@ -276,16 +276,7 @@ public class RecommendReplyService {
                 .collect(Collectors.toList());
     }
 
-    //관광지 평점 평균 계산
-    public int getAverageRatingByPlaceId(Long recommendPlaceId) {
-        List<RecommendReply> replies = recommendReplyRepository.findByRecommendPlaceId_RecommendPlaceId(recommendPlaceId);
-        OptionalDouble average = replies.stream()
-                .mapToDouble(RecommendReply::getRecommendReplyStar)
-                .average();
-        return average.isPresent() ? (int) Math.round(average.getAsDouble()) : 0; // 평균 평점을 반올림하여 정수로 반환
-    }
-
-    //reply 관광지 태그 ID 조회
+    //관광지 태그 ID 조회
     public List<ReadReplyPlaceTagByIdResponse> getRepliesByPlaceTagId(Long recommendPlaceId) {
         // 요청에서 제공된 관광지 ID를 기반으로 모든 후기를 조회합니다.
         List<RecommendReply> replies = recommendReplyRepository.findByRecommendPlaceId_RecommendPlaceId(recommendPlaceId);
@@ -298,6 +289,15 @@ public class RecommendReplyService {
                         reply.getRecommendPlaceId() != null ? reply.getRecommendPlaceId().getRecommendPlaceId() : null // 적절한 ID 접근 방식으로 수정
                 ))
                 .collect(Collectors.toList());
+    }
+
+    //관광지 평점 평균 계산
+    public int getAverageRatingByPlaceId(Long recommendPlaceId) {
+        List<RecommendReply> replies = recommendReplyRepository.findByRecommendPlaceId_RecommendPlaceId(recommendPlaceId);
+        OptionalDouble average = replies.stream()
+                .mapToDouble(RecommendReply::getRecommendReplyStar)
+                .average();
+        return average.isPresent() ? (int) Math.round(average.getAsDouble()) : 0; // 평균 평점을 반올림하여 정수로 반환
     }
 
     //숙박 평점 ID 조회
@@ -330,6 +330,15 @@ public class RecommendReplyService {
                 .collect(Collectors.toList());
     }
 
+    //숙박 평점 평균 계산
+    public int getAverageRatingByHotelId(Long recommendHotelId) {
+        List<RecommendReply> replies = recommendReplyRepository.findByRecommendHotelId_RecommendHotelId(recommendHotelId);
+        OptionalDouble average = replies.stream()
+                .mapToDouble(RecommendReply::getRecommendReplyStar)
+                .average();
+        return average.isPresent() ? (int) Math.round(average.getAsDouble()) : 0; // 평균 평점을 반올림하여 정수로 반환
+    }
+
     //축제행사 평점 ID 조회
     public List<ReadReplyEventByIdResponse> getRepliesByEventId(Long recommendEventId) {
         // 요청에서 제공된 축제행사 ID를 기반으로 모든 후기를 조회합니다.
@@ -360,6 +369,14 @@ public class RecommendReplyService {
                 .collect(Collectors.toList());
     }
 
+    //축제행사 평점 평균 계산
+    public int getAverageRatingByEventId(Long recommendEventId) {
+        List<RecommendReply> replies = recommendReplyRepository.findByRecommendEventId_RecommendEventId(recommendEventId);
+        OptionalDouble average = replies.stream()
+                .mapToDouble(RecommendReply::getRecommendReplyStar)
+                .average();
+        return average.isPresent() ? (int) Math.round(average.getAsDouble()) : 0; // 평균 평점을 반올림하여 정수로 반환
+    }
 
     // 음식점 전체조회 및 태그 필터링
     public List<ReadReplyFoodAllResponse> findAllReplyFoodTag(String recommendReplyTagValue, Pageable pageable) {
@@ -433,37 +450,6 @@ public class RecommendReplyService {
                 .map(recommendReply -> modelMapper.map(recommendReply, ReadReplyFoodAllResponse.class))
                 .collect(Collectors.toList());
     }
-
-
-    //음식점 평점 Id 1건 조회
-//    @Transactional(readOnly = true)
-//    public ReadReplyFoodAllResponse getReplyFoodById(Long recommendFoodId) {
-//        RecommendReply foodReply = recommendReplyRepository.findById(recommendFoodId)
-//                .orElseThrow(() -> new EntityNotFoundException("음식 추천 ID를 찾을 수 없습니다: " + recommendFoodId));
-//
-//        RecommendListFood recommendFood = foodReply.getRecommendFoodId();
-//
-//        return new ReadReplyFoodAllResponse(
-//                foodReply.getRecommendReplyId(),
-//                foodReply.getRecommendReply(),
-//                foodReply.getRecommendReplyStar(),
-//                foodReply.getRecommendReplyTagValue(),
-//                recommendFood != null ? recommendFood.getRecommendFoodId() : null // food 객체가 null이 아니면 ID 반환
-//        );
-//    }
-
-//    @Transactional(readOnly = true)
-//    public List<ReadReplyFoodAllResponse> getReplyFoodByFoodId(Long recommendFoodId) {
-//        List<RecommendReply> foodReplies = recommendReplyRepository.findByRecommendFoodId_Id(recommendFoodId);
-//
-//        return foodReplies.stream().map(foodReply -> new ReadReplyFoodAllResponse(
-//                foodReply.getRecommendReplyId(),
-//                foodReply.getRecommendReply(),
-//                foodReply.getRecommendReplyStar(),
-//                foodReply.getRecommendReplyTagValue(),
-//                foodReply.getRecommendFoodId() != null ? foodReply.getRecommendFoodId().getRecommendFoodId() : null
-//        )).collect(Collectors.toList());
-//    }
 
 }
 
