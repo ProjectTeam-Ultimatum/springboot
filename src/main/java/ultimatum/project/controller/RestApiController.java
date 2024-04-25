@@ -3,22 +3,24 @@ package ultimatum.project.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDto;
 import ultimatum.project.domain.dto.logInDTO.MemberFindPasswordRequestDto;
 import ultimatum.project.domain.dto.logInDTO.MemberRequestDto;
+import ultimatum.project.domain.dto.logInDTO.MemberWithKakaoRequestDto;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.domain.entity.member.MemberImage;
+import ultimatum.project.global.config.Security.auth.PrincipalDetails;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
+import ultimatum.project.repository.member.MemberRepository;
 import ultimatum.project.service.member.KakaoService;
 import ultimatum.project.service.member.MemberService;
-import ultimatum.project.repository.member.MemberRepository;
-import ultimatum.project.global.config.Security.auth.PrincipalDetails;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 @RequestMapping("api/v1")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
+@Log4j2
 public class RestApiController {
 
     private final MemberRepository memberRepository;
@@ -81,24 +84,24 @@ public class RestApiController {
         return "Access Token: " + accessToken;
     }
 
-    @PostMapping("/kakao-login")
-    public ResponseEntity<String> kakaoLogin(@RequestBody KakaoUserInfoDto kakaoUserInfoDto) {
-        String accessToken = kakaoService.getKakaoAccessToken(kakaoUserInfoDto.getCode());
-        if (accessToken != null && !accessToken.isEmpty()) {
-            // 카카오 사용자 정보 가져오기
-            String name = kakaoUserInfoDto.getName();
-            String email = kakaoUserInfoDto.getEmail();
-
-            // 사용자 정보로 로그인 또는 회원가입 처리
-            MemberRequestDto memberRequestDto = new MemberRequestDto();
-            memberRequestDto.setMemberName(name);
-            memberRequestDto.setMemberEmail(email);
-
-            return memberService.processKakaoLogin(kakaoUserInfoDto, memberRequestDto);
-        } else {
-            return ResponseEntity.badRequest().body("카카오 액세스 토큰을 가져오지 못했습니다.");
-        }
-    }
+//    @PostMapping("/kakao-login")
+//    public ResponseEntity<String> kakaoLogin(@RequestBody KakaoUserInfoDto kakaoUserInfoDto) {
+//        String accessToken = kakaoService.getKakaoAccessToken(kakaoUserInfoDto.getCode());
+//        if (accessToken != null && !accessToken.isEmpty()) {
+//            // 카카오 사용자 정보 가져오기
+//            String name = kakaoUserInfoDto.getName();
+//            String email = kakaoUserInfoDto.getEmail();
+//
+//            // 사용자 정보로 로그인 또는 회원가입 처리
+//            MemberWithKakaoResponseDto memberRequestDto = new MemberWithKakaoResponseDto();
+//            memberRequestDto.setMemberName(name);
+//            memberRequestDto.setMemberEmail(email);
+//
+//            return memberService.processKakaoLogin(kakaoUserInfoDto, memberRequestDto);
+//        } else {
+//            return ResponseEntity.badRequest().body("카카오 액세스 토큰을 가져오지 못했습니다.");
+//        }
+//    }
 
     @GetMapping("/user/info")
     @SecurityRequirement(name = "bearerAuth") // 토큰이 필요한 API
@@ -226,4 +229,11 @@ public class RestApiController {
         return response;
     }
 
+    @PostMapping(path = "/signup-with-kakao", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> signupWithKakao(
+            @RequestParam("code") String code,
+            @ModelAttribute MemberWithKakaoRequestDto requestDto) {
+
+        return memberService.registerOrLoginWithKakao(code, requestDto);
+    }
 }

@@ -2,13 +2,21 @@ package ultimatum.project.service.member;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDto;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Service
+@Log4j2
 public class KakaoService {
 
     public String getKakaoAccessToken(String code) {
@@ -62,6 +70,40 @@ public class KakaoService {
         }
 
         return accessToken;
+    }
+
+    public KakaoUserInfoDto getKakaoUserInfo(String accessToken) {
+        String requestUrl = "https://kapi.kakao.com/v2/user/me";
+        log.info("requestUrl : {}",requestUrl);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        log.info("headers : {}",headers);
+        log.info("entity : {}",entity);
+
+
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<KakaoUserInfoDto> response = restTemplate.exchange(
+                requestUrl, HttpMethod.GET, entity, KakaoUserInfoDto.class
+        );
+        log.info("response:{}",response);
+
+        KakaoUserInfoDto kakaoUserInfoDto = response.getBody();
+        if (kakaoUserInfoDto != null) {
+            String nickname = kakaoUserInfoDto.getProperties() != null ? kakaoUserInfoDto.getProperties().getNickname() : null;
+            String email = kakaoUserInfoDto.getKakao_account() != null ? kakaoUserInfoDto.getKakao_account().getEmail() : null;
+            log.info("Kakao User Nickname: {}", nickname);
+            log.info("Kakao User Email: {}", email);
+
+            // 추가적인 로직...
+        } else {
+            log.error("Kakao User Info is null");
+            // 적절한 예외 처리를 수행하거나 오류 응답 반환
+        }
+
+        return kakaoUserInfoDto;
     }
 
 }

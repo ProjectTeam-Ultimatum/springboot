@@ -1,39 +1,36 @@
 package ultimatum.project.service.member;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDto;
-import ultimatum.project.domain.dto.logInDTO.MemberFindPasswordRequestDto;
-import ultimatum.project.domain.dto.logInDTO.MemberRequestDto;
+import ultimatum.project.domain.dto.logInDTO.*;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.domain.entity.member.MemberImage;
 import ultimatum.project.global.config.Security.jwt.JwtProperties;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
-import lombok.RequiredArgsConstructor;
 import ultimatum.project.repository.member.MemberRepository;
 
-import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Log4j2
 public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final MemberImageService memberImageService;
     private final JwtProperties jwtProperties;
+    private final KakaoService kakaoService;
 
     @Autowired
     private JavaMailSender javaMailSender;
@@ -74,60 +71,84 @@ public class MemberService {
         return "회원가입 완료: " + member.getMemberName();
     }
 
-    public ResponseEntity<String> signUpWithKakao(KakaoUserInfoDto kakaoUserInfoDto, MemberRequestDto memberRequestDto) {
-        String name = kakaoUserInfoDto.getName();
-        String email = kakaoUserInfoDto.getEmail();
+    public ResponseEntity<MemberWithKakaoResponseDto> registerOrLoginWithKakao(String code,
+                                                                               MemberWithKakaoRequestDto additionalInfo
+                                                                               ) {
+        //카카오 인증 코드를 이용하여 엑세스 토크 획득
+        String accessToken = kakaoService.getKakaoAccessToken(code);
+        log.info("엑세스 토큰 : {}", accessToken); // 액세스 토큰 로그
 
-        // 사용자 정보로 회원가입 처리
-        Member newMember = Member.builder()
-                .memberName(name)
-                .memberEmail(email)
-                .memberPassword("") // 카카오 소셜 로그인은 비밀번호 필요 없음
-                .memberRole("ROLE_USER") // 기본 역할 설정
-                .memberAge(memberRequestDto.getMemberAge())
-                .memberGender(memberRequestDto.getMemberGender())
-                .memberAddress(memberRequestDto.getMemberAddress())
-                .build();
+        //엑세스 토큰을 사용하여 카카오로부터 사용자 정보 획득
+        KakaoUserInfoDto kakaoUserInfoDto = kakaoService.getKakaoUserInfo(accessToken);
 
-        memberRepository.save(newMember);
 
-        return ResponseEntity.ok("Welcome, " + newMember.getMemberName() + "! Email: " + email);
+        log.info("카카오 유저 information : {} ", kakaoUserInfoDto);
+        // 사용자 찾기 또는 새로 생성
+        Member member = findOrCreateUser(kakaoUserInfoDto, additionalInfo);
+
+        // 추가 회원 정보 설정
+
+        // 이미지 처리
+        List<MemberImage> memberImages = memberImageService.createMemberImages(additionalInfo.getFiles(), member);
+        if(memberImages.isEmpty() && !additionalInfo.getFiles().isEmpty()) {
+            throw new CustomException(ErrorCode.FILE_PROCESSING_ERROR);
+        }
+        member.setMemberImages(memberImages);
+
+        //jwt토큰 생성
+        String jwtToken = jwtProperties.generateToken(member);
+        memberRepository.save(member);
+        log.info("New member registered: {}", member.getMemberEmail()); // 새 회원 등록 로그
+
+        log.info("소셜 로그인 멤버 가입 완료 !!!"); // 멤버 저장 완료 로그
+        MemberWithKakaoResponseDto responseDto = createResponseDto(member, memberImages,jwtToken);
+        return ResponseEntity.ok(responseDto);
     }
 
-    public Member findOrCreateUser(KakaoUserInfoDto userInfo) {
+
+
+    public Member findOrCreateUser(KakaoUserInfoDto userInfo,
+                                   MemberWithKakaoRequestDto additionalInfo) {
         Member member = memberRepository.findByMemberEmail(userInfo.getEmail());
         if (member == null) {
             // 회원가입 로직
             member = Member.builder()
                     .memberEmail(userInfo.getEmail())
                     .memberName(userInfo.getName())
+                    .memberAge(additionalInfo.getMemberAge())
+                    .memberGender(additionalInfo.getMemberGender())
+                    .memberAddress(additionalInfo.getMemberAddress())
+                    .memberFindPasswordAnswer(additionalInfo.getMemberFindPasswordAnswer())
                     .memberPassword("") // 패스워드는 임의로 설정
                     .memberRole("ROLE_USER")
                     .build();
             memberRepository.save(member);
+
+
         }
         return member;
     }
+//
+//    public ResponseEntity<String> processKakaoLogin(KakaoUserInfoDto userInfo, MemberRequestDto memberRequestDto) {
+//        Member member = findOrCreateUser(userInfo);
+//        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+//                member.getMemberEmail(), null, member.getAuthorities());
+//
+//        SecurityContextHolder.getContext().setAuthentication(token);
+//
+//        String jwtToken = JWT.create()
+//                .withSubject(member.getMemberEmail())
+//                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
+//                .withClaim("id", member.getMemberId())
+//                .withClaim("username", member.getMemberName())
+//                .withClaim("userid", member.getMemberEmail())
+//                .sign(Algorithm.HMAC512(jwtProperties.getSecret()));
+//
+//        return ResponseEntity.ok()
+//                .header(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtToken)
+//                .body("Login successful with Kakao account");
+//    }
 
-    public ResponseEntity<String> processKakaoLogin(KakaoUserInfoDto userInfo, MemberRequestDto memberRequestDto) {
-        Member member = findOrCreateUser(userInfo);
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                member.getMemberEmail(), null, member.getAuthorities());
-
-        SecurityContextHolder.getContext().setAuthentication(token);
-
-        String jwtToken = JWT.create()
-                .withSubject(member.getMemberEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
-                .withClaim("id", member.getMemberId())
-                .withClaim("username", member.getMemberName())
-                .withClaim("userid", member.getMemberEmail())
-                .sign(Algorithm.HMAC512(jwtProperties.getSecret()));
-
-        return ResponseEntity.ok()
-                .header(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtToken)
-                .body("Login successful with Kakao account");
-    }
 
     public String changePassword(String userEmail, String currentPassword, String newPassword) {
         Member member = memberRepository.findByMemberEmail(userEmail);
@@ -225,5 +246,38 @@ public class MemberService {
 
         return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
     }
+    private MemberWithKakaoResponseDto createResponseDto(Member member, List<MemberImage> memberImages, String jwtToken) {
+        // MemberImage 엔티티 목록을 MemberImageResponseDto 목록으로 변환
+        List<MemberImageResponseDto> imageResponseDtoList = memberImages.stream()
+                .map(this::convertToImageResponseDto)
+                .collect(Collectors.toList());
+
+        // Member 엔티티의 정보를 MemberWithKakaoResponseDto 객체로 설정
+        MemberWithKakaoResponseDto dto = new MemberWithKakaoResponseDto();
+        dto.setMemberId(member.getMemberId());
+        dto.setMemberName(member.getMemberName());
+        dto.setMemberEmail(member.getMemberEmail());
+        dto.setMemberAge(member.getMemberAge());
+        dto.setMemberGender(member.getMemberGender());
+        dto.setMemberAddress(member.getMemberAddress());
+        dto.setMemberFindPasswordAnswer(member.getMemberFindPasswordAnswer());
+        dto.setMemberStyle(member.getMemberStyle());
+        dto.setMemberRole(member.getMemberRole());
+        dto.setFiles(imageResponseDtoList); // 이미지 정보 설정
+        // JWT 토큰은 보통 Response의 헤더에 포함시키거나 별도의 필드로 추가합니다.
+
+        return dto;
+    }
+
+    private MemberImageResponseDto convertToImageResponseDto(MemberImage memberImage) {
+        // MemberImage 엔티티를 MemberImageResponseDto로 변환하는 로직 구현
+        MemberImageResponseDto imageResponseDto = new MemberImageResponseDto();
+        imageResponseDto.setReviewImageId(memberImage.getMemberImageId());
+        imageResponseDto.setImageName(memberImage.getMemberImageName());
+        imageResponseDto.setImageUri(memberImage.getMemberImageUrl());
+        // 기타 필요한 필드를 설정할 수 있습니다.
+        return imageResponseDto;
+    }
+
 
 }
