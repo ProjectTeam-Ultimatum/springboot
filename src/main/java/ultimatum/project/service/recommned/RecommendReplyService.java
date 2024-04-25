@@ -30,6 +30,7 @@ import ultimatum.project.repository.reply.RecommendReplyRepository;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -221,7 +222,7 @@ public class RecommendReplyService {
     }
 
 
-    //reply 음식 평점 ID조회 - 최종
+    //음식 평점 ID조회 - 최종
     public List<ReadReplyFoodByIdResponse> getRepliesByFoodId(Long recommendFoodId) {
         // 요청에서 제공된 음식점 ID를 기반으로 모든 후기를 조회합니다.
         List<RecommendReply> replies = recommendReplyRepository.findByRecommendFoodId_RecommendFoodId(recommendFoodId);
@@ -236,7 +237,16 @@ public class RecommendReplyService {
                 .collect(Collectors.toList());
     }
 
-    //reply 음식 태그 ID조회
+    //음식 평점 평균 계산
+    public int getAverageRatingByFoodId(Long recommendFoodId) {
+        List<RecommendReply> replies = recommendReplyRepository.findByRecommendFoodId_RecommendFoodId(recommendFoodId);
+        OptionalDouble average = replies.stream()
+                .mapToDouble(RecommendReply::getRecommendReplyStar)
+                .average();
+        return average.isPresent() ? (int) Math.round(average.getAsDouble()) : 0; // 평균 평점을 반올림하여 정수로 반환
+    }
+
+    //음식 태그 ID조회
     public List<ReadReplyFoodTagByIdResponse> getRepliesByFoodTagId(Long recommendFoodId) {
         // 요청에서 제공된 음식점 ID를 기반으로 모든 후기를 조회합니다.
         List<RecommendReply> replies = recommendReplyRepository.findByRecommendFoodId_RecommendFoodId(recommendFoodId);
@@ -264,6 +274,15 @@ public class RecommendReplyService {
                         reply.getRecommendPlaceId() != null ? reply.getRecommendPlaceId().getRecommendPlaceId() : null // 적절한 ID 접근 방식으로 수정
                 ))
                 .collect(Collectors.toList());
+    }
+
+    //관광지 평점 평균 계산
+    public int getAverageRatingByPlaceId(Long recommendPlaceId) {
+        List<RecommendReply> replies = recommendReplyRepository.findByRecommendPlaceId_RecommendPlaceId(recommendPlaceId);
+        OptionalDouble average = replies.stream()
+                .mapToDouble(RecommendReply::getRecommendReplyStar)
+                .average();
+        return average.isPresent() ? (int) Math.round(average.getAsDouble()) : 0; // 평균 평점을 반올림하여 정수로 반환
     }
 
     //reply 관광지 태그 ID 조회
