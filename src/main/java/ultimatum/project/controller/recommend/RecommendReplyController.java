@@ -147,7 +147,6 @@ public class RecommendReplyController {
     }
 
     //관광지 태그 조회
-    //관광지 태그 조회
     @GetMapping("/place/reads/tag/{recommend_place_id}")
     @Operation(summary = "관광지 태그 조회")
     public ResponseEntity<List<ReadReplyPlaceTagByIdResponse>> getPlaceTagReplies(@PathVariable Long recommend_place_id) {

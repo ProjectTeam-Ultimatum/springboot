@@ -10,6 +10,7 @@ import ultimatum.project.domain.entity.event.RecommendListEvent;
 import ultimatum.project.domain.entity.food.RecommendListFood;
 import ultimatum.project.domain.entity.hotel.RecommendListHotel;
 import ultimatum.project.domain.entity.place.RecommendListPlace;
+import ultimatum.project.global.config.util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,34 +29,16 @@ public class RecommendReply {
     private Long recommendReplyStar;
     private String recommendReplyTagValue;  // JSON 형태의 태그 목록을 저장
 
-    // JSON 형태의 태그 목록을 List<String>으로 반환하는 getter
     public List<String> getRecommendReplyTagValue() {
-        if (this.recommendReplyTagValue == null || this.recommendReplyTagValue.isEmpty()) {
-            return new ArrayList<>();
-        }
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(this.recommendReplyTagValue, new TypeReference<List<String>>() {});
-        } catch (JsonProcessingException e) {
-            // JSON 변환 실패 시 빈 리스트 반환
-            return new ArrayList<>(); //문제... 현재 빈배열 출력
-        }
+        return JsonUtil.fromJson(this.recommendReplyTagValue);
     }
 
-
-    // List<String> 형태의 태그 목록을 JSON 문자열로 설정하는 setter
     public void setRecommendReplyTagValue(List<String> tags) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            this.recommendReplyTagValue = mapper.writeValueAsString(tags);
-        } catch (JsonProcessingException e) {
-            this.recommendReplyTagValue = "[]";
-        }
+        this.recommendReplyTagValue = JsonUtil.toJson(tags);
     }
 
     @JsonIgnore
     public String getRecommendReplyTagsAsString() {
-        // DB 저장용 raw 문자열 태그 목록을 가져오는 추가 getter
         return this.recommendReplyTagValue;
     }
 

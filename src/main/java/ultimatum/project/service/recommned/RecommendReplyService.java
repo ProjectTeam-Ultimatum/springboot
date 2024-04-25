@@ -22,6 +22,7 @@ import ultimatum.project.domain.entity.food.RecommendListFood;
 import ultimatum.project.domain.entity.hotel.RecommendListHotel;
 import ultimatum.project.domain.entity.place.RecommendListPlace;
 import ultimatum.project.domain.entity.recommendReply.RecommendReply;
+import ultimatum.project.global.config.util.JsonUtil;
 import ultimatum.project.repository.event.RecommendListEventRepository;
 import ultimatum.project.repository.food.RecommendListFoodRepository;
 import ultimatum.project.repository.hotel.RecommendListHotelRepository;
@@ -104,47 +105,44 @@ public class RecommendReplyService {
 
     //관광지 평점 저장
     public CreateReplyPlaceResponse createPlaceReply(CreateReplyPlaceRequest request) {
-        // 요청에서 제공된 관광지 ID를 기반으로 RecommendListPlace를 가져옵니다.
+        // 요청된 관광지 ID를 이용하여 RecommendListPlace 객체를 조회합니다.
         RecommendListPlace recommendPlace = recommendListPlaceRepository.findByRecommendPlaceId(request.getRecommendPlaceId());
         if (recommendPlace == null) {
-            log.error("RecommendListPlace ID 찾을수 없음", request.getRecommendPlaceId());
+            // 찾는 관광지 ID가 없는 경우, 로그를 출력하고 예외를 발생시킵니다.
+            log.error("RecommendListPlace ID 찾을 수 없음: {}", request.getRecommendPlaceId());
             throw new IllegalArgumentException("RecommendListPlace 정보 없음");
         }
 
-        // 평점 값이 1에서 5 사이인지 검증합니다.
+        // 요청받은 평점이 1에서 5 사이인지 검증합니다.
         long recommendReplyStar = Math.toIntExact(request.getRecommendReplyStar());
         if (recommendReplyStar < 1 || recommendReplyStar > 5) {
-            //throw new IllegalArgumentException("The recommend reply star must be between 1 and 5.");
-            log.error("------------ 관광지 평점을 잘못 입력했습니다 --------------- ");
-            log.error("현재 평점 값: {} / 평점은 1에서 5 사이여야 합니다.", recommendReplyStar);
-            return null; // 또는 적절한 예외 처리 및 에러 응답 반환
+            // 평점이 요구 범위를 벗어날 경우, 로그를 출력하고 예외 발생
+            log.error("관광지 평점 입력 오류: 현재 평점 값: {} / 평점은 1에서 5 사이여야 합니다.", recommendReplyStar);
+            throw new IllegalArgumentException("평점은 1에서 5 사이여야 합니다.");
         }
 
-        // Builder 패턴을 사용하여 RecommendReply 객체를 생성합니다.
+        // 태그 리스트를 JSON 문자열 변환
+        String jsonTags = JsonUtil.toJson(request.getRecommendReplyTagValue());
+
+        // RecommendReply 객체를 Builder 패턴 이용하여 생성
         RecommendReply recommendReply = RecommendReply.builder()
                 .recommendReplyStar(recommendReplyStar)
-                .recommendReplyTagValue(request.getRecommendReplyTagValue().toString()) //string, List<string> 타입 맞춤
+                .recommendReplyTagValue(jsonTags) // 태그 목록을 JSON 형태로 저장
                 .recommendPlaceId(recommendPlace)
                 .build();
 
-
-        // 수정된 엔티티를 저장합니다.
+        // 생성된 객체를 데이터베이스 저장
         recommendReply = recommendReplyRepository.save(recommendReply);
 
-        log.info("request Service : {}", request.getRecommendReplyTagValue());
-        log.info("recommendReply Service : {}", recommendReply.getRecommendReplyTagValue());
+        // 저장된 태그 정보를 로그 출력
+        log.info("저장된 태그: {}", jsonTags);
 
-        // 응답 객체를 수동으로 생성합니다.
+        // 최종적으로 생성된 RecommendReply 객체를 이용하여 응답 객체를 생성하고 반환합니다.
         return new CreateReplyPlaceResponse(
                 recommendReply.getRecommendReplyStar(),
-                recommendReply.getRecommendReplyTagValue() != null
-                        ? recommendReply.getRecommendReplyTagValue() // JSON을 List<String>로 변환
-                        : List.of(),
-                recommendReply.getRecommendPlaceId() != null
-                        ? recommendReply.getRecommendPlaceId().getRecommendPlaceId() // 숙박 ID만을 보내도록 보장
-                        : null
+                JsonUtil.fromJson(jsonTags), // JSON 문자열을 다시 리스트로 변환
+                recommendPlace != null ? recommendPlace.getRecommendPlaceId() : null
         );
-
     }
 
     //숙박 평점 저장
