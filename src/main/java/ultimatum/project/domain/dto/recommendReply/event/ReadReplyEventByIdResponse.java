@@ -14,6 +14,5 @@ import java.util.List;
 public class ReadReplyEventByIdResponse {
     private String recommendReply; //Security
     private Long recommendReplyStar;
-    private List<String> recommendReplyTagValue;
     private Long recommendEventId;
 }

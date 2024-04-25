@@ -8,22 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ultimatum.project.domain.dto.recommendReply.*;
-import ultimatum.project.domain.dto.recommendReply.event.CreateReplyEventRequest;
-import ultimatum.project.domain.dto.recommendReply.event.CreateReplyEventResponse;
-import ultimatum.project.domain.dto.recommendReply.event.ReadReplyEventAllResponse;
-import ultimatum.project.domain.dto.recommendReply.event.ReadReplyEventByIdResponse;
-import ultimatum.project.domain.dto.recommendReply.food.CreateReplyFoodRequest;
-import ultimatum.project.domain.dto.recommendReply.food.CreateReplyFoodResponse;
-import ultimatum.project.domain.dto.recommendReply.food.ReadReplyFoodAllResponse;
-import ultimatum.project.domain.dto.recommendReply.food.ReadReplyFoodByIdResponse;
-import ultimatum.project.domain.dto.recommendReply.hotel.CreateReplyHotelRequest;
-import ultimatum.project.domain.dto.recommendReply.hotel.CreateReplyHotelResponse;
-import ultimatum.project.domain.dto.recommendReply.hotel.ReadReplyHotelAllResponse;
-import ultimatum.project.domain.dto.recommendReply.hotel.ReadReplyHotelByIdResponse;
-import ultimatum.project.domain.dto.recommendReply.place.CreateReplyPlaceRequest;
-import ultimatum.project.domain.dto.recommendReply.place.CreateReplyPlaceResponse;
-import ultimatum.project.domain.dto.recommendReply.place.ReadReplyPlaceAllResponse;
-import ultimatum.project.domain.dto.recommendReply.place.ReadReplyPlaceByIdResponse;
+import ultimatum.project.domain.dto.recommendReply.event.*;
+import ultimatum.project.domain.dto.recommendReply.food.*;
+import ultimatum.project.domain.dto.recommendReply.hotel.*;
+import ultimatum.project.domain.dto.recommendReply.place.*;
 import ultimatum.project.service.recommned.RecommendReplyService;
 
 import java.util.List;
@@ -42,61 +30,8 @@ public class RecommendReplyController {
         this.recommendReplyService = recommendReplyService;
     }
 
-    // 새로운 후기 저장
-//    @PostMapping
-//    public ResponseEntity<RecommendReplyResponse> saveReply(@RequestBody RecommendReplyResponse recommendReplyResponse) {
-//        RecommendReplyResponse savedReply = recommendReplyService.saveReply(recommendReplyResponse);
-//        return ResponseEntity.ok(savedReply);
-//    }
-
-//    @PostMapping("/saveRecommendReply")
-//    @Operation(summary = "평점 작성", description = "입력 항목")
-//    public ResponseEntity<RecommendReplyResponse> saveRecommendReply(
-//        @RequestParam("recommendReplyId") Long recommendReplyId,
-//        @RequestParam("recommendReply") String recommendReply,
-//        @RequestParam("recommendReplyStar") Long recommendReplyStar,
-//        @RequestParam("recommendReplyTagValue") List<String> recommendReplyTagValue,
-//        @RequestParam("recommendPlaceId") RecommendListPlace recommendPlaceId,
-//        @RequestParam("recommendFoodId") RecommendListFood recommendFoodId,
-//        @RequestParam("recommendHotelId") RecommendListHotel recommendHotelId,
-//        @RequestParam("recommendEventId") RecommendListEvent recommendEventId) {
-//
-//        // Create the DTO from the request parameters
-//        RecommendReplyResponse recommendReplyResponse = new RecommendReplyResponse(
-//                recommendReplyId, recommendReply, recommendReplyStar, recommendReplyTagValue,
-//                recommendPlaceId, recommendFoodId, recommendHotelId, recommendEventId);
-//
-//        // Assuming there's a service method to save this response
-//        RecommendReplyResponse savedReply = recommendReplyService.saveReply(recommendReplyResponse);
-//
-//        return ResponseEntity.ok(savedReply);
-//    }
-
-//    @PostMapping("/saveRecommendReply")
-//    @Operation(summary = "평점 작성", description = "입력 항목")
-//    public ResponseEntity<RecommendReplyResponse> saveRecommendReply(
-//            @RequestParam("recommendReplyId") Long recommendReplyId,
-//            @RequestParam("recommendReply") String recommendReply,
-//            @RequestParam("recommendReplyStar") Long recommendReplyStar,
-//            @RequestParam("recommendReplyTagValue") List<String> recommendReplyTagValue,
-//            @RequestParam("recommendPlaceId") RecommendListPlace recommendPlaceId,
-//            @RequestParam("recommendFoodId") RecommendListFood recommendFoodId,
-//            @RequestParam("recommendHotelId") RecommendListHotel recommendHotelId,
-//            @RequestParam("recommendEventId") RecommendListEvent recommendEventId) {
-//
-//
-//        // RecommendReplyRequest 객체를 생성하고 파라미터로 전달받은 값을 설정합니다.
-//        RecommendReplyRequest request = new RecommendReplyRequest(
-//                recommendReplyId, recommendReplyStar, recommendReplyTagValue,
-//                recommendPlaceId, recommendFoodId, recommendHotelId, recommendEventId);
-//
-//        // 서비스를 호출하여 리뷰를 생성하고 응답 객체를 반환합니다.
-//        RecommendReplyResponse response = recommendReplyService.saveReply(request);
-//        return new ResponseEntity<>(response, HttpStatus.CREATED);
-//    }
-
     //음식점 평점 작성 - 최종
-    @PostMapping("/saveFoodReply")
+    @PostMapping("/food/save")
     @Operation(summary = "음식점 평점 작성", description = "입력 항목")
     public ResponseEntity<CreateReplyFoodResponse> saveRecommendFoodReply(
             @RequestParam("recommendReplyStar") Long recommendReplyStar,
@@ -114,7 +49,7 @@ public class RecommendReplyController {
     }
 
     //관광지 평점 작성
-    @PostMapping("/savePlaceReply")
+    @PostMapping("/place/save")
     @Operation(summary = "관광지 평점 작성", description = "입력 항목")
     public ResponseEntity<CreateReplyPlaceResponse> saveRecommendPlaceReply(
             @RequestParam("recommendReplyStar") Long recommendReplyStar,
@@ -131,7 +66,7 @@ public class RecommendReplyController {
     }
 
     //숙박 평점 작성
-    @PostMapping("/saveHotelReply")
+    @PostMapping("/hotel/save")
     @Operation(summary = "숙박 평점 작성", description = "입력 항목")
     public ResponseEntity<CreateReplyHotelResponse> saveRecommendHotelReply(
             @RequestParam("recommendReplyStar") Long recommendReplyStar,
@@ -148,7 +83,7 @@ public class RecommendReplyController {
     }
 
     //축제행사 평점 작성
-    @PostMapping("/saveEventReply")
+    @PostMapping("/event/save")
     @Operation(summary = "축제행사 평점 작성", description = "입력 항목")
     public ResponseEntity<CreateReplyEventResponse> saveRecommendEventReply(
             @RequestParam("recommendReplyStar") Long recommendReplyStar,
@@ -165,7 +100,7 @@ public class RecommendReplyController {
     }
 
     //음식점 평점 조회 - 최종
-    @GetMapping("/foodRead/{recommend_food_id}")
+    @GetMapping("/food/reads/star/{recommend_food_id}")
     @Operation(summary = "음식점 평점 조회")
     public ResponseEntity<List<ReadReplyFoodByIdResponse>> getFoodReplies(@PathVariable Long recommend_food_id) {
         List<ReadReplyFoodByIdResponse> responses = recommendReplyService.getRepliesByFoodId(recommend_food_id);
@@ -175,8 +110,19 @@ public class RecommendReplyController {
         return ResponseEntity.ok(responses);
     }
 
+    //음식점 태그 조회
+    @GetMapping("/food/reads/tag/{recommend_food_id}")
+    @Operation(summary = "음식점 태그 조회")
+    public ResponseEntity<List<ReadReplyFoodTagByIdResponse>> getFoodTagReplies(@PathVariable Long recommend_food_id) {
+        List<ReadReplyFoodTagByIdResponse> responses = recommendReplyService.getRepliesByFoodTagId(recommend_food_id);
+        if (responses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(responses);
+    }
+
     //관광지 평점 조회
-    @GetMapping("/placeRead/{recommend_place_id}")
+    @GetMapping("/place/reads/star/{recommend_place_id}")
     @Operation(summary = "관광지 평점 조회")
     public ResponseEntity<List<ReadReplyPlaceByIdResponse>> getPlaceReplies(@PathVariable Long recommend_place_id) {
         List<ReadReplyPlaceByIdResponse> responses = recommendReplyService.getRepliesByPlaceId(recommend_place_id);
@@ -186,8 +132,19 @@ public class RecommendReplyController {
         return ResponseEntity.ok(responses);
     }
 
+    //관광지 태그 조회
+    @GetMapping("/place/reads/tag/{recommend_place_id}")
+    @Operation(summary = "관광지 태그 조회")
+    public ResponseEntity<List<ReadReplyPlaceTagByIdResponse>> getPlaceTagReplies(@PathVariable Long recommend_place_id) {
+        List<ReadReplyPlaceTagByIdResponse> responses = recommendReplyService.getRepliesByPlaceTagId(recommend_place_id);
+        if (responses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(responses);
+    }
+
     //숙박 평점 조회
-    @GetMapping("/placeHotel/{recommend_hotel_id}")
+    @GetMapping("/hotel/reads/star/{recommend_hotel_id}")
     @Operation(summary = "숙박 평점 조회")
     public ResponseEntity<List<ReadReplyHotelByIdResponse>> getHotelReplies(@PathVariable Long recommend_hotel_id) {
         List<ReadReplyHotelByIdResponse> responses = recommendReplyService.getRepliesByHotelId(recommend_hotel_id);
@@ -197,8 +154,19 @@ public class RecommendReplyController {
         return ResponseEntity.ok(responses);
     }
 
+    //숙박 평점 조회
+    @GetMapping("/hotel/reads/tag/{recommend_hotel_id}")
+    @Operation(summary = "숙박 태그 조회")
+    public ResponseEntity<List<ReadReplyHotelTagByIdResponse>> getHotelTagReplies(@PathVariable Long recommend_hotel_id) {
+        List<ReadReplyHotelTagByIdResponse> responses = recommendReplyService.getRepliesByHotelTagId(recommend_hotel_id);
+        if (responses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(responses);
+    }
+
     //축제행사 평점 조회
-    @GetMapping("/placeEvent/{recommend_event_id}")
+    @GetMapping("/event/reads/star/{recommend_event_id}")
     @Operation(summary = "축제행사 평점 조회")
     public ResponseEntity<List<ReadReplyEventByIdResponse>> getEventReplies(@PathVariable Long recommend_event_id) {
         List<ReadReplyEventByIdResponse> responses = recommendReplyService.getRepliesByEventId(recommend_event_id);
@@ -208,9 +176,20 @@ public class RecommendReplyController {
         return ResponseEntity.ok(responses);
     }
 
+    //축제행사 태그 조회
+    @GetMapping("/event/reads/tag/{recommend_event_id}")
+    @Operation(summary = "축제행사 태그 조회")
+    public ResponseEntity<List<ReadReplyEventTagByIdResponse>> getEventTagReplies(@PathVariable Long recommend_event_id) {
+        List<ReadReplyEventTagByIdResponse> responses = recommendReplyService.getRepliesByEventTagId(recommend_event_id);
+        if (responses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(responses);
+    }
+
     // 태그 기반 음식점 조회
     @Operation(summary = "음식점 평점 태그 필터링 조회")
-    @GetMapping("/readAllFood/tag")
+    @GetMapping("/food/reads/all-tag")
     public ResponseEntity<List<ReadReplyFoodAllResponse>> getAllRepliesByTag(
             @RequestParam(value = "recommendReplyTagValue", required = false) String recommendReplyTagValue) {
 
@@ -220,7 +199,7 @@ public class RecommendReplyController {
 
     // 태그 기반 관광지 조회
     @Operation(summary = "관광지 평점 태그 필터링 조회")
-    @GetMapping("/readAllplace/tag")
+    @GetMapping("/place/all/all-tag")
     public ResponseEntity<List<ReadReplyPlaceAllResponse>> findAllReplyPlaceTag(
             @RequestParam(value = "recommendReplyTagValue", required = false) String recommendReplyTagValue) {
 
@@ -230,7 +209,7 @@ public class RecommendReplyController {
 
     // 태그 기반 숙박 조회
     @Operation(summary = "숙박 평점 태그 필터링 조회")
-    @GetMapping("/readAllhotel/tag")
+    @GetMapping("/hotel/read/all-tag")
     public ResponseEntity<List<ReadReplyHotelAllResponse>> findAllReplyHotelTag(
             @RequestParam(value = "recommendReplyTagValue", required = false) String recommendReplyTagValue) {
 
@@ -240,7 +219,7 @@ public class RecommendReplyController {
 
     // 태그 기반 축제행사 조회
     @Operation(summary = "축제행사 평점 태그 필터링 조회")
-    @GetMapping("/readAllevent/tag")
+    @GetMapping("/event/read/all-tag")
     public ResponseEntity<List<ReadReplyEventAllResponse>> findAllReplyEventTag(
             @RequestParam(value = "recommendReplyTagValue", required = false) String recommendReplyTagValue) {
 

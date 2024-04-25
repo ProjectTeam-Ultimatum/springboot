@@ -11,8 +11,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReadReplyPlaceByIdResponse {
+public class ReadReplyPlaceTagByIdResponse {
     private String recommendReply; //Security
-    private Long recommendReplyStar;
+    private List<String> recommendReplyTagValue;
     private Long recommendPlaceId;
 }
