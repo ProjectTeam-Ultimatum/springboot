@@ -15,7 +15,13 @@ public enum ErrorCode {
     /* 400 BAD_REQUEST : 잘못된 요청 */
     INVALID_INPUT_VALUE(400, "BAD_REQUEST", "입력값이 올바르지 않거나 입력되지 않았습니다."),
 
+    MEMBER_ALREADY_EXISTS(400,"MEMBER_ALREADY_EXISTS", "이미 존재하는 회원입니다."),
+
     INVALID_ANSWER_VALUE(400, "BAD_REQUEST", "질문에 관한 답변이 틀렸습니다."),
+
+    INVALID_PASSWORD(400, "BAD_REQUEST", "입력된 비밀번호가 틀렸습니다."),
+
+    INVALID_ANSWER(400, "BAD_REQUEST", "입력된 답변이 틀렸습니다."),
 
     BAD_REQUEST(400, "BAD_REQUEST","잘못된 요청입니다."),
 

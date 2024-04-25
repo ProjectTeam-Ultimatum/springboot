@@ -40,6 +40,12 @@ public class MemberService {
 
     @Transactional
     public String createMember(MemberRequestDto memberRequestDto) {
+
+        Member existingMember = memberRepository.findByMemberEmail(memberRequestDto.getMemberEmail());
+        if (existingMember != null) {
+            throw new CustomException(ErrorCode.MEMBER_ALREADY_EXISTS);
+        }
+
         // 회원 정보 생성
         Member member = Member.builder()
                 .memberName(memberRequestDto.getMemberName())
@@ -195,6 +201,29 @@ public class MemberService {
         message.setSubject("임시 비밀번호 안내");
         message.setText("안녕하세요. 임시 비밀번호는 " + temporaryPassword + "입니다. 로그인 후 비밀번호를 변경해주세요.");
         javaMailSender.send(message);
+    }
+
+    public ResponseEntity<String> deleteMember(String userEmail, String password, String answer) {
+        Member member = memberRepository.findByMemberEmail(userEmail);
+
+        if (member == null) {
+            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+
+        // 비밀번호 확인
+        if (!bCryptPasswordEncoder.matches(password, member.getMemberPassword())) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        // 특정 질문 답변 확인
+        if (!answer.equals(member.getMemberFindPasswordAnswer())) {
+            throw new CustomException(ErrorCode.INVALID_ANSWER);
+        }
+
+        // 회원 삭제
+        memberRepository.delete(member);
+
+        return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
     }
 
 }
