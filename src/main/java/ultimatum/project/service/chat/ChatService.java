@@ -81,6 +81,8 @@ public class ChatService {
     public List<ChatRoomListDto> getConnectedChatRooms(Long memberId) {
         List<Long> roomIds = chatRoomSessionService.getConnectedRoomsForMember(memberId);
         return chatRoomRepository.findAllById(roomIds).stream().map(room -> {
+            Member member = room.getMember();
+            String imageUrl = member.getMemberImages().isEmpty() ? null : member.getMemberImages().get(0).getMemberImageUrl();
             ChatRoomListDto dto = new ChatRoomListDto();
             dto.setChatRoomId(room.getChatRoomId());
             dto.setChatRoomName(room.getChatRoomName());
@@ -89,6 +91,7 @@ public class ChatService {
             dto.setCreatorAge(room.getMember().getMemberAge());
             dto.setTravelStyleTags(room.getTravelStyleTags());
             dto.setReviewLocation(room.getReviewLocation());
+            dto.setCreatorImage(imageUrl);
             dto.setRegDate(room.getRegDate());
             return dto;
         }).collect(Collectors.toList());
