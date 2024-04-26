@@ -83,18 +83,15 @@ public class PlanController {
 
             switch (category) {
                 case "food":
-                    Long recommendFoodId = planDetailDTO.getRecommendFoodId();
-                    PlanFoodDTO foodDTO = new PlanFoodDTO(planDetailDTO.getStayTime(), recommendFoodId, plan);
+                    PlanFoodDTO foodDTO = new PlanFoodDTO(planDetailDTO.getStayTime(), planDetailDTO.getRecommendFoodId(), plan.getPlanId());
                     planService.savePlanFood(foodDTO);
                     break;
                 case "event":
-                    Long recommendEventId = planDetailDTO.getRecommendEventId();
-                    PlanEventDTO eventDTO = new PlanEventDTO(planDetailDTO.getStayTime(), recommendEventId, plan);
+                    PlanEventDTO eventDTO = new PlanEventDTO(planDetailDTO.getStayTime(), planDetailDTO.getRecommendEventId(), plan.getPlanId());
                     planService.savePlanEvent(eventDTO);
                     break;
                 case "place":
-                    Long recommendPlaceId = planDetailDTO.getRecommendPlaceId();
-                    PlanPlaceDTO placeDTO = new PlanPlaceDTO(planDetailDTO.getStayTime(), recommendPlaceId, plan);
+                    PlanPlaceDTO placeDTO = new PlanPlaceDTO(planDetailDTO.getStayTime(), planDetailDTO.getRecommendPlaceId(), plan.getPlanId());
                     planService.savePlanPlace(placeDTO);
                     break;
                 default:
@@ -110,9 +107,14 @@ public class PlanController {
     @PostMapping("/addHotel")
     public ResponseEntity<?> addHotel(@RequestBody HotelRequest hotelRequest) {
         try {
-            PlanHotel planHotel = planService.savePlanHotel(hotelRequest.getPlanDayId(), hotelRequest.getHotelId());
+            PlanHotelDTO planHotelDTO = new PlanHotelDTO();
+            planHotelDTO.setPlanDayId(hotelRequest.getPlanDayId());
+            planHotelDTO.setRecommendHotelId(hotelRequest.getHotelId());
+
+            PlanHotel planHotel = planService.savePlanHotel(planHotelDTO);
             return ResponseEntity.ok(planHotel);
         } catch (RuntimeException e) {
+            logger.error("Error adding hotel: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }

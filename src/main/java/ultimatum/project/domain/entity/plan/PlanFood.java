@@ -21,14 +21,26 @@ public class PlanFood {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long planFoodId;
 
-    private LocalTime planFoodStayTime;
-
-    @ManyToOne
-    @JoinColumn(name = "recommend_food_id")
-    private RecommendListFood recommendListFoods;
-
     @ManyToOne
     @JoinColumn(name = "plan_id")
     private Plan plan;
+
+    @ManyToOne
+    @JoinColumn(name = "plan_day_id")
+    private PlanDay planDay;
+
+    @ManyToOne
+    @JoinColumn(name = "recommend_food_id")
+    private RecommendListFood recommendFood;
+
+    private LocalTime planFoodStayTime;
+
+    // 생성자
+    public PlanFood(Plan plan, PlanDay planDay, RecommendListFood recommendFood, LocalTime planFoodStayTime) {
+        this.plan = plan;
+        this.planDay = planDay;
+        this.recommendFood = recommendFood;
+        this.planFoodStayTime = planFoodStayTime;
+    }
 
 }

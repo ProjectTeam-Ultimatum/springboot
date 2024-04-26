@@ -24,4 +24,8 @@ public class PlanHotel {
     @JoinColumn(name = "plan_day_id")
     private PlanDay planDay;
 
+    public PlanHotel(PlanDay planDay, RecommendListHotel recommendHotel) {
+        this.planDay = planDay;
+        this.recommendHotel = recommendHotel;
+    }
 }

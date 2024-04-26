@@ -16,5 +16,5 @@ import java.time.LocalTime;
 public class PlanEventDTO {
     private LocalTime stayTime;
     private Long  recommendEventId;
-    private Plan  planId;
+    private Long  planId;
 }

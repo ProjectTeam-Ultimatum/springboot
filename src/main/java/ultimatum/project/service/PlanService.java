@@ -1,10 +1,12 @@
 package ultimatum.project.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ultimatum.project.domain.dto.PlanRequest;
 import ultimatum.project.domain.dto.plan.*;
 import ultimatum.project.domain.entity.event.RecommendListEvent;
 import ultimatum.project.domain.entity.food.RecommendListFood;
@@ -13,20 +15,20 @@ import ultimatum.project.domain.entity.place.RecommendListPlace;
 import ultimatum.project.domain.entity.plan.*;
 import ultimatum.project.repository.PlanDayRepository;
 import ultimatum.project.repository.PlanRepository;
-import ultimatum.project.domain.dto.PlanRequest; // 필요한 경우 import 추가
 import ultimatum.project.repository.event.RecommendListEventRepository;
 import ultimatum.project.repository.food.RecommendListFoodRepository;
 import ultimatum.project.repository.hotel.RecommendListHotelRepository;
 import ultimatum.project.repository.place.RecommendListPlaceRepository;
-import ultimatum.project.repository.plan.*;
+import ultimatum.project.repository.plan.PlanEventRepository;
+import ultimatum.project.repository.plan.PlanFoodRepository;
+import ultimatum.project.repository.plan.PlanHotelRepository;
+import ultimatum.project.repository.plan.PlanPlaceRepository;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class PlanService {
 
     private final Logger logger = LoggerFactory.getLogger(PlanService.class);
@@ -51,7 +53,6 @@ public class PlanService {
     @Autowired
     private RecommendListEventRepository recommendEventRepository;
 
-
     public Plan createPlan(PlanRequest planRequest) {
         logger.info("Received plan request: {}", planRequest);
 
@@ -65,141 +66,124 @@ public class PlanService {
                 .planEndDay(planRequest.getPlanEndDay())
                 .planTitle(planRequest.getPlanTitle())
                 .build();
-        plan = planRepository.save(plan);
+        planRepository.save(plan);
 
         List<PlanDay> planDays = createAndSavePlanDays(plan, planRequest.getPlanDays());
-        final Plan finalPlan = plan;
-        planDays.forEach(planDay -> {
-            savePlanDetails(finalPlan.getPlanId(), planDay.getPlanDayId(), planRequest);
-        });
+        planDays.forEach(planDay -> savePlanDetails(plan, planDay, planRequest));
 
         return plan;
     }
 
-    private void savePlanDetails(Long planId, Long planDayId, PlanRequest planRequest) {
-        Plan plan = planRepository.findById(planId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid plan ID: " + planId));
-        PlanDay planDay = planDayRepository.findById(planDayId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid plan day ID: " + planDayId));
 
-        savePlanFoods(plan, planRequest.getPlanFoods());
-        savePlanEvents(plan, planRequest.getPlanEvents());
-        savePlanPlaces(plan, planRequest.getPlanPlaces());
-        savePlanHotels(planDay, planRequest.getPlanHotels());  // 이제 planDay 객체 사용
+    public void savePlanDetails(Plan plan, PlanDay planDay, PlanRequest planRequest) {
+        savePlanFoods(plan, planDay, planRequest.getPlanFoods());
+        savePlanEvents(plan, planDay, planRequest.getPlanEvents());
+        savePlanPlaces(plan, planDay, planRequest.getPlanPlaces());
+        savePlanHotels(planDay, planRequest.getPlanHotels());
     }
 
-    private void savePlanFoods(Plan plan, List<PlanFoodDTO> planFoods) {
+    private void savePlanFoods(Plan plan, PlanDay planDay, List<PlanFoodDTO> planFoods) {
         for (PlanFoodDTO dto : planFoods) {
-            RecommendListFood food = recommendFoodRepository.findById(dto.getRecommendFoodId())
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid food ID: " + dto.getRecommendFoodId()));
-            PlanFood planFood = new PlanFood();
-            planFood.setPlan(plan); // Plan 객체 설정
-            planFood.setRecommendListFoods(food);
-            planFood.setPlanFoodStayTime(dto.getStayTime());
-            planFoodRepository.save(planFood);
+            if (!planFoodRepository.existsByPlanAndRecommendFoodId(plan.getPlanId(), dto.getRecommendFoodId())) {
+                RecommendListFood food = recommendFoodRepository.findById(dto.getRecommendFoodId())
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid food ID: " + dto.getRecommendFoodId()));
+                PlanFood planFood = new PlanFood(plan, planDay, food, dto.getStayTime());
+                planFoodRepository.save(planFood);
+            }
         }
     }
 
-
-
-
-    private void savePlanPlaces(Plan plan, List<PlanPlaceDTO> planPlaces) {
-        for (PlanPlaceDTO dto : planPlaces) {
-            RecommendListPlace place = recommendPlaceRepository.findById(dto.getRecommendPlaceId())
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid Place ID: " + dto.getRecommendPlaceId()));
-            PlanPlace planPlace = new PlanPlace();
-            planPlace.setPlan(plan); // Plan 객체 설정
-            planPlace.setRecommendListPlaces(place);
-            planPlace.setPlanPlaceStayTime(dto.getStayTime());
-            planPlaceRepository.save(planPlace);
-        }
-    }
-
-    private void savePlanEvents(Plan plan, List<PlanEventDTO> planEvents) {
+    private void savePlanEvents(Plan plan, PlanDay planDay, List<PlanEventDTO> planEvents) {
         for (PlanEventDTO dto : planEvents) {
-            RecommendListEvent event = recommendEventRepository.findById(dto.getRecommendEventId())
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid Event ID: " + dto.getRecommendEventId()));
-            PlanEvent planEvent = new PlanEvent();
-            planEvent.setPlan(plan); // Plan 객체 설정
-            planEvent.setRecommendListEvents(event);
-            planEvent.setPlanEventStayTime(dto.getStayTime());
-            planEventRepository.save(planEvent);
+            if (!planEventRepository.existsByPlanIdAndEventId(plan.getPlanId(), dto.getRecommendEventId())) {
+                RecommendListEvent event = recommendEventRepository.findById(dto.getRecommendEventId())
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid event ID: " + dto.getRecommendEventId()));
+                PlanEvent planEvent = new PlanEvent(plan, planDay, event, dto.getStayTime());
+                planEventRepository.save(planEvent);
+            }
+        }
+    }
+
+    private void savePlanPlaces(Plan plan, PlanDay planDay, List<PlanPlaceDTO> planPlaces) {
+        for (PlanPlaceDTO dto : planPlaces) {
+            if (!planPlaceRepository.existsByPlanIdAndPlaceId(plan.getPlanId(), dto.getRecommendPlaceId())) {
+                RecommendListPlace place = recommendPlaceRepository.findById(dto.getRecommendPlaceId())
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid place ID: " + dto.getRecommendPlaceId()));
+                PlanPlace planPlace = new PlanPlace(plan, planDay, place, dto.getStayTime());
+                planPlaceRepository.save(planPlace);
+            }
         }
     }
 
     private void savePlanHotels(PlanDay planDay, List<PlanHotelDTO> planHotels) {
-        if (planHotels == null) {
-            logger.warn("No plan hotels to save for PlanDay ID: {}", planDay.getPlanDayId());
-            return;
-        }
-
         planHotels.forEach(hotelDTO -> {
             RecommendListHotel hotel = recommendHotelRepository.findById(hotelDTO.getRecommendHotelId())
                     .orElseThrow(() -> new RuntimeException("Hotel not found with ID: " + hotelDTO.getRecommendHotelId()));
-
-            PlanHotel planHotel = PlanHotel.builder()
-                    .planDay(planDay)
-                    .recommendHotel(hotel)
-                    .build();
-
-            planHotelRepository.save(planHotel);
+            if (!planHotelRepository.existsByPlanDayAndRecommendHotel_RecommendHotelId(planDay, hotelDTO.getRecommendHotelId())) {
+                PlanHotel planHotel = PlanHotel.builder()
+                        .planDay(planDay)
+                        .recommendHotel(hotel)
+                        .build();
+                planHotelRepository.save(planHotel);
+            }
         });
     }
 
+    public void savePlanFood(PlanFoodDTO planFoodDTO) {
+        Plan plan = planRepository.findById(planFoodDTO.getPlanId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid plan ID: " + planFoodDTO.getPlanId()));
 
-    public PlanFood savePlanFood(PlanFoodDTO planFoodDTO) {
-        // DTO에서 제공된 ID를 사용하여 RecommendListFood 객체를 찾습니다.
-        RecommendListFood recommendFood = recommendFoodRepository.findById(planFoodDTO.getRecommendFoodId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid food ID: " + planFoodDTO.getRecommendFoodId()));
-
-        PlanFood planFood = PlanFood.builder()
-                .plan(planFoodDTO.getPlanId())
-                .recommendListFoods(recommendFood)
-                .planFoodStayTime(planFoodDTO.getStayTime())
-                .build();
-        return planFoodRepository.save(planFood);
+        if (!planFoodRepository.existsByPlanAndRecommendFoodId(plan.getPlanId(), planFoodDTO.getRecommendFoodId())) {
+            RecommendListFood food = recommendFoodRepository.findById(planFoodDTO.getRecommendFoodId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid food ID: " + planFoodDTO.getRecommendFoodId()));
+            PlanFood planFood = new PlanFood(plan, null, food, planFoodDTO.getStayTime());  // 여기에서 PlanDay를 null로 설정하는 것을 개선해야 함
+            planFoodRepository.save(planFood);
+        }
     }
 
-    public PlanEvent savePlanEvent(PlanEventDTO planEventDTO) {
-        // DTO에서 제공된 ID를 사용하여 RecommendListEvent 객체를 찾습니다.
-        RecommendListEvent recommendEvent = recommendEventRepository.findById(planEventDTO.getRecommendEventId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid event ID: " + planEventDTO.getRecommendEventId()));
+    public void savePlanEvent(PlanEventDTO planEventDTO) {
+        Plan plan = planRepository.findById(planEventDTO.getPlanId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid plan ID: " + planEventDTO.getPlanId()));
 
-        PlanEvent planEvent = PlanEvent.builder()
-                .plan(planEventDTO.getPlanId())
-                .recommendListEvents(recommendEvent)
-                .planEventStayTime(planEventDTO.getStayTime())
-                .build();
-        return planEventRepository.save(planEvent);
+        if (!planEventRepository.existsByPlanIdAndEventId(plan.getPlanId(), planEventDTO.getRecommendEventId())) {
+            RecommendListEvent event = recommendEventRepository.findById(planEventDTO.getRecommendEventId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid event ID: " + planEventDTO.getRecommendEventId()));
+            PlanEvent planEvent = new PlanEvent(plan, null, event, planEventDTO.getStayTime());  // 여기에서 PlanDay를 null로 설정하는 것을 개선해야 함
+            planEventRepository.save(planEvent);
+        }
     }
 
-    public PlanPlace savePlanPlace(PlanPlaceDTO planPlaceDTO) {
-        // DTO에서 제공된 ID를 사용하여 RecommendListPlace 객체를 찾습니다.
-        RecommendListPlace recommendPlace = recommendPlaceRepository.findById(planPlaceDTO.getRecommendPlaceId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid place ID: " + planPlaceDTO.getRecommendPlaceId()));
+    public void savePlanPlace(PlanPlaceDTO planPlaceDTO) {
+        Plan plan = planRepository.findById(planPlaceDTO.getPlanId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid plan ID: " + planPlaceDTO.getPlanId()));
 
-        PlanPlace planPlace = PlanPlace.builder()
-                .plan(planPlaceDTO.getPlanId())
-                .recommendListPlaces(recommendPlace)
-                .planPlaceStayTime(planPlaceDTO.getStayTime())
-                .build();
-        return planPlaceRepository.save(planPlace);
+        if (!planPlaceRepository.existsByPlanIdAndPlaceId(plan.getPlanId(), planPlaceDTO.getRecommendPlaceId())) {
+            RecommendListPlace place = recommendPlaceRepository.findById(planPlaceDTO.getRecommendPlaceId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid event ID: " + planPlaceDTO.getRecommendPlaceId()));
+            PlanPlace planPlace = new PlanPlace(plan, null, place, planPlaceDTO.getStayTime());  // 여기에서 PlanDay를 null로 설정하는 것을 개선해야 함
+            planPlaceRepository.save(planPlace);
+        }
     }
 
-    public PlanHotel savePlanHotel(Long planDayId, Long hotelId) {
-        PlanDay planDay = planDayRepository.findById(planDayId)
-                .orElseThrow(() -> new RuntimeException("PlanDay not found with the given ID"));
-        RecommendListHotel hotel = recommendHotelRepository.findById(hotelId)
-                .orElseThrow(() -> new RuntimeException("Hotel not found with the given ID"));
 
-        PlanHotel planHotel = PlanHotel.builder()
-                .planDay(planDay) // 변경된 필드 이름 사용
-                .recommendHotel(hotel) // 일관성을 위해 변경
-                .build();
-        return planHotelRepository.save(planHotel);
+    public PlanHotel savePlanHotel(PlanHotelDTO planHotelDTO) {
+        PlanDay planDay = planDayRepository.findById(planHotelDTO.getPlanDayId())
+                .orElseThrow(() -> new IllegalArgumentException("PlanDay ID " + planHotelDTO.getPlanDayId() + " not found"));
+
+        if (!planHotelRepository.existsByPlanDayAndRecommendHotel_RecommendHotelId(planDay, planHotelDTO.getRecommendHotelId())) {
+            RecommendListHotel hotel = recommendHotelRepository.findById(planHotelDTO.getRecommendHotelId())
+                    .orElseThrow(() -> new RuntimeException("Hotel not found with ID: " + planHotelDTO.getRecommendHotelId()));
+            PlanHotel planHotel = new PlanHotel(planDay, hotel);
+            return planHotelRepository.save(planHotel);
+        }
+        // 만약 이미 저장된 PlanHotel 객체가 있을 경우에는 null이 아닌 해당 PlanHotel 객체를 반환하도록 수정할 수 있습니다.
+        return null;
     }
 
-    public  List<PlanDay> createAndSavePlanDays(Plan plan, List<PlanRequest.PlanDayRequest> planDaysRequest) {
+
+
+
+    public List<PlanDay> createAndSavePlanDays(Plan plan, List<PlanRequest.PlanDayRequest> planDaysRequest) {
         List<PlanDay> planDays = planDaysRequest.stream().map(dayRequest -> PlanDay.builder()
                 .plan(plan)
                 .planDate(dayRequest.getDate())

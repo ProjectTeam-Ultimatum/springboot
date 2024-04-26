@@ -13,5 +13,5 @@ import ultimatum.project.domain.entity.plan.PlanDay;
 @AllArgsConstructor
 public class PlanHotelDTO {
     private Long recommendHotelId;
-    private PlanDay planDayId;
+    private Long planDayId;
 }
