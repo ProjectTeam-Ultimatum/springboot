@@ -31,14 +31,18 @@ public class MemberImageService {
 
         for (MultipartFile file : files) {
             try {
-                String fileUri = memberS3Service.uploadFileToS3(file);  // S3 업로드 로직을 서비스로 이동
+                // 고유한 파일명 생성
+                String uniqueFileName = generateUniqueFileName(member, file);
+
+                // S3에 고유한 파일명으로 파일 업로드
+                String fileUri = memberS3Service.uploadFileToS3(uniqueFileName, file);
 
                 // MemberImage 객체 생성 및 저장
                 MemberImage memberImage = new MemberImage();
-                memberImage.setMemberImageName(StringUtils.cleanPath(file.getOriginalFilename()));
-                memberImage.setMemberImageUrl(fileUri); //s3 파일 uri 설정
+                memberImage.setMemberImageName(uniqueFileName); // 고유한 파일명 설정
+                memberImage.setMemberImageUrl(fileUri);
                 memberImage.setMember(member);
-                memberImages.add(memberImage); // 올바른 리스트에 객체를 추가
+                memberImages.add(memberImage); // 리스트에 객체 추가
 
             } catch (IOException e) {
                 throw new RuntimeException("이미지 저장 실패" + file.getOriginalFilename(), e);
@@ -46,6 +50,7 @@ public class MemberImageService {
         }
         return memberImages;
     }
+
 
     @Transactional
     public MemberImage updateMemberImage(Member member, MultipartFile file) {
@@ -58,7 +63,9 @@ public class MemberImageService {
             }
 
             // 새 이미지를 S3에 업로드하고 데이터베이스에 저장
-            String fileUri = memberS3Service.uploadFileToS3(file);
+            String uniqueFileName = generateUniqueFileName(member, file); // 고유한 파일명 생성
+            String fileUri = memberS3Service.uploadFileToS3(uniqueFileName, file); // S3에 업로드
+
             MemberImage newImage = new MemberImage();
             newImage.setMemberImageName(StringUtils.cleanPath(file.getOriginalFilename()));
             newImage.setMemberImageUrl(fileUri);
@@ -70,6 +77,15 @@ public class MemberImageService {
             log.error("이미지 업데이트 실패: {}", file.getOriginalFilename(), e);
             throw new RuntimeException("이미지 업데이트 실패: " + file.getOriginalFilename(), e);
         }
+    }
+
+    // 회원 정보와 파일을 이용하여 고유한 파일명 생성
+    private String generateUniqueFileName(Member member, MultipartFile file) {
+        // 회원 ID와 현재 타임스탬프를 이용하여 파일명 생성
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
+        String uniqueFileName = member.getMemberId() + "_" + timestamp + "_" + originalFilename;
+        return uniqueFileName;
     }
 
 }
