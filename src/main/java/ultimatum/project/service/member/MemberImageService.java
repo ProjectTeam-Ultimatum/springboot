@@ -46,4 +46,30 @@ public class MemberImageService {
         }
         return memberImages;
     }
+
+    @Transactional
+    public MemberImage updateMemberImage(Member member, MultipartFile file) {
+        try {
+            // 기존 이미지가 있는지 확인하고 S3에서 삭제
+            MemberImage existingImage = member.getMemberImages().stream().findFirst().orElse(null);
+            if (existingImage != null) {
+                memberS3Service.deleteFileFromS3(existingImage.getMemberImageUrl());
+                imageRepository.delete(existingImage);
+            }
+
+            // 새 이미지를 S3에 업로드하고 데이터베이스에 저장
+            String fileUri = memberS3Service.uploadFileToS3(file);
+            MemberImage newImage = new MemberImage();
+            newImage.setMemberImageName(StringUtils.cleanPath(file.getOriginalFilename()));
+            newImage.setMemberImageUrl(fileUri);
+            newImage.setMember(member);
+
+            return imageRepository.save(newImage);
+
+        } catch (IOException e) {
+            log.error("이미지 업데이트 실패: {}", file.getOriginalFilename(), e);
+            throw new RuntimeException("이미지 업데이트 실패: " + file.getOriginalFilename(), e);
+        }
+    }
+
 }

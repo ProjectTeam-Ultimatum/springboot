@@ -14,12 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDto;
 import ultimatum.project.domain.dto.logInDTO.MemberFindPasswordRequestDto;
 import ultimatum.project.domain.dto.logInDTO.MemberRequestDto;
+import ultimatum.project.domain.dto.logInDTO.MemberUpdateRequestDto;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.domain.entity.member.MemberImage;
 import ultimatum.project.global.config.Security.jwt.JwtProperties;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import ultimatum.project.repository.member.MemberImageRepository;
 import ultimatum.project.repository.member.MemberRepository;
 
 import java.util.Date;
@@ -38,9 +40,10 @@ public class MemberService {
     @Autowired
     private JavaMailSender javaMailSender;
 
+    private final MemberImageRepository memberImageRepository; // MemberImageRepository 주입
+
     @Transactional
     public String createMember(MemberRequestDto memberRequestDto) {
-
         Member existingMember = memberRepository.findByMemberEmail(memberRequestDto.getMemberEmail());
         if (existingMember != null) {
             throw new CustomException(ErrorCode.MEMBER_ALREADY_EXISTS);
@@ -175,13 +178,6 @@ public class MemberService {
     }
 
     private String generateRandomPassword() {
-
-        /**
-         * StringBuilder: 문자열을 효율적으로 처리하기 위한 클래스로, 비밀번호를 생성할 때 사용됩니다.
-         * randomIndex: 0부터 characters 문자열 길이 사이의 난수를 생성하여 무작위로 문자를 선택합니다.
-         * sb.append(characters.charAt(randomIndex)): 무작위로 선택된 문자를 StringBuilder에 추가합니다.
-         */
-
         int length = 10;
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
         StringBuilder sb = new StringBuilder();
@@ -225,5 +221,30 @@ public class MemberService {
 
         return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
     }
+
+    // 사용자 정보 업데이트 메서드
+    public ResponseEntity<String> updateMemberInfo(String userEmail, MemberUpdateRequestDto updateRequestDto) {
+        Member member = memberRepository.findByMemberEmail(userEmail);
+
+        if (member == null) {
+            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+
+        // 요청된 업데이트 필드를 검사하여 업데이트
+        if (updateRequestDto.getMemberAge() != null ) {
+            member.setMemberAge(updateRequestDto.getMemberAge());
+        }
+
+        if (updateRequestDto.getMemberAddress() != null && !updateRequestDto.getMemberAddress().isEmpty()) {
+            member.setMemberAddress(updateRequestDto.getMemberAddress());
+        }
+
+        // 변경된 회원 정보 저장
+        memberRepository.save(member);
+
+        return ResponseEntity.ok("회원 정보가 성공적으로 업데이트되었습니다.");
+    }
+
+
 
 }

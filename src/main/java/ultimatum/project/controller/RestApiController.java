@@ -3,6 +3,7 @@ package ultimatum.project.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,11 +12,13 @@ import org.springframework.web.multipart.MultipartFile;
 import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDto;
 import ultimatum.project.domain.dto.logInDTO.MemberFindPasswordRequestDto;
 import ultimatum.project.domain.dto.logInDTO.MemberRequestDto;
+import ultimatum.project.domain.dto.logInDTO.MemberUpdateRequestDto;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.domain.entity.member.MemberImage;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
 import ultimatum.project.service.member.KakaoService;
+import ultimatum.project.service.member.MemberImageService;
 import ultimatum.project.service.member.MemberService;
 import ultimatum.project.repository.member.MemberRepository;
 import ultimatum.project.global.config.Security.auth.PrincipalDetails;
@@ -35,6 +38,7 @@ public class RestApiController {
     private final MemberRepository memberRepository;
     private final MemberService memberService;
     private final KakaoService kakaoService;
+    private final MemberImageService memberImageService;
 
     // 모든 사람이 접근 가능
     @GetMapping("/home")
@@ -224,6 +228,41 @@ public class RestApiController {
         }
 
         return response;
+    }
+
+    @PostMapping("/user/update-info")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<String> updateMemberInfo(
+            @RequestParam String userEmail,
+            @RequestBody MemberUpdateRequestDto updateRequestDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+
+        if (!loggedInUserEmail.equals(userEmail)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        return memberService.updateMemberInfo(userEmail, updateRequestDto);
+    }
+
+    // 프로필 이미지 업데이트
+    @PostMapping("/profile-image")
+    public ResponseEntity<String> updateProfileImage(
+            Authentication authentication,
+            @RequestParam("imageFile") MultipartFile imageFile
+    ) {
+        try {
+            // PrincipalDetails에서 Member 객체 추출
+            PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+            Member loggedInMember = principalDetails.getUser();
+
+            // 이미지 파일을 사용하여 이미지 업데이트 로직 수행
+            MemberImage updatedImage = memberImageService.updateMemberImage(loggedInMember, imageFile);
+            return ResponseEntity.ok("프로필 이미지가 업데이트되었습니다.");
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 업데이트 실패: " + e.getMessage());
+        }
     }
 
 }
