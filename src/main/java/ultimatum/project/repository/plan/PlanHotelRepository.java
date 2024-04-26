@@ -18,5 +18,5 @@ public interface PlanHotelRepository extends JpaRepository<PlanHotel, Long> {
     @Query("SELECT COUNT(pf) > 0 FROM PlanHotel pf WHERE pf.planDay.planDayId = :planId AND pf.recommendHotel.recommendHotelId = :hotelId")
     boolean existsByPlanDayAndRecommendHotelId(Long planId, Long hotelId);
 
-    Optional<PlanHotel> findByPlanDayId(Long planDayId);
+    Optional<PlanHotel> findByPlanDay(PlanDay planDay);
 }

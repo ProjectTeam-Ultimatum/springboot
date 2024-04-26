@@ -124,9 +124,11 @@ public class PlanService {
             log.info("🎉 roof");
 
 
-            planHotelRepository.findByPlanDayId(planDay.getPlanDayId());
-
-            if (!planHotelRepository.existsByPlanDayAndRecommendHotelId(planDay.getPlanDayId(), hotelDTO.getRecommendHotelId())) {
+//            PlanHotel planHotelTest = planHotelRepository.findByPlanDay(planDay)
+//                    .orElseThrow(()-> new RuntimeException("error "));
+//
+//            log.info("😘 plan day {} 에 해당하는 호텔 {}",planDay.getPlanDayId(),planHotelTest.getRecommendHotel());
+            if (planHotelRepository.findByPlanDay(planDay).isEmpty()) {
                 log.info("🐱‍💻 plandayId : {}", planDay.getPlanDayId());
                 PlanHotel planHotel = PlanHotel.builder()
                         .planDay(planDay)
