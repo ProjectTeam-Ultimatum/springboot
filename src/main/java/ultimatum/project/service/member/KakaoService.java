@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDTO1;
 import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDto;
 
 import java.io.*;
@@ -33,11 +34,13 @@ public class KakaoService {
             // POST 요청을 수행하려면 setDoOutput()을 true로 설정한다.
             conn.setDoOutput(true);
 
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
             // POST 요청에서 필요한 파라미터를 OutputStream을 통해 전송
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
             String sb = "grant_type=authorization_code" +
                     "&client_id=100bde42d2ac4c0bf9cf54655e5395cc" + // REST_API_KEY
-                    "&redirect_uri=http://localhost:8080/kakaologin" + // REDIRECT_URI
+                    "&redirect_uri=http://localhost:8081/social" + // REDIRECT_URI
                     "&code=" + code;
             bufferedWriter.write(sb);
             bufferedWriter.flush();
@@ -72,7 +75,7 @@ public class KakaoService {
         return accessToken;
     }
 
-    public KakaoUserInfoDto getKakaoUserInfo(String accessToken) {
+    public KakaoUserInfoDTO1 getKakaoUserInfo(String accessToken) {
         String requestUrl = "https://kapi.kakao.com/v2/user/me";
         log.info("requestUrl : {}",requestUrl);
 
@@ -85,12 +88,12 @@ public class KakaoService {
 
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<KakaoUserInfoDto> response = restTemplate.exchange(
-                requestUrl, HttpMethod.GET, entity, KakaoUserInfoDto.class
+        ResponseEntity<KakaoUserInfoDTO1> response = restTemplate.exchange(
+                requestUrl, HttpMethod.GET, entity, KakaoUserInfoDTO1.class
         );
         log.info("response:{}",response);
 
-        KakaoUserInfoDto kakaoUserInfoDto = response.getBody();
+        KakaoUserInfoDTO1 kakaoUserInfoDto = response.getBody();
         if (kakaoUserInfoDto != null) {
             String nickname = kakaoUserInfoDto.getProperties() != null ? kakaoUserInfoDto.getProperties().getNickname() : null;
             String email = kakaoUserInfoDto.getKakao_account() != null ? kakaoUserInfoDto.getKakao_account().getEmail() : null;

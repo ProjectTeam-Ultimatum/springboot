@@ -27,4 +27,6 @@ public class MemberWithKakaoResponseDto {
 
     // 프로필 사진
     private List<MemberImageResponseDto> files;
+
+    private boolean newMember;
 }
