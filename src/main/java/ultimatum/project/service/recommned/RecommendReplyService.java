@@ -30,10 +30,10 @@ import ultimatum.project.repository.place.RecommendListPlaceRepository;
 import ultimatum.project.repository.reply.RecommendReplyRepository;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.OptionalDouble;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Log4j2
 @Service
@@ -121,13 +121,13 @@ public class RecommendReplyService {
             throw new IllegalArgumentException("평점은 1에서 5 사이여야 합니다.");
         }
 
-        // 태그 리스트를 JSON 문자열 변환
+        // 태그 리스트를 JSON String 변환
         String jsonTags = JsonUtil.toJson(request.getRecommendReplyTagValue());
 
         // RecommendReply 객체를 Builder 패턴 이용하여 생성
         RecommendReply recommendReply = RecommendReply.builder()
                 .recommendReplyStar(recommendReplyStar)
-                .recommendReplyTagValue(jsonTags) // 태그 목록을 JSON 형태로 저장
+                .recommendReplyTagValue(jsonTags) // DB 저장
                 .recommendPlaceId(recommendPlace)
                 .build();
 
@@ -140,7 +140,7 @@ public class RecommendReplyService {
         // 최종적으로 생성된 RecommendReply 객체를 이용하여 응답 객체를 생성하고 반환합니다.
         return new CreateReplyPlaceResponse(
                 recommendReply.getRecommendReplyStar(),
-                JsonUtil.fromJson(jsonTags), // JSON 문자열을 다시 리스트로 변환
+                JsonUtil.fromJson(jsonTags), // JSON 문자열을 다시 리스트로 변환, 태그 데이터를 사용
                 recommendPlace != null ? recommendPlace.getRecommendPlaceId() : null
         );
     }
@@ -169,6 +169,8 @@ public class RecommendReplyService {
                 .recommendReplyTagValue(request.getRecommendReplyTagValue().toString()) //string, List<string> 타입 맞춤
                 .recommendHotelId(recommendHotel)
                 .build();
+
+        log.info(request.getRecommendReplyTagValue().toString());
 
         // 수정된 엔티티를 저장합니다.
         recommendReply = recommendReplyRepository.save(recommendReply);
@@ -217,7 +219,7 @@ public class RecommendReplyService {
         return new CreateReplyEventResponse(
                 recommendReply.getRecommendReplyStar(),
                 recommendReply.getRecommendReplyTagValue() != null
-                        ? recommendReply.getRecommendReplyTagValue() // JSON을 List<String>로 변환
+                        ? recommendReply.getRecommendReplyTagValue() // JSON을 List<String>로 저장.
                         : List.of(),
                 recommendReply.getRecommendEventId() != null
                         ? recommendReply.getRecommendEventId().getRecommendEventId() // 축제행사 ID만을 보내도록 보장
@@ -293,6 +295,34 @@ public class RecommendReplyService {
                         reply.getRecommendPlaceId() != null ? reply.getRecommendPlaceId().getRecommendPlaceId() : null // 적절한 ID 접근 방식으로 수정
                 ))
                 .collect(Collectors.toList());
+    }
+
+    //관광지 태그카운트 ID 조회
+    public List<Map.Entry<String, Long>> getTagsWithCountsByPlaceId(Long recommendPlaceId) {
+        // 지정된 recommendPlaceId에 대한 모든 후기에서 태그 리스트를 추출합니다.
+        List<String> tags = recommendReplyRepository.findByRecommendPlaceId_RecommendPlaceId(recommendPlaceId).stream()
+                .flatMap(reply -> {
+                    List<String> tagList = reply.getRecommendReplyTagValue();
+                    if (tagList == null || tagList.isEmpty()) {
+                        log.info("tagValue가 비어 있습니다.");
+                        return Stream.empty();
+                    } else {
+                        return tagList.stream();
+                    }
+                })
+                .collect(Collectors.toList());
+
+        // 추출된 각 태그의 등장 빈도수를 계산합니다.
+        Map<String, Long> tagFrequency = tags.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        // 태그 빈도수를 내림차순으로 정렬합니다.
+        List<Map.Entry<String, Long>> sortedTagFrequency = tagFrequency.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .collect(Collectors.toList());
+
+        log.info("태그 카운트: {}", sortedTagFrequency);
+        return sortedTagFrequency;
     }
 
     //관광지 평점 평균 계산

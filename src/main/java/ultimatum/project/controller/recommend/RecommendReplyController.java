@@ -16,6 +16,7 @@ import ultimatum.project.domain.entity.recommendReply.RecommendReply;
 import ultimatum.project.service.recommned.RecommendReplyService;
 
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "recommend", description = "평점정보")
 @Log4j2
@@ -157,6 +158,16 @@ public class RecommendReplyController {
         return ResponseEntity.ok(responses);
     }
 
+    @GetMapping("/place/reads/tag-couting/{recommend_place_id}")
+    @Operation(summary = "관광지 태그 카운팅")
+    public ResponseEntity<List<Map.Entry<String, Long>>> getPlaceTagFrequencies(@PathVariable("recommend_place_id") Long recommendPlaceId) {
+        List<Map.Entry<String, Long>> tagFrequencies = recommendReplyService.getTagsWithCountsByPlaceId(recommendPlaceId);
+        if (tagFrequencies.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(tagFrequencies);
+    }
+
 
     //관광지 평균 평점 계산
     @GetMapping("/place/average/star/{recommend_place_id}")
@@ -288,28 +299,6 @@ public class RecommendReplyController {
         List<ReadRecommendReplyAllResponse> allReplies = recommendReplyService.getReplyAll();
         return ResponseEntity.ok(allReplies);
     }
-
-    //음식점 평점 1개 조회
-//    @GetMapping("/food/{recommend_food_id}")
-//    @Operation(summary = "음식점평점 id 조회")
-//    public ResponseEntity<ReadReplyFoodAllResponse> getByIdListPlaces(@PathVariable Long recommend_food_id) {
-//        ReadReplyFoodAllResponse foodAllResponse = recommendReplyService.getReplyFoodById(recommend_food_id);
-//        return ResponseEntity.ok(foodAllResponse);
-//    }
-
-//    @GetMapping("/food/{recommendFoodId}")
-//    @Operation(summary = "음식점 평점 리스트 조회", description = "음식점 ID에 대한 모든 평점을 조회합니다.")
-//    public ResponseEntity<List<ReadReplyFoodAllResponse>> getFoodRepliesByFoodId(@PathVariable Long recommendFoodId) {
-//        List<ReadReplyFoodAllResponse> responses = recommendReplyService.getReplyFoodByFoodId(recommendFoodId);
-//        return ResponseEntity.ok(responses);
-//    }
-
-    //food 조회
-//    @GetMapping
-//    public ResponseEntity<List<ReadReplyFoodAllResponse>> getAllFoodReplies() {
-//        List<ReadReplyFoodAllResponse> foodReplies = recommendReplyService.getReplyFoods();
-//        return ResponseEntity.ok(foodReplies);
-//    }
 
 
 }

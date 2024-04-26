@@ -27,16 +27,28 @@ public class RecommendReply {
     private Long recommendReplyId;
     private String recommendReply;
     private Long recommendReplyStar;
-    private String recommendReplyTagValue;  // JSON 형태의 태그 목록을 저장
+    /**
+     * 태그 목록을 JSON 형태의 문자열로 저장
+     * ["string1", "string2"]
+     * */
+    private String recommendReplyTagValue;
 
+    // 저장된 JSON 문자열을 List<String>으로 변환하여 태그를 검색할 때 사용
     public List<String> getRecommendReplyTagValue() {
         return JsonUtil.fromJson(this.recommendReplyTagValue);
     }
 
+    // 태그 목록을 JSON 문자열로 변환하여 저장
     public void setRecommendReplyTagValue(List<String> tags) {
         this.recommendReplyTagValue = JsonUtil.toJson(tags);
     }
 
+    /**
+     * 원시 JSON 데이터 직접 접근
+     * 데이터베이스에 저장된 태그 정보가 JSON 문자열 형태로 되어 있을 때
+     *  JSON 문자열을 그대로 가져옴
+     *  변환 없이 원본 데이터 형태로 접근
+     * */
     @JsonIgnore
     public String getRecommendReplyTagsAsString() {
         return this.recommendReplyTagValue;
