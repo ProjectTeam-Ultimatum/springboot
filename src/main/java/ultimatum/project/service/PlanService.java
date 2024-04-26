@@ -116,10 +116,18 @@ public class PlanService {
     }
 
     private void savePlanHotels(PlanDay planDay, List<PlanHotelDTO> planHotels) {
+        //
         planHotels.forEach(hotelDTO -> {
             RecommendListHotel hotel = recommendHotelRepository.findById(hotelDTO.getRecommendHotelId())
                     .orElseThrow(() -> new RuntimeException("Hotel not found with ID: " + hotelDTO.getRecommendHotelId()));
-            if (!planHotelRepository.existsByPlanDayAndRecommendHotel_RecommendHotelId(planDay, hotelDTO.getRecommendHotelId())) {
+
+            log.info("🎉 roof");
+
+
+            planHotelRepository.findByPlanDayId(planDay.getPlanDayId());
+
+            if (!planHotelRepository.existsByPlanDayAndRecommendHotelId(planDay.getPlanDayId(), hotelDTO.getRecommendHotelId())) {
+                log.info("🐱‍💻 plandayId : {}", planDay.getPlanDayId());
                 PlanHotel planHotel = PlanHotel.builder()
                         .planDay(planDay)
                         .recommendHotel(hotel)
