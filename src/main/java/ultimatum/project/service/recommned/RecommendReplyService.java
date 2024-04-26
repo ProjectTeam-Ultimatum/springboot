@@ -63,43 +63,45 @@ public class RecommendReplyService {
         this.modelMapper = modelMapper;
     }
 
-    //음식 평점 저장 - 최종
+    //음식 평점 저장
     public CreateReplyFoodResponse createFoodReply(CreateReplyFoodRequest request) {
-        // 요청에서 제공된 음식 ID를 기반으로 RecommendListFood를 가져옵니다.
+        // 요청된 음식 ID를 이용하여 RecommendListFood 객체를 조회합니다.
         RecommendListFood recommendFood = recommendListFoodRepository.findByRecommendFoodId(request.getRecommendFoodId());
         if (recommendFood == null) {
-            log.error("RecommendListFood with ID {} not found.", request.getRecommendFoodId());
+            // 음식점 ID가 없는 경우, 로그를 출력하고 예외를 발생시킵니다.
+            log.error("RecommendListFood ID 찾을 수 없음: {}", request.getRecommendFoodId());
             throw new IllegalArgumentException("RecommendListFood 정보 없음");
         }
 
-        // 평점 값이 1에서 5 사이인지 검증합니다.
+        // 요청받은 평점이 1에서 5 사이인지 검증합니다.
         long recommendReplyStar = Math.toIntExact(request.getRecommendReplyStar());
         if (recommendReplyStar < 1 || recommendReplyStar > 5) {
-            //throw new IllegalArgumentException("The recommend reply star must be between 1 and 5.");
-            log.error("------------ 음식 평점을 잘못 입력했습니다 --------------- ");
-            log.error("현재 평점 값: {} / 평점은 1에서 5 사이여야 합니다.", recommendReplyStar);
-            return null; // 또는 적절한 예외 처리 및 에러 응답 반환
+            // 평점이 요구 범위를 벗어날 경우, 로그를 출력하고 예외 발생
+            log.error("음식점 평점 입력 오류: 현재 평점 값: {} / 평점은 1에서 5 사이여야 합니다.", recommendReplyStar);
+            throw new IllegalArgumentException("평점은 1에서 5 사이여야 합니다.");
         }
 
-        // Builder 패턴을 사용하여 RecommendReply 객체를 생성합니다.
+        // 태그 리스트를 JSON String 변환
+        String jsonTags = JsonUtil.toJson(request.getRecommendReplyTagValue());
+
+        // RecommendReply 객체를 Builder 패턴 이용하여 생성
         RecommendReply recommendReply = RecommendReply.builder()
                 .recommendReplyStar(recommendReplyStar)
-                .recommendReplyTagValue(request.getRecommendReplyTagValue().toString()) //string, List<string> 타입 맞춤
+                .recommendReplyTagValue(jsonTags) // DB 저장
                 .recommendFoodId(recommendFood)
                 .build();
 
-        // 수정된 엔티티를 저장합니다.
+        // 생성된 객체를 데이터베이스 저장
         recommendReply = recommendReplyRepository.save(recommendReply);
 
-        // 응답 객체를 수동으로 생성합니다.
+        // 저장된 태그 정보를 로그 출력
+        log.info("저장된 태그: {}", jsonTags);
+
+        // 최종적으로 생성된 RecommendReply 객체를 이용하여 응답 객체를 생성하고 반환합니다.
         return new CreateReplyFoodResponse(
                 recommendReply.getRecommendReplyStar(),
-                recommendReply.getRecommendReplyTagValue() != null
-                        ? recommendReply.getRecommendReplyTagValue() // JSON을 List<String>로 변환
-                        : List.of(),
-                recommendReply.getRecommendFoodId() != null
-                        ? recommendReply.getRecommendFoodId().getRecommendFoodId() // 음식 ID만을 보내도록 보장
-                        : null
+                JsonUtil.fromJson(jsonTags), // JSON 문자열을 다시 리스트로 변환, 태그 데이터를 사용
+                recommendFood != null ? recommendFood.getRecommendFoodId() : null
         );
     }
 
@@ -147,83 +149,85 @@ public class RecommendReplyService {
 
     //숙박 평점 저장
     public CreateReplyHotelResponse createHotelReply(CreateReplyHotelRequest request) {
-        // 요청에서 제공된 숙박 ID를 기반으로 RecommendListHotel를 가져옵니다.
+        // 요청된 숙박 ID를 이용하여 RecommendListHotel 객체를 조회합니다.
         RecommendListHotel recommendHotel = recommendListHotelRepository.findByRecommendHotelId(request.getRecommendHotelId());
         if (recommendHotel == null) {
-            log.error("RecommendListHotel ID 찾을수 없음", request.getRecommendHotelId());
+            // 찾는 관광지 ID가 없는 경우, 로그를 출력하고 예외를 발생시킵니다.
+            log.error("RecommendListHotel ID 찾을 수 없음: {}", request.getRecommendHotelId());
             throw new IllegalArgumentException("RecommendListHotel 정보 없음");
         }
 
-        // 평점 값이 1에서 5 사이인지 검증합니다.
+        // 요청받은 평점이 1에서 5 사이인지 검증합니다.
         long recommendReplyStar = Math.toIntExact(request.getRecommendReplyStar());
         if (recommendReplyStar < 1 || recommendReplyStar > 5) {
-            //throw new IllegalArgumentException("The recommend reply star must be between 1 and 5.");
-            log.error("------------ 숙박 평점을 잘못 입력했습니다 --------------- ");
-            log.error("현재 평점 값: {} / 평점은 1에서 5 사이여야 합니다.", recommendReplyStar);
-            return null; // 또는 적절한 예외 처리 및 에러 응답 반환
+            // 평점이 요구 범위를 벗어날 경우, 로그를 출력하고 예외 발생
+            log.error("관광지 평점 입력 오류: 현재 평점 값: {} / 평점은 1에서 5 사이여야 합니다.", recommendReplyStar);
+            throw new IllegalArgumentException("평점은 1에서 5 사이여야 합니다.");
         }
 
-        // Builder 패턴을 사용하여 RecommendReply 객체를 생성합니다.
+        // 태그 리스트를 JSON String 변환
+        String jsonTags = JsonUtil.toJson(request.getRecommendReplyTagValue());
+
+        // RecommendReply 객체를 Builder 패턴 이용하여 생성
         RecommendReply recommendReply = RecommendReply.builder()
                 .recommendReplyStar(recommendReplyStar)
-                .recommendReplyTagValue(request.getRecommendReplyTagValue().toString()) //string, List<string> 타입 맞춤
+                .recommendReplyTagValue(jsonTags) // DB 저장
                 .recommendHotelId(recommendHotel)
                 .build();
 
-        log.info(request.getRecommendReplyTagValue().toString());
-
-        // 수정된 엔티티를 저장합니다.
+        // 생성된 객체를 데이터베이스 저장
         recommendReply = recommendReplyRepository.save(recommendReply);
 
-        // 응답 객체를 수동으로 생성합니다.
+        // 저장된 태그 정보를 로그 출력
+        log.info("저장된 태그: {}", jsonTags);
+
+        // 최종적으로 생성된 RecommendReply 객체를 이용하여 응답 객체를 생성하고 반환합니다.
         return new CreateReplyHotelResponse(
                 recommendReply.getRecommendReplyStar(),
-                recommendReply.getRecommendReplyTagValue() != null
-                        ? recommendReply.getRecommendReplyTagValue() // JSON을 List<String>로 변환
-                        : List.of(),
-                recommendReply.getRecommendHotelId() != null
-                        ? recommendReply.getRecommendHotelId().getRecommendHotelId() // 숙박 ID만을 보내도록 보장
-                        : null
+                JsonUtil.fromJson(jsonTags), // JSON 문자열을 다시 리스트로 변환, 태그 데이터를 사용
+                recommendHotel != null ? recommendHotel.getRecommendHotelId() : null
         );
     }
 
     //축제행사 평점 저장
     public CreateReplyEventResponse createEventReply(CreateReplyEventRequest request) {
-        // 요청에서 제공된 축제행사 ID를 기반으로 RecommendListEvent를 가져옵니다.
+        // 축제행사 ID를 이용하여 RecommendListEvent 객체를 조회합니다.
         RecommendListEvent recommendEvent = recommendListEventRepository.findByRecommendEventId(request.getRecommendEventId());
         if (recommendEvent == null) {
-            log.error("RecommendListEvent ID 찾을수 없음", request.getRecommendEventId());
+            // 축제행사 ID가 없는 경우, 로그를 출력하고 예외를 발생시킵니다.
+            log.error("RecommendListEvent ID 찾을 수 없음: {}", request.getRecommendEventId());
             throw new IllegalArgumentException("RecommendListEvent 정보 없음");
         }
 
-        // 평점 값이 1에서 5 사이인지 검증합니다.
+        // 요청받은 평점이 1에서 5 사이인지 검증합니다.
         long recommendReplyStar = Math.toIntExact(request.getRecommendReplyStar());
         if (recommendReplyStar < 1 || recommendReplyStar > 5) {
-            //throw new IllegalArgumentException("The recommend reply star must be between 1 and 5.");
-            log.error("------------ 축제행사 평점을 잘못 입력했습니다 --------------- ");
-            log.error("현재 평점 값: {} / 평점은 1에서 5 사이여야 합니다.", recommendReplyStar);
-            return null; // 또는 적절한 예외 처리 및 에러 응답 반환
+            // 평점이 요구 범위를 벗어날 경우, 로그를 출력하고 예외 발생
+            log.error("축제행사 평점 입력 오류: 현재 평점 값: {} / 평점은 1에서 5 사이여야 합니다.", recommendReplyStar);
+            throw new IllegalArgumentException("평점은 1에서 5 사이여야 합니다.");
         }
 
-        // Builder 패턴을 사용하여 RecommendReply 객체를 생성합니다.
+        // 태그 리스트를 JSON String 변환
+        String jsonTags = JsonUtil.toJson(request.getRecommendReplyTagValue());
+
+        // RecommendReply 객체를 Builder 패턴 이용하여 생성
         RecommendReply recommendReply = RecommendReply.builder()
                 .recommendReplyStar(recommendReplyStar)
-                .recommendReplyTagValue(request.getRecommendReplyTagValue().toString()) //string, List<string> 타입 맞춤
+                .recommendReplyTagValue(jsonTags) // DB 저장
                 .recommendEventId(recommendEvent)
                 .build();
 
-        // 수정된 엔티티를 저장합니다.
+        // 생성된 객체를 데이터베이스 저장
         recommendReply = recommendReplyRepository.save(recommendReply);
 
-        // 응답 객체를 수동으로 생성합니다.
+        // 저장된 태그 정보를 로그 출력
+        log.info("저장된 태그: {}", jsonTags);
+
+        // 최종적으로 생성된 RecommendReply 객체를 이용하여 응답 객체를 생성하고 반환합니다.
         return new CreateReplyEventResponse(
                 recommendReply.getRecommendReplyStar(),
-                recommendReply.getRecommendReplyTagValue() != null
-                        ? recommendReply.getRecommendReplyTagValue() // JSON을 List<String>로 저장.
-                        : List.of(),
-                recommendReply.getRecommendEventId() != null
-                        ? recommendReply.getRecommendEventId().getRecommendEventId() // 축제행사 ID만을 보내도록 보장
-                        : null
+                JsonUtil.fromJson(jsonTags), // JSON 문자열을 다시 리스트로 변환, 태그 데이터를 사용
+                recommendEvent != null ? recommendEvent.getRecommendEventId() : null
         );
     }
 
@@ -266,6 +270,35 @@ public class RecommendReplyService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    //음식점 태그카운트 ID 조회
+    public List<Map.Entry<String, Long>> getTagsWithCountsByFoodId(Long recommendFoodId) {
+        // 지정된 recommendFoodId에 대한 모든 후기에서 태그 리스트를 추출합니다.
+        List<String> tags = recommendReplyRepository.findByRecommendFoodId_RecommendFoodId(recommendFoodId).stream()
+                .flatMap(reply -> {
+                    List<String> tagList = reply.getRecommendReplyTagValue();
+                    if (tagList == null || tagList.isEmpty()) {
+                        log.info("tagValue가 비어 있습니다.");
+                        return Stream.empty();
+                    } else {
+                        return tagList.stream();
+                    }
+                })
+                .collect(Collectors.toList());
+
+        // 추출된 각 태그의 등장 빈도수를 계산합니다.
+        Map<String, Long> tagFrequency = tags.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        // 태그 빈도수를 내림차순으로 정렬합니다.
+        List<Map.Entry<String, Long>> sortedTagFrequency = tagFrequency.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .collect(Collectors.toList());
+
+        log.info("태그 카운트: {}", sortedTagFrequency);
+        return sortedTagFrequency;
+    }
+
 
     //관광지 평점 ID 조회
     public List<ReadReplyPlaceByIdResponse> getRepliesByPlaceId(Long recommendPlaceId) {
@@ -366,6 +399,34 @@ public class RecommendReplyService {
                 .collect(Collectors.toList());
     }
 
+    //숙박 태그카운트 ID 조회
+    public List<Map.Entry<String, Long>> getTagsWithCountsByHotelId(Long recommendHotelId) {
+        // 지정된 recommendHotelId에 대한 모든 후기에서 태그 리스트를 추출합니다.
+        List<String> tags = recommendReplyRepository.findByRecommendHotelId_RecommendHotelId(recommendHotelId).stream()
+                .flatMap(reply -> {
+                    List<String> tagList = reply.getRecommendReplyTagValue();
+                    if (tagList == null || tagList.isEmpty()) {
+                        log.info("tagValue가 비어 있습니다.");
+                        return Stream.empty();
+                    } else {
+                        return tagList.stream();
+                    }
+                })
+                .collect(Collectors.toList());
+
+        // 추출된 각 태그의 등장 빈도수를 계산합니다.
+        Map<String, Long> tagFrequency = tags.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        // 태그 빈도수를 내림차순으로 정렬합니다.
+        List<Map.Entry<String, Long>> sortedTagFrequency = tagFrequency.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .collect(Collectors.toList());
+
+        log.info("태그 카운트: {}", sortedTagFrequency);
+        return sortedTagFrequency;
+    }
+
     //숙박 평점 평균 계산
     public int getAverageRatingByHotelId(Long recommendHotelId) {
         List<RecommendReply> replies = recommendReplyRepository.findByRecommendHotelId_RecommendHotelId(recommendHotelId);
@@ -390,7 +451,7 @@ public class RecommendReplyService {
                 .collect(Collectors.toList());
     }
 
-    //축제행사 평점 ID 조회
+    //축제행사 태그 ID 조회
     public List<ReadReplyEventTagByIdResponse> getRepliesByEventTagId(Long recommendEventId) {
         // 요청에서 제공된 축제행사 ID를 기반으로 모든 후기를 조회합니다.
         List<RecommendReply> replies = recommendReplyRepository.findByRecommendEventId_RecommendEventId(recommendEventId);
@@ -403,6 +464,34 @@ public class RecommendReplyService {
                         reply.getRecommendEventId() != null ? reply.getRecommendEventId().getRecommendEventId() : null // 적절한 ID 접근 방식으로 수정
                 ))
                 .collect(Collectors.toList());
+    }
+
+    //측제행사 태그카운트 ID 조회
+    public List<Map.Entry<String, Long>> getTagsWithCountsByEventId(Long recommendEventId) {
+        // 지정된 recommendEventId에 대한 모든 후기에서 태그 리스트를 추출합니다.
+        List<String> tags = recommendReplyRepository.findByRecommendEventId_RecommendEventId(recommendEventId).stream()
+                .flatMap(reply -> {
+                    List<String> tagList = reply.getRecommendReplyTagValue();
+                    if (tagList == null || tagList.isEmpty()) {
+                        log.info("tagValue가 비어 있습니다.");
+                        return Stream.empty();
+                    } else {
+                        return tagList.stream();
+                    }
+                })
+                .collect(Collectors.toList());
+
+        // 추출된 각 태그의 등장 빈도수를 계산합니다.
+        Map<String, Long> tagFrequency = tags.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        // 태그 빈도수를 내림차순으로 정렬합니다.
+        List<Map.Entry<String, Long>> sortedTagFrequency = tagFrequency.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .collect(Collectors.toList());
+
+        log.info("태그 카운트: {}", sortedTagFrequency);
+        return sortedTagFrequency;
     }
 
     //축제행사 평점 평균 계산

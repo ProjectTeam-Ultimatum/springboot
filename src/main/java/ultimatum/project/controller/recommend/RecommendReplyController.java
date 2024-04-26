@@ -136,6 +136,17 @@ public class RecommendReplyController {
         return ResponseEntity.ok(responses);
     }
 
+    //음식점 태그 카운팅
+    @GetMapping("/food/reads/tag-couting/{recommend_food_id}")
+    @Operation(summary = "음식점 태그 카운팅")
+    public ResponseEntity<List<Map.Entry<String, Long>>> getFoodTagFrequencies(@PathVariable("recommend_food_id") Long recommendFoodId) {
+        List<Map.Entry<String, Long>> tagFrequencies = recommendReplyService.getTagsWithCountsByFoodId(recommendFoodId);
+        if (tagFrequencies.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(tagFrequencies);
+    }
+
     //관광지 평점 조회
     @GetMapping("/place/reads/star/{recommend_place_id}")
     @Operation(summary = "관광지 평점 조회")
@@ -158,6 +169,7 @@ public class RecommendReplyController {
         return ResponseEntity.ok(responses);
     }
 
+    //관광지 태그 카운팅
     @GetMapping("/place/reads/tag-couting/{recommend_place_id}")
     @Operation(summary = "관광지 태그 카운팅")
     public ResponseEntity<List<Map.Entry<String, Long>>> getPlaceTagFrequencies(@PathVariable("recommend_place_id") Long recommendPlaceId) {
@@ -204,6 +216,17 @@ public class RecommendReplyController {
         return ResponseEntity.ok(responses);
     }
 
+    //숙박 태그 카운팅
+    @GetMapping("/hotel/reads/tag-couting/{recommend_hotel_id}")
+    @Operation(summary = "숙박 태그 카운팅")
+    public ResponseEntity<List<Map.Entry<String, Long>>> getHotelTagFrequencies(@PathVariable("recommend_hotel_id") Long recommendHotelId) {
+        List<Map.Entry<String, Long>> tagFrequencies = recommendReplyService.getTagsWithCountsByHotelId(recommendHotelId);
+        if (tagFrequencies.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(tagFrequencies);
+    }
+
     //숙박 평균 평점 계산
     @GetMapping("/hotel/average/star/{recommend_hotel_id}")
     @Operation(summary = "숙박 평균 평점 계산")
@@ -236,6 +259,17 @@ public class RecommendReplyController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(responses);
+    }
+
+    //축제행사 태그 카운팅
+    @GetMapping("/event/reads/tag-couting/{recommend_event_id}")
+    @Operation(summary = "축제행사 태그 카운팅")
+    public ResponseEntity<List<Map.Entry<String, Long>>> getEventTagFrequencies(@PathVariable("recommend_event_id") Long recommendEventId) {
+        List<Map.Entry<String, Long>> tagFrequencies = recommendReplyService.getTagsWithCountsByEventId(recommendEventId);
+        if (tagFrequencies.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(tagFrequencies);
     }
 
     //축제행사 평균 평점 계산
