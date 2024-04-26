@@ -137,7 +137,7 @@ public class RecommendReplyController {
     }
 
     //음식점 태그 카운팅
-    @GetMapping("/food/reads/tag-couting/{recommend_food_id}")
+    @GetMapping("/food/reads/tag-counting/{recommend_food_id}")
     @Operation(summary = "음식점 태그 카운팅")
     public ResponseEntity<List<Map.Entry<String, Long>>> getFoodTagFrequencies(@PathVariable("recommend_food_id") Long recommendFoodId) {
         List<Map.Entry<String, Long>> tagFrequencies = recommendReplyService.getTagsWithCountsByFoodId(recommendFoodId);
@@ -170,7 +170,7 @@ public class RecommendReplyController {
     }
 
     //관광지 태그 카운팅
-    @GetMapping("/place/reads/tag-couting/{recommend_place_id}")
+    @GetMapping("/place/reads/tag-counting/{recommend_place_id}")
     @Operation(summary = "관광지 태그 카운팅")
     public ResponseEntity<List<Map.Entry<String, Long>>> getPlaceTagFrequencies(@PathVariable("recommend_place_id") Long recommendPlaceId) {
         List<Map.Entry<String, Long>> tagFrequencies = recommendReplyService.getTagsWithCountsByPlaceId(recommendPlaceId);
@@ -217,7 +217,7 @@ public class RecommendReplyController {
     }
 
     //숙박 태그 카운팅
-    @GetMapping("/hotel/reads/tag-couting/{recommend_hotel_id}")
+    @GetMapping("/hotel/reads/tag-counting/{recommend_hotel_id}")
     @Operation(summary = "숙박 태그 카운팅")
     public ResponseEntity<List<Map.Entry<String, Long>>> getHotelTagFrequencies(@PathVariable("recommend_hotel_id") Long recommendHotelId) {
         List<Map.Entry<String, Long>> tagFrequencies = recommendReplyService.getTagsWithCountsByHotelId(recommendHotelId);
@@ -262,7 +262,7 @@ public class RecommendReplyController {
     }
 
     //축제행사 태그 카운팅
-    @GetMapping("/event/reads/tag-couting/{recommend_event_id}")
+    @GetMapping("/event/reads/tag-counting/{recommend_event_id}")
     @Operation(summary = "축제행사 태그 카운팅")
     public ResponseEntity<List<Map.Entry<String, Long>>> getEventTagFrequencies(@PathVariable("recommend_event_id") Long recommendEventId) {
         List<Map.Entry<String, Long>> tagFrequencies = recommendReplyService.getTagsWithCountsByEventId(recommendEventId);
