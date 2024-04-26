@@ -151,6 +151,17 @@ public class MemberService {
         return "비밀번호 변경 성공";
     }
 
+    @Transactional
+    public String updateMemberStyle(String userEmail, String memberStyle) {
+        Member member = memberRepository.findByMemberEmail(userEmail);
+        if (member == null) {
+            throw new RuntimeException("회원을 찾을 수 없습니다.");
+        }
+        member.setMemberStyle(memberStyle); // 스타일 업데이트
+        memberRepository.save(member);
+        return "회원 스타일 정보가 업데이트 되었습니다.";
+    }
+
     public ResponseEntity<String> memberCheck(MemberFindPasswordRequestDto memberFindPasswordRequestDto) {
         String memberName = memberFindPasswordRequestDto.getMemberName();
         String memberEmail = memberFindPasswordRequestDto.getMemberEmail();

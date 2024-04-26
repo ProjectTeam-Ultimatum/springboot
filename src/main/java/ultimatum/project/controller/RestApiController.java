@@ -13,6 +13,7 @@ import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDto;
 import ultimatum.project.domain.dto.logInDTO.MemberFindPasswordRequestDto;
 import ultimatum.project.domain.dto.logInDTO.MemberRequestDto;
 import ultimatum.project.domain.dto.logInDTO.MemberUpdateRequestDto;
+import ultimatum.project.domain.dto.logInDTO.UpdateStyleDto;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.domain.entity.member.MemberImage;
 import ultimatum.project.global.exception.CustomException;
@@ -177,6 +178,8 @@ public class RestApiController {
         userDetails.put("gender", member.getMemberGender());
         userDetails.put("age", member.getMemberAge());
         userDetails.put("address", member.getMemberAddress());
+        userDetails.put("memberStyle", member.getMemberStyle()); // 스타일 정보 추가
+        userDetails.put("needSurvey", member.getMemberStyle() == null); // 설문 필요 여부 추가
 
         // 이미지 정보 추가: 멤버의 이미지 URL 리스트
         List<String> imageUrls = member.getMemberImages().stream()
@@ -205,6 +208,22 @@ public class RestApiController {
     public String findPassword(@RequestBody MemberFindPasswordRequestDto memberFindPasswordRequestDto) {
         memberService.memberCheck(memberFindPasswordRequestDto);
         return "success!";
+    }
+
+    @PostMapping("/user/updateStyle")
+    public ResponseEntity<String> updateMemberStyle(@RequestBody UpdateStyleDto updateStyleDto, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("인증되지 않은 사용자입니다.");
+        }
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        String userEmail = principal.getUsername(); // 인증된 사용자의 이메일을 가져옴
+
+        try {
+            String result = memberService.updateMemberStyle(userEmail, updateStyleDto.getMemberStyle());
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("업데이트 과정에서 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/user/delete")
