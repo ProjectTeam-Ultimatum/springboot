@@ -82,5 +82,17 @@ public class MemberS3Service {
             log.error("Invalid URL for object {}: {}", imageUri, e.getMessage());
             // MalformedURLException 처리
         }
-        }
+    }
+
+    public String uploadFileToS3(String uniqueFileName, MultipartFile file) throws IOException {
+        String s3Key = "profile/" + uniqueFileName; // S3에 저장될 키 (폴더명/파일명)
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(file.getSize());
+
+        amazonS3.putObject(new PutObjectRequest(bucketName, s3Key, file.getInputStream(), metadata));
+        log.info("파일을 S3에 업로드했습니다. 파일명: {}", uniqueFileName);
+
+        return amazonS3.getUrl(bucketName, s3Key).toString();
+    }
 }

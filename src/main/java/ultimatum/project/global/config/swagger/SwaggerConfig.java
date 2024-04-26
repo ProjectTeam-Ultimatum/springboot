@@ -31,12 +31,12 @@ public class SwaggerConfig {
 
     private OperationCustomizer customizeFileUploadOperation() {
         return (operation, handlerMethod) -> {
-            if (handlerMethod.getMethod().getName().equals("join")) { // Controller method name
+            if (handlerMethod.getMethod().getName().equals("join")) {
+                // 'join' 메서드의 경우 파일 업로드 요청 스키마 정의
                 RequestBody requestBody = new RequestBody();
                 Content content = new Content();
                 MediaType mediaType = new MediaType();
 
-                // Define the schema for multipart form data
                 ObjectSchema schema = new ObjectSchema();
                 schema.addProperties("member", new StringSchema().description("Member JSON as String"));
                 schema.addProperties("files", new StringSchema().description("File data").type("string").format("binary"));
@@ -46,10 +46,27 @@ public class SwaggerConfig {
                 requestBody.setContent(content);
                 requestBody.setRequired(true);
                 operation.setRequestBody(requestBody);
+            } else if (handlerMethod.getMethod().getName().equals("updateProfileImage")) {
+                // 'updateProfileImage' 메서드의 경우 파일 업로드 요청 스키마 정의
+                RequestBody requestBody = new RequestBody();
+                Content content = new Content();
+                MediaType mediaType = new MediaType();
+
+                // 파일 업로드 요청 스키마 정의
+                ObjectSchema schema = new ObjectSchema();
+                schema.addProperties("imageFile", new StringSchema().type("string").format("binary"));
+
+                mediaType.setSchema(schema);
+                content.addMediaType("multipart/form-data", mediaType);
+                requestBody.setContent(content);
+                requestBody.setRequired(true);
+                operation.setRequestBody(requestBody);
             }
+
             return operation;
         };
     }
+
 
     @Bean
     public OpenAPI openAPI() {
@@ -73,17 +90,6 @@ public class SwaggerConfig {
                 .bearerFormat("JWT")
                 .in(SecurityScheme.In.HEADER)
                 .name("Authorization");
-    }
-
-    @Bean
-    public GroupedOpenApi List(){
-        String[] path = {
-                "ultimatum.project.controller"
-        };
-        return GroupedOpenApi.builder()
-                .group("2. 리스트")
-                .packagesToScan(path)
-                .build();
     }
 
     private SecurityRequirement getSecurityRequirement() {
