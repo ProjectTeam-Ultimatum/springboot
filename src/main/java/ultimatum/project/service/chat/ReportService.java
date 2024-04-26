@@ -28,4 +28,9 @@ public class ReportService {
 
         // 추가 로직: 알림 서비스, 신고 통계 업데이트 등...
     }
+
+    public int countUserReports(String email) {
+        return reportRepository.countByReportedUserId(email);
+    }
+
 }

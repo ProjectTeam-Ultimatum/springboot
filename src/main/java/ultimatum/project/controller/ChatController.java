@@ -42,6 +42,7 @@ public class ChatController {
             ChatRoomDto savedRoomDto = new ChatRoomDto(
                     createdRoom.getChatRoomId(),
                     createdRoom.getChatRoomName(),
+                    chatRoomDto.getCreatorGender(),
                     createdRoom.getChatRoomContent(),
                     createdRoom.getTravelStyleTags(),
                     createdRoom.getReviewLocation()

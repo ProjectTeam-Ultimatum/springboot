@@ -19,6 +19,7 @@ import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.service.chat.ChatRoomSessionService;
 import ultimatum.project.service.chat.ChatService;
 import ultimatum.project.service.chat.JwtTokenService;
+import ultimatum.project.service.chat.ReportService;
 
 import java.io.*;
 import java.net.URLDecoder;
@@ -33,6 +34,8 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
     private  final ObjectMapper mapper;
 
     private final ChatService chatService;
+
+    private final ReportService reportService;
 
     private final JwtTokenService jwtTokenService;
 
@@ -106,6 +109,8 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
 
         SecurityContext context = (SecurityContext) session.getAttributes().get("SPRING_SECURITY_CONTEXT");
 
+        String senderEmail = ((Member) context.getAuthentication().getPrincipal()).getMemberEmail();
+
         // SecurityContext와 Authentication 검증
         if (context == null || context.getAuthentication() == null || !context.getAuthentication().isAuthenticated()) {
             log.warn("No authentication information available for session id {}", session.getId());
@@ -128,6 +133,19 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
                 // TALK 메시지 처리 전 로그 추가
                 //log.info("Received TALK message: sessionId={}, senderId={}, message={}",
                         //session.getId(), chatMessageDto.getSenderId(), chatMessageDto.getMessage());
+                int reportCount = reportService.countUserReports(senderEmail); // 이메일을 사용하여 신고 횟수 조회
+                if (reportCount >= 3) {
+                    // 경고 메시지 생성
+                    ChatMessageDto warningMessage = ChatMessageDto.builder()
+                            .messageType(MessageType.WARNING)
+                            .chatRoomId(chatRoomId)
+                            .senderId("System") // 시스템에서 보낸 메시지로 설정
+                            .message("Warning: The user " + senderEmail + " has been reported more than three times.")
+                            .build();
+
+                    // 채팅방에 경고 메시지 전송
+                    sendMessageToChatRoom(warningMessage, chatRoomSessionMap.get(chatRoomId));
+                }
 
                 chatService.saveMessage(chatMessageDto, authentication);  // Modified to include authentication
                 chatRoomSessionService.getSessionsForRoom(chatRoomId)
