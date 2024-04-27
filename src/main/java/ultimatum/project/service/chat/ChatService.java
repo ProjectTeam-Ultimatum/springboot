@@ -68,6 +68,7 @@ public class ChatService {
                             member.getMemberName(),  // 작성자 이름
                             member.getMemberGender(),
                             member.getMemberAge(),   // 작성자 나이
+                            member.getMemberId(),
                             chatRoom.getTravelStyleTags(),
                             chatRoom.getReviewLocation(),
                             imageUrl, // 작성자 이미지 URL 추가
@@ -104,7 +105,7 @@ public class ChatService {
     // 특정 채팅방에 입장
     public ChatRoomDto enterChatRoom(Long roomId) {
         return chatRoomRepository.findById(roomId)
-                .map(chatRoom -> new ChatRoomDto(chatRoom.getChatRoomId(), chatRoom.getChatRoomName(), chatRoom.getChatRoomContent(), chatRoom.getCreatorGender(), chatRoom.getTravelStyleTags(), chatRoom.getReviewLocation()))
+                .map(chatRoom -> new ChatRoomDto(chatRoom.getChatRoomId(),chatRoom.getMember().getMemberId(), chatRoom.getChatRoomName(), chatRoom.getChatRoomContent(), chatRoom.getCreatorGender(), chatRoom.getTravelStyleTags(), chatRoom.getReviewLocation()))
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다!"));
     }
 

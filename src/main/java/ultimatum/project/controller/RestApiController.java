@@ -173,6 +173,7 @@ public class RestApiController {
         }
 
         Map<String, Object> userDetails = new HashMap<>();
+        userDetails.put("memberId",member.getMemberId());
         userDetails.put("userName", member.getMemberName());
         userDetails.put("email", member.getMemberEmail());
         userDetails.put("gender", member.getMemberGender());

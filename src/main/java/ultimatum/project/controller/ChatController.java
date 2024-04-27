@@ -41,6 +41,7 @@ public class ChatController {
             ChatRoom createdRoom = chatService.createChatRoom(chatRoomDto, member);
             ChatRoomDto savedRoomDto = new ChatRoomDto(
                     createdRoom.getChatRoomId(),
+                    createdRoom.getMember().getMemberId(),
                     createdRoom.getChatRoomName(),
                     chatRoomDto.getCreatorGender(),
                     createdRoom.getChatRoomContent(),
