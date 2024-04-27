@@ -5,4 +5,5 @@ import ultimatum.project.domain.entity.chat.ChatRoom;
 import ultimatum.project.domain.entity.chat.Report;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
+    int countByReportedUserId(String email);
 }

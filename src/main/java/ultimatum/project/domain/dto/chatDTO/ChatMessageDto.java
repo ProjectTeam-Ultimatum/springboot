@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessageDto {
-
+    private Long chatMessageId;
     private MessageType messageType; // 메시지 타입
     private Long chatRoomId; // 채팅방 번호
     private String senderId; // 채팅을 보낸 사용자의 ID
