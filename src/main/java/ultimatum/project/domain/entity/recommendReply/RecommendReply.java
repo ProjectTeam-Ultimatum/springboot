@@ -10,14 +10,14 @@ import ultimatum.project.domain.entity.event.RecommendListEvent;
 import ultimatum.project.domain.entity.food.RecommendListFood;
 import ultimatum.project.domain.entity.hotel.RecommendListHotel;
 import ultimatum.project.domain.entity.place.RecommendListPlace;
+import ultimatum.project.global.config.util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Builder
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecommendReply {
@@ -25,38 +25,32 @@ public class RecommendReply {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long recommendReplyId;
-
     private String recommendReply;
     private Long recommendReplyStar;
-    private String recommendReplyTagValue;  // JSON 형태의 태그 목록을 저장
+    /**
+     * 태그 목록을 JSON 형태의 문자열로 저장
+     * ["string1", "string2"]
+     * */
+    private String recommendReplyTagValue;
 
-    // JSON 형태의 태그 목록을 List<String>으로 반환하는 getter
+    // 저장된 JSON 문자열을 List<String>으로 변환하여 태그를 검색할 때 사용
     public List<String> getRecommendReplyTagValue() {
-        if (this.recommendReplyTagValue == null || this.recommendReplyTagValue.isEmpty()) {
-            return new ArrayList<>();
-        }
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(this.recommendReplyTagValue, new TypeReference<List<String>>() {});
-        } catch (JsonProcessingException e) {
-            // JSON 변환 실패 시 빈 리스트 반환
-            return new ArrayList<>();
-        }
+        return JsonUtil.fromJson(this.recommendReplyTagValue);
     }
 
-    // List<String> 형태의 태그 목록을 JSON 문자열로 설정하는 setter
+    // 태그 목록을 JSON 문자열로 변환하여 저장
     public void setRecommendReplyTagValue(List<String> tags) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            this.recommendReplyTagValue = mapper.writeValueAsString(tags);
-        } catch (JsonProcessingException e) {
-            this.recommendReplyTagValue = "[]";
-        }
+        this.recommendReplyTagValue = JsonUtil.toJson(tags);
     }
 
+    /**
+     * 원시 JSON 데이터 직접 접근
+     * 데이터베이스에 저장된 태그 정보가 JSON 문자열 형태로 되어 있을 때
+     *  JSON 문자열을 그대로 가져옴
+     *  변환 없이 원본 데이터 형태로 접근
+     * */
     @JsonIgnore
     public String getRecommendReplyTagsAsString() {
-        // DB 저장용 raw 문자열 태그 목록을 가져오는 추가 getter
         return this.recommendReplyTagValue;
     }
 

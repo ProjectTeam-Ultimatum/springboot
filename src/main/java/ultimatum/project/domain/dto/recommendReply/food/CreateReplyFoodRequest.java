@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CreateReplyFoodRequest {
 
-    //private String recommendReply;
+//    private Long recommendReplyId;
     private Long recommendReplyStar;
     private List<String> recommendReplyTagValue;
     private Long recommendFoodId;
