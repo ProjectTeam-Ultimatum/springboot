@@ -14,6 +14,7 @@ import java.sql.Time;
 public class RecommendListEventResponse {
 
     private Long recommendEventId;
+    private String recommendEventContentsId;
     private String recommendEventTitle;
     private String recommendEventIntroduction;
     private String recommendEventAllTag;

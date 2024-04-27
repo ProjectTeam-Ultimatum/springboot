@@ -2,7 +2,6 @@ package ultimatum.project.domain.entity.food;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.sql.Time;
 
 @Entity
