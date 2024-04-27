@@ -14,6 +14,7 @@ import java.sql.Time;
 public class RecommendListHotelResponse {
 
     private Long recommendHotelId;
+    private String recommendHotelContentsId;
     private String recommendHotelTitle;
     private String recommendHotelIntroduction;
     private String recommendHotelAllTag;

@@ -4,12 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import ultimatum.project.domain.entity.event.RecommendListEvent;
 import ultimatum.project.domain.entity.food.RecommendListFood;
-import ultimatum.project.domain.entity.place.RecommendListPlace;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
+
 
 @Entity
 @Builder
@@ -17,10 +14,10 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlanPlace {
+public class PlanEvent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long planPlaceId;
+    private Long planEventId;
 
     @ManyToOne
     @JoinColumn(name = "plan_id")
@@ -31,16 +28,16 @@ public class PlanPlace {
     private PlanDay planDay;
 
     @ManyToOne
-    @JoinColumn(name = "recommend_place_id")
-    private RecommendListPlace recommendPlace;
+    @JoinColumn(name = "recommend_event_id")
+    private RecommendListEvent recommendEvent;
 
-    private LocalTime planPlaceStayTime;
+    private LocalTime planEventStayTime;
 
     // 생성자
-    public PlanPlace(Plan plan, PlanDay planDay, RecommendListPlace recommendPlace, LocalTime planPlaceStayTime) {
+    public PlanEvent(Plan plan, PlanDay planDay, RecommendListEvent recommendEvent, LocalTime planEventStayTime) {
         this.plan = plan;
         this.planDay = planDay;
-        this.recommendPlace = recommendPlace;
-        this.planPlaceStayTime = planPlaceStayTime;
+        this.recommendEvent = recommendEvent;
+        this.planEventStayTime = planEventStayTime;
     }
 }
