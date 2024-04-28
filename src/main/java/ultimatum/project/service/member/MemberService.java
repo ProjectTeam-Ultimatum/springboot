@@ -82,7 +82,7 @@ public class MemberService {
     }
 
     public ResponseEntity<?> registerOrLoginWithKakao(String accessToken,
-                                                               MemberWithKakaoRequestDto additionalInfo) {
+                                                      MemberWithKakaoRequestDto additionalInfo) {
         // 카카오 API로부터 사용자 정보를 조회
         KakaoUserInfoDTO1 kakaoUserInfo = kakaoService.getKakaoUserInfo(accessToken);
 
@@ -113,9 +113,9 @@ public class MemberService {
         }
         // 변경된 회원 객체를 다시 저장 (이미지 정보 포함)
         memberRepository.save(member);
-            log.info("회원정보 업데이트 완료 : {}", member.getMemberEmail());
+        log.info("회원정보 업데이트 완료 : {}", member.getMemberEmail());
 
-            return ResponseEntity.ok("회원정보가 업데이트 되었습니다.");
+        return ResponseEntity.ok("회원정보가 업데이트 되었습니다.");
 
     }
 
@@ -252,61 +252,38 @@ public class MemberService {
         return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
     }
 
-//    public MemberWithKakaoResponseDto createResponseDto(Member member, List<MemberImage> memberImages, String jwtToken, boolean isNewMember) {
-//        // MemberImage 엔티티 목록을 MemberImageResponseDto 목록으로 변환
-//        List<MemberImageResponseDto> imageResponseDtoList = memberImages.stream()
-//                .map(this::convertToImageResponseDto)
-//                .collect(Collectors.toList());
-//
-//        // Member 엔티티의 정보를 MemberWithKakaoResponseDto 객체로 설정
-//        return new MemberWithKakaoResponseDto(
-//                member.getMemberId(),
-//                member.getMemberName(),
-//                member.getMemberEmail(),
-//                member.getMemberAge(),
-//                member.getMemberGender(),
-//                member.getMemberAddress(),
-//                member.getMemberFindPasswordAnswer(),
-//                member.getMemberStyle(),
-//                member.getMemberRole(),
-//                jwtToken,
-//                imageResponseDtoList, // 이미지 정보 설정
-//                isNewMember
-//        );
-//    }
+    public String getUserAccessTokenFromKaKao(String code) {
 
-    private MemberImageResponseDto convertToImageResponseDto(MemberImage memberImage) {
-        return new MemberImageResponseDto(memberImage.getMemberImageId(),memberImage.getMemberImageName(), memberImage.getMemberImageUrl());
-
+        // 카카오 서비스에서 액세스 토큰 가져오기
+        String accessToken = kakaoService.getKakaoAccessToken(code);
+        if (accessToken == null || accessToken.isEmpty()) {
+            throw new IllegalArgumentException("액세스 토큰을 받아오지 못했습니다.");
+        }
+        return accessToken;
     }
 
-    private Member createUserWithKakao(KakaoUserInfoDTO1 kakaoUserInfoDTO1,
-                                      MemberWithKakaoRequestDto additionalInfo) {
-        Member member = Member.builder()
-                .memberEmail(kakaoUserInfoDTO1.getMemberEmail())
-                .memberName(kakaoUserInfoDTO1.getMemberName())
-                .memberAge(additionalInfo.getMemberAge())
-                .memberGender(additionalInfo.getMemberGender())
-                .memberAddress(additionalInfo.getMemberAddress())
-                .memberFindPasswordAnswer(additionalInfo.getMemberFindPasswordAnswer())
-                .memberPassword("") // 패스워드는 임의로 설정
-                .memberRole("ROLE_USER")
-                .build();
-        memberRepository.save(member);
+    public KakaoUserInfoDTO1 getUserInfoFromKakao(String accessToken){
+        KakaoUserInfoDTO1 kakaoUserInfoDTO1 = kakaoService.getKakaoUserInfo(accessToken);
+        if (kakaoUserInfoDTO1 == null) {
+            throw new IllegalArgumentException("사용자 정보를 받아오지 못했습니다.");
+        }
+        return kakaoUserInfoDTO1;
+    }
 
+    public Member registerOrLookupMember(KakaoUserInfoDTO1 kakaoUserInfoDTO1){
+        Member member = new Member();
+        member.setMemberName(kakaoUserInfoDTO1.getMemberName());
+        member.setMemberEmail(kakaoUserInfoDTO1.getMemberEmail());
+        member.setMemberPassword(null);
+        member.setMemberAge(null);
+        member.setMemberGender(null);
+        member.setMemberAddress(null);
+        member.setMemberFindPasswordAnswer(null);
+        member.setMemberRole("ROLE_USER");
+        member.setMemberStyle(null);
+        member.setMemberImages(null);
+        memberRepository.save(member);
         return member;
     }
 
-    public void UpdateExistingMember(Member member, KakaoUserInfoDTO1 kakaoUserInfo, MemberWithKakaoRequestDto additionalInfo) {
-        member.setMemberName(kakaoUserInfo.getMemberName());
-        member.setMemberEmail(kakaoUserInfo.getMemberEmail());
-        member.setMemberAge(additionalInfo.getMemberAge());  // 예: 나이 정보 업데이트
-        member.setMemberGender(additionalInfo.getMemberGender());  // 예: 성별 정보 업데이트
-        member.setMemberAddress(additionalInfo.getMemberAddress());
-        member.setMemberFindPasswordAnswer(additionalInfo.getMemberFindPasswordAnswer());
-        member.setMemberPassword("");
-        member.setMemberRole("ROLE_USER");
-
-        memberImageService.createMemberImages(additionalInfo.getFiles(), member);
-    }
 }

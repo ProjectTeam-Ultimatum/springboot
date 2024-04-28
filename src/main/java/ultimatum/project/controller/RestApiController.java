@@ -84,56 +84,32 @@ public class RestApiController {
 
     @PostMapping("/accessToken")
     public ResponseEntity<?> getKakaoAccessToken(@RequestParam String code) {
-        try {
-            // 카카오 서비스에서 액세스 토큰 가져오기
-            String accessToken = kakaoService.getKakaoAccessToken(code);
-            if (accessToken == null || accessToken.isEmpty()) {
-                throw new IllegalArgumentException("액세스 토큰을 받아오지 못했습니다.");
-            }
 
-            KakaoUserInfoDTO1 kakaoUserInfoDTO1 = kakaoService.getKakaoUserInfo(accessToken);
-            if (kakaoUserInfoDTO1 == null) {
-                throw new IllegalArgumentException("사용자 정보를 받아오지 못했습니다.");
-            }
+            String accessToken = memberService.getUserAccessTokenFromKaKao(code);
+           KakaoUserInfoDTO1 kakaoUserInfoDTO1 = memberService.getUserInfoFromKakao(accessToken);
             // 데이터베이스에서 사용자 조회 또는 저장 로직
             Member member = memberRepository.findByMemberEmail(kakaoUserInfoDTO1.getMemberEmail());
             boolean isNewMember = member == null;
             if (isNewMember) {
-                member = new Member();
-                member.setMemberName(kakaoUserInfoDTO1.getMemberName());
-                member.setMemberEmail(kakaoUserInfoDTO1.getMemberEmail());
-                member.setMemberPassword(null);
-                member.setMemberAge(null);
-                member.setMemberGender(null);
-                member.setMemberAddress(null);
-                member.setMemberFindPasswordAnswer(null);
-                member.setMemberRole("ROLE_USER");
-                member.setMemberStyle(null);
-                member.setMemberImages(null);
-                memberRepository.save(member);
+                member = memberService.registerOrLookupMember(kakaoUserInfoDTO1);
             }
 
             // JWT 토큰 생성
             String jwtToken = jwtProperties.generateToken(member);
-
             // 응답 헤더에 JWT 토큰 추가
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(jwtToken);
-log.info("jwtToken : "+jwtToken);
+            log.info("jwtToken : " + jwtToken);
+
             // 응답 데이터 구성 및 반환
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("jwtToken", jwtToken);
+            responseData.put("kakaoAccessToken", accessToken);
             responseData.put("userName", member.getMemberName());
             responseData.put("email", member.getMemberEmail());
             responseData.put("isNewMember", isNewMember);
 
             return ResponseEntity.ok().headers(headers).body(responseData);
-
-        } catch (Exception e) {
-            // 로그로 더 많은 정보를 기록하면 추적이 용이해집니다.
-            log.error("Error during Kakao login process: ", e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed at step [Specific Step]: " + e.getMessage());
-        }
     }
 
 //    @PostMapping("/kakao-login")
@@ -280,20 +256,11 @@ log.info("jwtToken : "+jwtToken);
 
         // 여기서 accessToken은 프론트엔드에서 받은 카카오 액세스 토큰입니다.
         // Service 메소드는 카카오 API로부터 사용자 정보를 조회하고 추가 정보와 결합하여 처리합니다.
-        ResponseEntity<?> responseDto = memberService.registerOrLoginWithKakao(accessToken,requestDto);
+        ResponseEntity<?> responseDto = memberService.registerOrLoginWithKakao(accessToken, requestDto);
 
         // 결과를 클라이언트에 반환합니다.
         return ResponseEntity.ok(responseDto.getBody());
     }
 
-//    @GetMapping("/kakao/userinfo")
-//    public ResponseEntity<?> getkakaoUserInfo(@AuthenticationPrincipal OAuth2User principal) {
-//
-//        if (principal == null) {
-//            return ResponseEntity.status(401).build(); // Unauthorized
-//        }
-//
-//        Member member = memberService.UpdateExistingMember(principal);
-//        return ResponseEntity.ok(member);
-//    }
+
 }
