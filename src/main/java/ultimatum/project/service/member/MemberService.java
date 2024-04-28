@@ -1,34 +1,24 @@
 package ultimatum.project.service.member;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import io.swagger.v3.oas.models.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ultimatum.project.domain.dto.logInDTO.*;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.domain.entity.member.MemberImage;
 import ultimatum.project.global.config.Security.jwt.JwtProperties;
-import ultimatum.project.global.config.Security.oauth2.Oauth2UserService;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
 import ultimatum.project.repository.member.MemberRepository;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -39,7 +29,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final MemberImageService memberImageService;
-    private final JwtProperties jwtProperties;
     private final KakaoService kakaoService;
 
     @Autowired
@@ -134,25 +123,25 @@ public class MemberService {
         return member;
     }
 
-    public ResponseEntity<String> processKakaoLogin(KakaoUserInfoDto userInfo) {
-        Member member = findOrCreateUser(userInfo);
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                member.getMemberEmail(), null, member.getAuthorities());
-
-        SecurityContextHolder.getContext().setAuthentication(token);
-
-        String jwtToken = JWT.create()
-                .withSubject(member.getMemberEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
-                .withClaim("id", member.getMemberId())
-                .withClaim("username", member.getMemberName())
-                .withClaim("userid", member.getMemberEmail())
-                .sign(Algorithm.HMAC512(jwtProperties.getSecret()));
-
-        return ResponseEntity.ok()
-                .header(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtToken)
-                .body("Login successful with Kakao account");
-    }
+//    public ResponseEntity<String> processKakaoLogin(KakaoUserInfoDto userInfo) {
+//        Member member = findOrCreateUser(userInfo);
+//        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+//                member.getMemberEmail(), null, member.getAuthorities());
+//
+//        SecurityContextHolder.getContext().setAuthentication(token);
+//
+//        String jwtToken = JWT.create()
+//                .withSubject(member.getMemberEmail())
+//                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
+//                .withClaim("id", member.getMemberId())
+//                .withClaim("username", member.getMemberName())
+//                .withClaim("userid", member.getMemberEmail())
+//                .sign(Algorithm.HMAC512(jwtProperties.getSecret()));
+//
+//        return ResponseEntity.ok()
+//                .header(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtToken)
+//                .body("Login successful with Kakao account");
+//    }
 
 
     public String changePassword(String userEmail, String currentPassword, String newPassword) {
@@ -262,7 +251,7 @@ public class MemberService {
         return accessToken;
     }
 
-    public KakaoUserInfoDTO1 getUserInfoFromKakao(String accessToken){
+    public KakaoUserInfoDTO1 getUserInfoFromKakao(String accessToken) {
         KakaoUserInfoDTO1 kakaoUserInfoDTO1 = kakaoService.getKakaoUserInfo(accessToken);
         if (kakaoUserInfoDTO1 == null) {
             throw new IllegalArgumentException("사용자 정보를 받아오지 못했습니다.");
@@ -270,7 +259,7 @@ public class MemberService {
         return kakaoUserInfoDTO1;
     }
 
-    public Member registerOrLookupMember(KakaoUserInfoDTO1 kakaoUserInfoDTO1){
+    public Member registerOrLookupMember(KakaoUserInfoDTO1 kakaoUserInfoDTO1) {
         Member member = new Member();
         member.setMemberName(kakaoUserInfoDTO1.getMemberName());
         member.setMemberEmail(kakaoUserInfoDTO1.getMemberEmail());

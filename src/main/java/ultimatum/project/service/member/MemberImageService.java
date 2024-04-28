@@ -20,9 +20,6 @@ import java.util.List;
 @Log4j2
 public class MemberImageService {
 
-    private final MemberImageRepository imageRepository;
-    private final MemberRepository memberRepository;
-
     private final MemberS3Service memberS3Service;
 
     @Transactional

@@ -8,8 +8,6 @@ import java.util.List;
 @Data
 public class MemberWithKakaoRequestDto {
 
-
-
     private Long memberAge;
 
     private String memberGender;
