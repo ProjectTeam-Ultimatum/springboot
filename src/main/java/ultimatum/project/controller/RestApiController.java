@@ -136,24 +136,24 @@ log.info("jwtToken : "+jwtToken);
         }
     }
 
-    @PostMapping("/kakao-login")
-    public ResponseEntity<String> kakaoLogin(@AuthenticationPrincipal OAuth2User principal, @RequestParam KakaoUserInfoDto kakaoUserInfoDto) {
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("사용자 인증에 실패했습니다.");
-        }
-
-        // OAuth2User에서 사용자 정보 가져오기
-        String name = principal.getAttribute("name");
-        String email = principal.getAttribute("email");
-
-        // DTO 준비 및 설정
-        MemberWithKakaoRequestDto memberRequestDto = new MemberWithKakaoRequestDto();
-        memberRequestDto.setMemberName(name);
-        memberRequestDto.setMemberEmail(email);
-
-        return memberService.processKakaoLogin(kakaoUserInfoDto);
-
-    }
+//    @PostMapping("/kakao-login")
+//    public ResponseEntity<String> kakaoLogin(@AuthenticationPrincipal OAuth2User principal, @RequestParam KakaoUserInfoDto kakaoUserInfoDto) {
+//        if (principal == null) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("사용자 인증에 실패했습니다.");
+//        }
+//
+//        // OAuth2User에서 사용자 정보 가져오기
+//        String name = principal.getAttribute("name");
+//        String email = principal.getAttribute("email");
+//
+//        // DTO 준비 및 설정
+//        MemberWithKakaoRequestDto memberRequestDto = new MemberWithKakaoRequestDto();
+//        memberRequestDto.setMemberName(name);
+//        memberRequestDto.setMemberEmail(email);
+//
+//        return memberService.processKakaoLogin(kakaoUserInfoDto);
+//
+//    }
 
     @GetMapping("/user/info")
     @SecurityRequirement(name = "bearerAuth") // 토큰이 필요한 API
@@ -275,25 +275,25 @@ log.info("jwtToken : "+jwtToken);
         return response;
     }
 
-    @PostMapping(path = "/signup-with-kakao", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> signupWithKakao(@AuthenticationPrincipal OAuth2User principal, @ModelAttribute MemberWithKakaoRequestDto requestDto) {
+    @PutMapping(path = "/signup-with-kakao", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateWithKakao(@RequestParam String accessToken, @ModelAttribute MemberWithKakaoRequestDto requestDto) {
 
         // 여기서 accessToken은 프론트엔드에서 받은 카카오 액세스 토큰입니다.
         // Service 메소드는 카카오 API로부터 사용자 정보를 조회하고 추가 정보와 결합하여 처리합니다.
-        MemberWithKakaoResponseDto responseDto = memberService.registerOrLoginWithKakao(principal, requestDto);
+        ResponseEntity<?> responseDto = memberService.registerOrLoginWithKakao(accessToken,requestDto);
 
         // 결과를 클라이언트에 반환합니다.
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(responseDto.getBody());
     }
 
-    @GetMapping("/kakao/userinfo")
-    public ResponseEntity<?> getkakaoUserInfo(@AuthenticationPrincipal OAuth2User principal) {
-
-        if (principal == null) {
-            return ResponseEntity.status(401).build(); // Unauthorized
-        }
-
-        Member member = memberService.registerOrUpdateUser(principal);
-        return ResponseEntity.ok(member);
-    }
+//    @GetMapping("/kakao/userinfo")
+//    public ResponseEntity<?> getkakaoUserInfo(@AuthenticationPrincipal OAuth2User principal) {
+//
+//        if (principal == null) {
+//            return ResponseEntity.status(401).build(); // Unauthorized
+//        }
+//
+//        Member member = memberService.UpdateExistingMember(principal);
+//        return ResponseEntity.ok(member);
+//    }
 }

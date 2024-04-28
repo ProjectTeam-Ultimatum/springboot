@@ -60,11 +60,11 @@ public class SecurityConfig {
 				.httpBasic(httpBasic -> httpBasic.disable())
 				.addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtProperties))
 				.addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository, jwtProperties))
-				.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo ->
-						//사용자 정보를 가져올때 사용할 서비스 설정
-						userInfo.userService(oauth2UserService))
-						.successHandler(oAuthSuccessHandler)
-						.failureHandler(oAuthFailureHandler))
+//				.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo ->
+//						//사용자 정보를 가져올때 사용할 서비스 설정
+//						userInfo.userService(oauth2UserService))
+//						.successHandler(oAuthSuccessHandler)
+//						.failureHandler(oAuthFailureHandler))
 				.authorizeRequests()
 		 		.requestMatchers("/api/v1/user/info").access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
 				.requestMatchers("/api/v1/admin/**").access("hasRole('ROLE_ADMIN')")
