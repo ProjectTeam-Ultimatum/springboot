@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDTO1;
-import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDto;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -18,7 +17,9 @@ import java.net.URL;
 
 @Service
 @Log4j2
-public class KakaoService {
+public class KakaoService  {
+
+
 
     public String getKakaoAccessToken(String code) {
         String accessToken = "";
@@ -85,8 +86,6 @@ public class KakaoService {
         log.info("headers : {}",headers);
         log.info("entity : {}",entity);
 
-
-
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<KakaoUserInfoDTO1> response = restTemplate.exchange(
                 requestUrl, HttpMethod.GET, entity, KakaoUserInfoDTO1.class
@@ -95,9 +94,9 @@ public class KakaoService {
 
         KakaoUserInfoDTO1 kakaoUserInfoDto = response.getBody();
         if (kakaoUserInfoDto != null) {
-            String nickname = kakaoUserInfoDto.getProperties() != null ? kakaoUserInfoDto.getProperties().getNickname() : null;
+            String nickName = kakaoUserInfoDto.getProperties() != null ? kakaoUserInfoDto.getProperties().getNickname() : null;
             String email = kakaoUserInfoDto.getKakao_account() != null ? kakaoUserInfoDto.getKakao_account().getEmail() : null;
-            log.info("Kakao User Nickname: {}", nickname);
+            log.info("Kakao User Nickname: {}", nickName);
             log.info("Kakao User Email: {}", email);
 
             // 추가적인 로직...

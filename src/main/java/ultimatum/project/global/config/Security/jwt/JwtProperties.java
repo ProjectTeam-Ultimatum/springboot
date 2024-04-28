@@ -35,5 +35,6 @@ public class JwtProperties {
 				.withIssuedAt(now)
 				.withExpiresAt(expiryDate)
 				.sign(Algorithm.HMAC512(getSecret()));
+
 	}
 }

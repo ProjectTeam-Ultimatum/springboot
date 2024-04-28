@@ -9,14 +9,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ultimatum.project.domain.dto.logInDTO.*;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.domain.entity.member.MemberImage;
 import ultimatum.project.global.config.Security.jwt.JwtProperties;
+import ultimatum.project.global.config.Security.oauth2.Oauth2UserService;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
 import ultimatum.project.repository.member.MemberRepository;
@@ -37,7 +41,6 @@ public class MemberService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final MemberImageService memberImageService;
     private final JwtProperties jwtProperties;
-    private final KakaoService kakaoService;
 
     @Autowired
     private JavaMailSender javaMailSender;
@@ -78,20 +81,20 @@ public class MemberService {
         return "회원가입 완료: " + member.getMemberName();
     }
 
-    public MemberWithKakaoResponseDto registerOrLoginWithKakao(String accessToken,
+    public MemberWithKakaoResponseDto registerOrLoginWithKakao(@AuthenticationPrincipal OAuth2User principal,
                                                                MemberWithKakaoRequestDto additionalInfo) {
-        //엑세스 토큰을 사용하여 카카오로부터 사용자 정보 획득
-        KakaoUserInfoDTO1 kakaoUserInfoDto = kakaoService.getKakaoUserInfo(accessToken);
-        log.info("카카오 유저 information : {} ", kakaoUserInfoDto);
+        // OAuth2User에서 카카오 유저 정보 추출
+        String email = principal.getAttribute("email");
+        String name = principal.getAttribute("name");
+        log.info("카카오 유저 information : {} ", email);
 
         // 데이터베이스에서 사용자 조회
-        Member member = memberRepository.findByMemberEmail(kakaoUserInfoDto.getMemberEmail());
-
-
+        Member member = memberRepository.findByMemberEmail(email);
         boolean isNewMember = member == null;
+
         if (isNewMember) {
             // 사용자 새로 생성
-            member = createUserWithKakao(kakaoUserInfoDto, additionalInfo);
+            member = createUserWithKakao(principal, additionalInfo);
             // 이미지 처리
             List<MemberImage> memberImages = memberImageService.createMemberImages(additionalInfo.getFiles(), member);
             if (memberImages.isEmpty() && !additionalInfo.getFiles().isEmpty()) {
@@ -250,45 +253,39 @@ public class MemberService {
         return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
     }
 
-    private MemberWithKakaoResponseDto createResponseDto(Member member, List<MemberImage> memberImages, String jwtToken, boolean isNewMember) {
+    public MemberWithKakaoResponseDto createResponseDto(Member member, List<MemberImage> memberImages, String jwtToken, boolean isNewMember) {
         // MemberImage 엔티티 목록을 MemberImageResponseDto 목록으로 변환
         List<MemberImageResponseDto> imageResponseDtoList = memberImages.stream()
                 .map(this::convertToImageResponseDto)
                 .collect(Collectors.toList());
 
         // Member 엔티티의 정보를 MemberWithKakaoResponseDto 객체로 설정
-        MemberWithKakaoResponseDto dto = new MemberWithKakaoResponseDto();
-        dto.setMemberId(member.getMemberId());
-        dto.setMemberName(member.getMemberName());
-        dto.setMemberEmail(member.getMemberEmail());
-        dto.setMemberAge(member.getMemberAge());
-        dto.setMemberGender(member.getMemberGender());
-        dto.setMemberAddress(member.getMemberAddress());
-        dto.setMemberFindPasswordAnswer(member.getMemberFindPasswordAnswer());
-        dto.setMemberStyle(member.getMemberStyle());
-        dto.setMemberRole(member.getMemberRole());
-        dto.setFiles(imageResponseDtoList); // 이미지 정보 설정
-        // JWT 토큰은 보통 Response의 헤더에 포함시키거나 별도의 필드로 추가합니다.
-        dto.setNewMember(isNewMember);
-
-        return dto;
+        return new MemberWithKakaoResponseDto(
+                member.getMemberId(),
+                member.getMemberName(),
+                member.getMemberEmail(),
+                member.getMemberAge(),
+                member.getMemberGender(),
+                member.getMemberAddress(),
+                member.getMemberFindPasswordAnswer(),
+                member.getMemberStyle(),
+                member.getMemberRole(),
+                jwtToken,
+                imageResponseDtoList, // 이미지 정보 설정
+                isNewMember
+        );
     }
 
     private MemberImageResponseDto convertToImageResponseDto(MemberImage memberImage) {
-        // MemberImage 엔티티를 MemberImageResponseDto로 변환하는 로직 구현
-        MemberImageResponseDto imageResponseDto = new MemberImageResponseDto();
-        imageResponseDto.setReviewImageId(memberImage.getMemberImageId());
-        imageResponseDto.setImageName(memberImage.getMemberImageName());
-        imageResponseDto.setImageUri(memberImage.getMemberImageUrl());
-        // 기타 필요한 필드를 설정할 수 있습니다.
-        return imageResponseDto;
+        return new MemberImageResponseDto(memberImage.getMemberImageId(),memberImage.getMemberImageName(), memberImage.getMemberImageUrl());
+
     }
 
-    private Member createUserWithKakao(KakaoUserInfoDTO1 userInfo,
+    private Member createUserWithKakao(OAuth2User oAuth2User,
                                       MemberWithKakaoRequestDto additionalInfo) {
         Member member = Member.builder()
-                .memberEmail(userInfo.getMemberEmail())
-                .memberName(userInfo.getMemberName())
+                .memberEmail(oAuth2User.getAttribute("email"))
+                .memberName(oAuth2User.getAttribute("name"))
                 .memberAge(additionalInfo.getMemberAge())
                 .memberGender(additionalInfo.getMemberGender())
                 .memberAddress(additionalInfo.getMemberAddress())
@@ -297,6 +294,31 @@ public class MemberService {
                 .memberRole("ROLE_USER")
                 .build();
         memberRepository.save(member);
+
+        return member;
+    }
+
+    public Member registerOrUpdateUser(OAuth2User oauthUser) {
+        String email = oauthUser.getAttribute("email");
+        if (email == null) {
+            throw new IllegalArgumentException("Email not found from OAuth2User");
+        }
+
+        Member member = memberRepository.findByMemberEmail(email);
+        if (member == null) {
+            // New user registration
+            member = new Member();
+            member.setMemberEmail(email);
+            member.setMemberName(oauthUser.getAttribute("name"));
+            // Further attributes can be set here
+            memberRepository.save(member);
+            log.info("New user registered: {}", email);
+        } else {
+            // Update existing user details
+            member.setMemberName(oauthUser.getAttribute("name"));
+            memberRepository.save(member);
+            log.info("User details updated: {}", email);
+        }
 
         return member;
     }

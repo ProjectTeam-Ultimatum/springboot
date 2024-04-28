@@ -39,13 +39,13 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 		}
 		String token = header.replace(JwtProperties.TOKEN_PREFIX, "");
 
-		String memberEmail = JWT.require(Algorithm.HMAC512(jwtProperties.getSecret())).build().verify(token)
-				.getClaim("userid").asString();
+		String email = JWT.require(Algorithm.HMAC512(jwtProperties.getSecret())).build().verify(token)
+				.getClaim("email").asString();
 
-		System.out.println("memberEmail: " + memberEmail);
+		System.out.println("email: " + email);
 
-		if (memberEmail != null) {
-			Member member = memberRepository.findByMemberEmail(memberEmail);
+		if (email != null) {
+			Member member = memberRepository.findByMemberEmail(email);
 
 			if (member != null) {
 				PrincipalDetails principalDetails = new PrincipalDetails(member);
