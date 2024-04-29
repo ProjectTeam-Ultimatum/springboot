@@ -48,10 +48,11 @@ public class ChatService {
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setChatRoom(chatRoom);
         chatMessage.setSenderId(senderName);  // 사용자 이름을 senderId에 저장
-        chatMessage.setSenderEmail(senderEmail);
+        chatMessage.setSenderEmail(chatMessageDto.getSenderEmail());
         chatMessage.setMessage(chatMessageDto.getMessage());
         chatMessage.setMessageType(chatMessageDto.getMessageType());
 
+        log.info("senderEmail{}!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", senderEmail);
         messageRepository.save(chatMessage);
     }
 
