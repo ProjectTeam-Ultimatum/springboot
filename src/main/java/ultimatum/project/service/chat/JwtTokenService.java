@@ -5,12 +5,14 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.global.config.Security.jwt.JwtProperties;
 
 @Service
+@Slf4j
 public class JwtTokenService {
 
     private final JwtProperties jwtProperties;
@@ -51,7 +53,9 @@ public class JwtTokenService {
         Member member = new Member();
         member.setMemberId(jwt.getClaim("id").asLong());
         member.setMemberName(jwt.getClaim("username").asString());
-        member.setMemberEmail(jwt.getClaim("userid").asString());
+        member.setMemberEmail(jwt.getClaim("email").asString());
+
+        log.info("member jwt email : {}", jwt.getClaim("email").asString());
         member.setMemberGender(jwt.getClaim("gender").asString());
         member.setMemberRole(jwt.getClaim("role").asString());  // 'role' 클레임에서 역할 정보 추출
         return member;

@@ -74,7 +74,7 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
         Member member = jwtTokenService.parseToken(token);
         if (member != null) {
             // 사용자 ID를 세션 속성에 저장
-            session.getAttributes().put("userId", member.getMemberId());
+            session.getAttributes().put("email", member.getMemberId());
         }
 
         log.info("{} 연결됨", session.getId());
@@ -134,6 +134,7 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
                 //log.info("Received TALK message: sessionId={}, senderId={}, message={}",
                         //session.getId(), chatMessageDto.getSenderId(), chatMessageDto.getMessage());
                 chatService.saveMessage(chatMessageDto, authentication);  // Modified to include authentication
+                log.info("chatMessageDto {}!!!!!!!!!!!!", chatMessageDto.getSenderEmail());
                 chatRoomSessionService.getSessionsForRoom(chatRoomId)
                         .forEach(s -> sendMessageToSession(chatMessageDto, s));
                 break;
@@ -177,14 +178,20 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
                 .senderId(username)
                 .message(enterMessageContent)
                 .build();
+
+        // 세션을 채팅방에 추가
         chatRoomSessionService.addSessionToRoom(chatRoomId, session);
+
+        // 채팅방에 있는 모든 세션에게 입장 메시지 전송
         chatRoomSessionService.getSessionsForRoom(chatRoomId)
                 .forEach(s -> sendMessageToSession(enterMessage, s));
 
         log.info("User {} entered chat room {} with session ID: {}", username, chatRoomId, session.getId());
 
+        log.info("email{}",email);
         // 사용자의 신고 횟수 확인
         int reportCount = reportService.countUserReports(email);
+        log.info("reportCount{}", reportCount);
         if (reportCount >= 3) {
             // 경고 메시지 전송
             ChatMessageDto warningMessage = ChatMessageDto.builder()
