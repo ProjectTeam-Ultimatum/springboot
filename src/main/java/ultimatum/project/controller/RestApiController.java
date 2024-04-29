@@ -169,6 +169,8 @@ public class RestApiController {
         userDetails.put("address", member.getMemberAddress());
         userDetails.put("memberStyle", member.getMemberStyle()); // 스타일 정보 추가
         userDetails.put("needSurvey", member.getMemberStyle() == null); // 설문 필요 여부 추가
+        userDetails.put("findByAnswer", member.getMemberFindPasswordAnswer());
+
 
         // 이미지 정보 추가: 멤버의 이미지 URL 리스트
         List<String> imageUrls = member.getMemberImages().stream()

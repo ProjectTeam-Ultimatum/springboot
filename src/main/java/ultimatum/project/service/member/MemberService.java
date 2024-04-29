@@ -159,14 +159,14 @@ public class MemberService {
 
     public String changePassword(String userEmail, String currentPassword, String newPassword) {
         Member member = memberRepository.findByMemberEmail(userEmail);
-
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         if (member == null) {
-            return "사용자를 찾을 수 없습니다.";
+            throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
         }
 
         // 현재 비밀번호 검증
         if (!bCryptPasswordEncoder.matches(currentPassword, member.getMemberPassword())) {
-            return "현재 비밀번호가 일치하지 않습니다.";
+            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
         }
 
         // 새로운 비밀번호 설정
