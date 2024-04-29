@@ -13,21 +13,21 @@ import java.sql.Time;
 @NoArgsConstructor
 public class RecommendListPlaceByIdResponse {
 
-    private Long recommendHotelId;
-    private String recommendHotelTitle;
-    private String recommendHotelIntroduction;
-    private String recommendHotelAllTag;
-    private String recommendHotelTag;
-    private String recommendHotelCategory;
-    private String recommendHotelAddress;
-    private String recommendHotelRegion;
-    private Time recommendHotelOpentime;
-    private Time recommendHotelClosetime;
-    private Long recommendHotelStar;
-    private Long recommendHotelLike;
-    private String recommendHotelLatitude;
-    private String recommendHotelLongitude;
-    private String recommendHotelPhoneNo;
-    private String recommendHotelImgPath;
-    private Long recommendHotelBudget;
+    private Long recommendPlaceId;
+    private String recommendPlaceTitle;
+    private String recommendPlaceIntroduction;
+    private String recommendPlaceAllTag;
+    private String recommendPlaceTag;
+    private String recommendPlaceCategory;
+    private String recommendPlaceAddress;
+    private String recommendPlaceRegion;
+    private Time recommendPlaceOpentime;
+    private Time recommendPlaceClosetime;
+    private Long recommendPlaceStar;
+    private Long recommendPlaceLike;
+    private String recommendPlaceLatitude;
+    private String recommendPlaceLongitude;
+    private String recommendPlacePhoneNo;
+    private String recommendPlaceImgPath;
+    private Long recommendPlaceBudget;
 }

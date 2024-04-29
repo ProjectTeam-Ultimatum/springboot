@@ -2,11 +2,12 @@ package ultimatum.project.domain.entity.plan;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ultimatum.project.domain.entity.hotel.RecommendHotel;
-import ultimatum.project.domain.entity.place.RecommendPlace;
-import ultimatum.project.domain.entity.plan.PlanDay;
+import ultimatum.project.domain.entity.event.RecommendListEvent;
+import ultimatum.project.domain.entity.food.RecommendListFood;
+import ultimatum.project.domain.entity.place.RecommendListPlace;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,30 +18,29 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PlanPlace {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long planPlaceId;
 
-    private LocalDateTime planPlaceDate;
-
-    private LocalDateTime planPlaceStayTime;
-
-    private LocalDateTime planPlaceArriveTime;
-
-//    @OneToMany
-//    @JoinColumn(name = "recommend_place_id")
-//    private List<RecommendPlace> recommendPlaceId = new ArrayList<>();
-
     @ManyToOne
-    private RecommendPlace recommendPlace;
+    @JoinColumn(name = "plan_id")
+    private Plan plan;
 
     @ManyToOne
     @JoinColumn(name = "plan_day_id")
-    private PlanDay planDayId;
+    private PlanDay planDay;
 
     @ManyToOne
-    @JoinColumn(name = "plan_day_date")
-    private PlanDay plan_day_date;
+    @JoinColumn(name = "recommend_place_id")
+    private RecommendListPlace recommendPlace;
 
+    private LocalTime planPlaceStayTime;
+
+    // 생성자
+    public PlanPlace(Plan plan, PlanDay planDay, RecommendListPlace recommendPlace, LocalTime planPlaceStayTime) {
+        this.plan = plan;
+        this.planDay = planDay;
+        this.recommendPlace = recommendPlace;
+        this.planPlaceStayTime = planPlaceStayTime;
+    }
 }

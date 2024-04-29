@@ -4,9 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.sql.Time;
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,7 +12,6 @@ import java.sql.Time;
 public class RecommendListPlaceResponse {
 
     private Long recommendPlaceId;
-    //private String recommendPlaceId;
     private String recommendPlaceTitle;
     private String recommendPlaceIntroduction;
     private String recommendPlaceAllTag;

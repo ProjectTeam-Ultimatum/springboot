@@ -16,32 +16,30 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PlanFood {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long planFoodId;
 
-    private LocalDateTime planFoodDate;
-
-    private LocalDateTime planFoodStayTime;
-
-    private LocalDateTime planFoodArriveTime;
-
-    private LocalDateTime planFoodRouteTime;
-
-//    @OneToMany
-//    @JoinColumn(name = "recommend_food_id")
-//    private List<RecommendFood> recommendFoodId = new ArrayList<>();
-
     @ManyToOne
-    private RecommendFood recommendFood;
+    @JoinColumn(name = "plan_id")
+    private Plan plan;
 
     @ManyToOne
     @JoinColumn(name = "plan_day_id")
-    private PlanDay planDayId;
+    private PlanDay planDay;
 
     @ManyToOne
-    @JoinColumn(name = "plan_day_date")
-    private PlanDay plan_day_date;
+    @JoinColumn(name = "recommend_food_id")
+    private RecommendListFood recommendFood;
+
+    private LocalTime planFoodStayTime;
+
+    // 생성자
+    public PlanFood(Plan plan, PlanDay planDay, RecommendListFood recommendFood, LocalTime planFoodStayTime) {
+        this.plan = plan;
+        this.planDay = planDay;
+        this.recommendFood = recommendFood;
+        this.planFoodStayTime = planFoodStayTime;
+    }
 
 }

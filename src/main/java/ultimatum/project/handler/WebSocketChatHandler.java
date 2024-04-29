@@ -19,6 +19,7 @@ import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.service.chat.ChatRoomSessionService;
 import ultimatum.project.service.chat.ChatService;
 import ultimatum.project.service.chat.JwtTokenService;
+import ultimatum.project.service.chat.ReportService;
 
 import java.io.*;
 import java.net.URLDecoder;
@@ -33,6 +34,8 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
     private  final ObjectMapper mapper;
 
     private final ChatService chatService;
+
+    private final ReportService reportService;
 
     private final JwtTokenService jwtTokenService;
 
@@ -106,6 +109,8 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
 
         SecurityContext context = (SecurityContext) session.getAttributes().get("SPRING_SECURITY_CONTEXT");
 
+        String senderEmail = ((Member) context.getAuthentication().getPrincipal()).getMemberEmail();
+
         // SecurityContext와 Authentication 검증
         if (context == null || context.getAuthentication() == null || !context.getAuthentication().isAuthenticated()) {
             log.warn("No authentication information available for session id {}", session.getId());
@@ -128,7 +133,6 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
                 // TALK 메시지 처리 전 로그 추가
                 //log.info("Received TALK message: sessionId={}, senderId={}, message={}",
                         //session.getId(), chatMessageDto.getSenderId(), chatMessageDto.getMessage());
-
                 chatService.saveMessage(chatMessageDto, authentication);  // Modified to include authentication
                 chatRoomSessionService.getSessionsForRoom(chatRoomId)
                         .forEach(s -> sendMessageToSession(chatMessageDto, s));
@@ -163,6 +167,9 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
     private void handleEnter(WebSocketSession session, Long chatRoomId, Authentication authentication) {
         Member member = (Member) authentication.getPrincipal();
         String username = member.getMemberName();
+        String email = member.getMemberEmail();
+
+        // 입장 메시지 생성 및 전송
         String enterMessageContent = username + " 님이 입장하셨습니다.";
         ChatMessageDto enterMessage = ChatMessageDto.builder()
                 .messageType(MessageType.ENTER)
@@ -170,16 +177,28 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
                 .senderId(username)
                 .message(enterMessageContent)
                 .build();
-
-        // 세션을 채팅방에 추가
         chatRoomSessionService.addSessionToRoom(chatRoomId, session);
-
-        // 채팅방에 있는 모든 세션에게 입장 메시지 전송
         chatRoomSessionService.getSessionsForRoom(chatRoomId)
                 .forEach(s -> sendMessageToSession(enterMessage, s));
 
         log.info("User {} entered chat room {} with session ID: {}", username, chatRoomId, session.getId());
+
+        // 사용자의 신고 횟수 확인
+        int reportCount = reportService.countUserReports(email);
+        if (reportCount >= 3) {
+            // 경고 메시지 전송
+            ChatMessageDto warningMessage = ChatMessageDto.builder()
+                    .messageType(MessageType.WARNING)
+                    .chatRoomId(chatRoomId)
+                    .senderId(username)
+                    .message("경고 ❗: " + username + " 님은 최근 3개월동안 3회이상 신고 접수된 사용자입니다. 피해 위험이 있습니다 주의하세요!")
+                    .build();
+            chatRoomSessionService.addSessionToRoom(chatRoomId, session);
+            chatRoomSessionService.getSessionsForRoom(chatRoomId)
+                    .forEach(s -> sendMessageToSession(warningMessage, s));
+        }
     }
+
 
 
 
@@ -212,6 +231,7 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
                 if (session.isOpen()) {
                     String messagePayload = mapper.writeValueAsString(chatMessageDto);
                     session.sendMessage(new TextMessage(messagePayload));
+                    log.info("Sent message to session ID: {}", session.getId());
                 }
             }
         } catch (Exception e) {

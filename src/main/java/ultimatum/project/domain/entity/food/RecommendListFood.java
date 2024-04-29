@@ -2,13 +2,11 @@ package ultimatum.project.domain.entity.food;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.sql.Time;
 
 @Entity
 @Builder
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RecommendListFood {
@@ -30,7 +28,7 @@ public class RecommendListFood {
     private String recommendFoodRegion;
     private Time recommendFoodOpentime;
     private Time recommendFoodClosetime;
-    private Long recommendFoodStar;
+    private Long recommendFoodStar; //평점
     private Long recommendFoodLike;
     private String recommendFoodLatitude;
     private String recommendFoodLongitude;

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +16,8 @@ import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDTO1;
 import ultimatum.project.domain.dto.logInDTO.MemberFindPasswordRequestDto;
 import ultimatum.project.domain.dto.logInDTO.MemberRequestDto;
 import ultimatum.project.domain.dto.logInDTO.MemberWithKakaoRequestDto;
+import ultimatum.project.domain.dto.logInDTO.MemberUpdateRequestDto;
+import ultimatum.project.domain.dto.logInDTO.UpdateStyleDto;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.domain.entity.member.MemberImage;
 import ultimatum.project.global.config.Security.auth.PrincipalDetails;
@@ -23,6 +26,7 @@ import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
 import ultimatum.project.repository.member.MemberRepository;
 import ultimatum.project.service.member.KakaoService;
+import ultimatum.project.service.member.MemberImageService;
 import ultimatum.project.service.member.MemberService;
 
 import java.util.Collections;
@@ -42,6 +46,7 @@ public class RestApiController {
     private final MemberService memberService;
     private final JwtProperties jwtProperties;
     private final KakaoService kakaoService;
+    private final MemberImageService memberImageService;
 
     // 모든 사람이 접근 가능
     @GetMapping("/home")
@@ -74,7 +79,9 @@ public class RestApiController {
     }
 
     @PostMapping("/join")
-    public ResponseEntity<String> join(@RequestPart("member") MemberRequestDto memberRequestDto, @RequestPart("files") List<MultipartFile> files) {
+    public ResponseEntity<String> join(
+            @RequestPart("member") MemberRequestDto memberRequestDto,
+            @RequestPart("files") List<MultipartFile> files) {
         memberRequestDto.setFiles(files);
         String result = memberService.createMember(memberRequestDto);
         return ResponseEntity.ok(result);
@@ -110,25 +117,6 @@ public class RestApiController {
             return ResponseEntity.ok().headers(headers).body(responseData);
     }
 
-//    @PostMapping("/kakao-login")
-//    public ResponseEntity<String> kakaoLogin(@AuthenticationPrincipal OAuth2User principal, @RequestParam KakaoUserInfoDto kakaoUserInfoDto) {
-//        if (principal == null) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("사용자 인증에 실패했습니다.");
-//        }
-//
-//        // OAuth2User에서 사용자 정보 가져오기
-//        String name = principal.getAttribute("name");
-//        String email = principal.getAttribute("email");
-//
-//        // DTO 준비 및 설정
-//        MemberWithKakaoRequestDto memberRequestDto = new MemberWithKakaoRequestDto();
-//        memberRequestDto.setMemberName(name);
-//        memberRequestDto.setMemberEmail(email);
-//
-//        return memberService.processKakaoLogin(kakaoUserInfoDto);
-//
-//    }
-
     @GetMapping("/user/info")
     @SecurityRequirement(name = "bearerAuth") // 토큰이 필요한 API
     @ResponseBody
@@ -153,31 +141,7 @@ public class RestApiController {
         }
     }
 
-//    @GetMapping("/user/info/detail")
-//    @SecurityRequirement(name = "bearerAuth")
-//    @ResponseBody
-//    public ResponseEntity<String> getUserInfoDetail(Authentication authentication) {
-//        if (authentication == null || !authentication.isAuthenticated()) {
-//            throw new CustomException(ErrorCode.BAD_REQUSET_USER);
-//        }
-//
-//        String memberEmail = authentication.getName();
-//
-//        Member member = memberRepository.findByMemberEmail(memberEmail);
-//
-//        if (member == null) {
-//            return ResponseEntity.badRequest().body("사용자 정보를 찾을 수 없습니다.");
-//        }
-//
-//        String userDetails =
-//                "사용자 이름: " + member.getMemberName() +
-//                        ", 이메일: " + member.getMemberEmail() +
-//                        ", 성별: " + member.getMemberGender() +
-//                        ", 나이: " + member.getMemberAge() +
-//                        ", 주소: " + member.getMemberAddress();
-//
-//        return ResponseEntity.ok(userDetails);
-//    }
+
 
 
     @GetMapping("/user/info/detail")
@@ -197,21 +161,28 @@ public class RestApiController {
         }
 
         Map<String, Object> userDetails = new HashMap<>();
+        userDetails.put("memberId",member.getMemberId());
         userDetails.put("userName", member.getMemberName());
         userDetails.put("email", member.getMemberEmail());
         userDetails.put("gender", member.getMemberGender());
         userDetails.put("age", member.getMemberAge());
         userDetails.put("address", member.getMemberAddress());
+        userDetails.put("memberStyle", member.getMemberStyle()); // 스타일 정보 추가
+        userDetails.put("needSurvey", member.getMemberStyle() == null); // 설문 필요 여부 추가
 
         // 이미지 정보 추가: 멤버의 이미지 URL 리스트
-        List<String> imageUrls = member.getMemberImages().stream().map(MemberImage::getMemberImageUrl).collect(Collectors.toList());
+        List<String> imageUrls = member.getMemberImages().stream()
+                .map(MemberImage::getMemberImageUrl)
+                .collect(Collectors.toList());
         userDetails.put("images", imageUrls);
 
         return ResponseEntity.ok(userDetails);
     }
 
     @PostMapping("/user/password")
-    public ResponseEntity<String> changePassword(@RequestParam String currentPassword, @RequestParam String newPassword) {
+    public ResponseEntity<String> changePassword(
+            @RequestParam String currentPassword,
+            @RequestParam String newPassword) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.badRequest().body("인증되지 않은 사용자입니다.");
@@ -228,10 +199,28 @@ public class RestApiController {
         return "success!";
     }
 
-    @DeleteMapping("/user/delete")
-    public ResponseEntity<String> deleteMember(@RequestParam String password, @RequestParam String answer) {
+    @PostMapping("/user/updateStyle")
+    public ResponseEntity<String> updateMemberStyle(@RequestBody UpdateStyleDto updateStyleDto, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("인증되지 않은 사용자입니다.");
+        }
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        String userEmail = principal.getUsername(); // 인증된 사용자의 이메일을 가져옴
 
-        // 현재 인증된 사용자 정보 가져오기ㅌ
+        try {
+            String result = memberService.updateMemberStyle(userEmail, updateStyleDto.getMemberStyle());
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("업데이트 과정에서 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/user/delete")
+    public ResponseEntity<String> deleteMember(
+            @RequestParam String password,
+            @RequestParam String answer) {
+
+        // 현재 인증된 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new CustomException(ErrorCode.BAD_REQUSET_USER);
@@ -247,6 +236,41 @@ public class RestApiController {
         }
 
         return response;
+    }
+
+    @PostMapping("/user/update-info")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<String> updateMemberInfo(
+            @RequestParam String userEmail,
+            @RequestBody MemberUpdateRequestDto updateRequestDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+
+        if (!loggedInUserEmail.equals(userEmail)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        return memberService.updateMemberInfo(userEmail, updateRequestDto);
+    }
+
+    // 프로필 이미지 업데이트
+    @PostMapping("/profile-image")
+    public ResponseEntity<String> updateProfileImage(
+            Authentication authentication,
+            @RequestParam("imageFile") MultipartFile imageFile
+    ) {
+        try {
+            // PrincipalDetails에서 Member 객체 추출
+            PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+            Member loggedInMember = principalDetails.getUser();
+
+            // 이미지 파일을 사용하여 이미지 업데이트 로직 수행
+            MemberImage updatedImage = memberImageService.updateMemberImage(loggedInMember, imageFile);
+            return ResponseEntity.ok("프로필 이미지가 업데이트되었습니다.");
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 업데이트 실패: " + e.getMessage());
+        }
     }
 
     @PutMapping(path = "/signup-with-kakao", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

@@ -2,15 +2,8 @@ package ultimatum.project.domain.entity.plan;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ultimatum.project.domain.entity.food.RecommendFood;
-import ultimatum.project.domain.entity.hotel.RecommendHotel;
-import ultimatum.project.domain.entity.plan.PlanDay;
+import ultimatum.project.domain.entity.hotel.RecommendListHotel;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Builder
@@ -23,26 +16,16 @@ public class PlanHotel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long planHotelId;
 
-    private LocalDateTime planHotelDate;
-
-    private LocalDateTime planHotelStayTime;
-
-    private LocalTime planHotelArriveTime;
-
-    private LocalTime planHotelRouteTime;
-
-//    @OneToMany
-//    @JoinColumn(name = "recommend_hotel_id")
-//    private List<RecommendHotel> recommendHotelId = new ArrayList<>();
-
     @ManyToOne
-    private RecommendHotel recommendHotel;
+    @JoinColumn(name = "recommend_hotel_id")
+    private RecommendListHotel recommendHotel;
 
     @ManyToOne
     @JoinColumn(name = "plan_day_id")
-    private PlanDay planDayId;
+    private PlanDay planDay;
 
-    @ManyToOne
-    @JoinColumn(name = "plan_day_date")
-    private PlanDay plan_day_date; // 1일차, 2일차, 3일차로 표시
+    public PlanHotel(PlanDay planDay, RecommendListHotel recommendHotel) {
+        this.planDay = planDay;
+        this.recommendHotel = recommendHotel;
+    }
 }

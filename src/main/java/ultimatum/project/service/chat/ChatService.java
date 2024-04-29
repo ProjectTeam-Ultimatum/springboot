@@ -66,7 +66,9 @@ public class ChatService {
                             chatRoom.getChatRoomName(),
                             chatRoom.getChatRoomContent(),
                             member.getMemberName(),  // 작성자 이름
+                            member.getMemberGender(),
                             member.getMemberAge(),   // 작성자 나이
+                            member.getMemberId(),
                             chatRoom.getTravelStyleTags(),
                             chatRoom.getReviewLocation(),
                             imageUrl, // 작성자 이미지 URL 추가
@@ -81,14 +83,18 @@ public class ChatService {
     public List<ChatRoomListDto> getConnectedChatRooms(Long memberId) {
         List<Long> roomIds = chatRoomSessionService.getConnectedRoomsForMember(memberId);
         return chatRoomRepository.findAllById(roomIds).stream().map(room -> {
+            Member member = room.getMember();
+            String imageUrl = member.getMemberImages().isEmpty() ? null : member.getMemberImages().get(0).getMemberImageUrl();
             ChatRoomListDto dto = new ChatRoomListDto();
             dto.setChatRoomId(room.getChatRoomId());
             dto.setChatRoomName(room.getChatRoomName());
+            dto.setCreatorGender(room.getCreatorGender());
             dto.setChatRoomContent(room.getChatRoomContent());
             dto.setCreatorName(room.getMember().getMemberName());
             dto.setCreatorAge(room.getMember().getMemberAge());
             dto.setTravelStyleTags(room.getTravelStyleTags());
             dto.setReviewLocation(room.getReviewLocation());
+            dto.setCreatorImage(imageUrl);
             dto.setRegDate(room.getRegDate());
             return dto;
         }).collect(Collectors.toList());
@@ -99,7 +105,7 @@ public class ChatService {
     // 특정 채팅방에 입장
     public ChatRoomDto enterChatRoom(Long roomId) {
         return chatRoomRepository.findById(roomId)
-                .map(chatRoom -> new ChatRoomDto(chatRoom.getChatRoomId(), chatRoom.getChatRoomName(), chatRoom.getChatRoomContent(), chatRoom.getTravelStyleTags(), chatRoom.getReviewLocation()))
+                .map(chatRoom -> new ChatRoomDto(chatRoom.getChatRoomId(),chatRoom.getMember().getMemberId(), chatRoom.getChatRoomName(), chatRoom.getChatRoomContent(), chatRoom.getCreatorGender(), chatRoom.getTravelStyleTags(), chatRoom.getReviewLocation()))
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다!"));
     }
 
@@ -123,6 +129,7 @@ public class ChatService {
             ChatRoom chatRoom = new ChatRoom();
             chatRoom.setChatRoomName(chatRoomDto.getChatRoomName());
             chatRoom.setChatRoomContent(chatRoomDto.getChatRoomContent());
+            chatRoom.setCreatorGender(chatRoomDto.getCreatorGender());
             chatRoom.setTravelStyleTags(chatRoomDto.getTravelStyleTags());
             chatRoom.setReviewLocation(chatRoomDto.getReviewLocation());
             chatRoom.setMember(member); // 채팅방 개설 회원 설정
@@ -202,6 +209,7 @@ public class ChatService {
 
         return messages.stream()
                 .map(message -> new ChatMessageDto(
+                        message.getChatMessageId(),
                         message.getMessageType(),
                         message.getChatRoom().getChatRoomId(),
                         message.getSenderId(),

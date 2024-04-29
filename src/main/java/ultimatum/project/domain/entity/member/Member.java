@@ -37,7 +37,7 @@ public class Member {
 
     private String memberRole;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberImage> memberImages = new ArrayList<>();
 
 //    public Collection<? extends GrantedAuthority> getAuthorities() {

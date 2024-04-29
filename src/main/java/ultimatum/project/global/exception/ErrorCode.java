@@ -32,6 +32,8 @@ public enum ErrorCode {
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
     UNAUTHENTICATED_USERS(401, "UNAUTHORIZED","인증이 필요합니다."),
 
+    UNAUTHORIZED_ACCESS(401, "UNAUTHORIZED", "인증되지 않은 사용자입니다."),
+
     /* 403 FORBIDDEN : 접근권한 없음 */
     ACCESS_DENIED(403, "FORBIDDEN","접근이 거부되었습니다."),
 

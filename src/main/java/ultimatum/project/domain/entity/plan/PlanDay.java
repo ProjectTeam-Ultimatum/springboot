@@ -12,19 +12,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PlanDay {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long planDayId;
 
-    private LocalDateTime planDayStartTime;
-
-    private LocalDateTime planDayFinishTime;
+    private LocalTime planDayStartTime;
+    private LocalTime planDayFinishTime;
+    private LocalDate planDate;
 
     @ManyToOne
     @JoinColumn(name = "plan_id")
-    private Plan planId;
-
-
-    private String plan_day_date;
+    @JsonIgnore
+    private Plan plan;
 }
