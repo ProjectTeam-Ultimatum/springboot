@@ -2,7 +2,7 @@ name: Ultimatum CI & CD
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
  # pull_request:
   #  branches: ["develop"]
 
