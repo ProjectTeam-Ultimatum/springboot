@@ -451,6 +451,7 @@ public class RecommendReplyService {
                 .collect(Collectors.toList());
     }
 
+
     //축제행사 태그 ID 조회
     public List<ReadReplyEventTagByIdResponse> getRepliesByEventTagId(Long recommendEventId) {
         // 요청에서 제공된 축제행사 ID를 기반으로 모든 후기를 조회합니다.

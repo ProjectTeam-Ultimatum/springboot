@@ -2,14 +2,24 @@ package ultimatum.project.service.member;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDTO1;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Service
-public class KakaoService {
+@Log4j2
+public class KakaoService  {
+
+
 
     public String getKakaoAccessToken(String code) {
         String accessToken = "";
@@ -25,11 +35,13 @@ public class KakaoService {
             // POST 요청을 수행하려면 setDoOutput()을 true로 설정한다.
             conn.setDoOutput(true);
 
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
             // POST 요청에서 필요한 파라미터를 OutputStream을 통해 전송
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
             String sb = "grant_type=authorization_code" +
                     "&client_id=100bde42d2ac4c0bf9cf54655e5395cc" + // REST_API_KEY
-                    "&redirect_uri=http://localhost:8080/kakaologin" + // REDIRECT_URI
+                    "&redirect_uri=http://localhost:8081/social" + // REDIRECT_URI
                     "&code=" + code;
             bufferedWriter.write(sb);
             bufferedWriter.flush();
@@ -62,6 +74,38 @@ public class KakaoService {
         }
 
         return accessToken;
+    }
+
+    public KakaoUserInfoDTO1 getKakaoUserInfo(String accessToken) {
+        String requestUrl = "https://kapi.kakao.com/v2/user/me";
+        log.info("requestUrl : {}",requestUrl);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        log.info("headers : {}",headers);
+        log.info("entity : {}",entity);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<KakaoUserInfoDTO1> response = restTemplate.exchange(
+                requestUrl, HttpMethod.GET, entity, KakaoUserInfoDTO1.class
+        );
+        log.info("response:{}",response);
+
+        KakaoUserInfoDTO1 kakaoUserInfoDto = response.getBody();
+        if (kakaoUserInfoDto != null) {
+            String nickName = kakaoUserInfoDto.getProperties() != null ? kakaoUserInfoDto.getProperties().getNickname() : null;
+            String email = kakaoUserInfoDto.getKakao_account() != null ? kakaoUserInfoDto.getKakao_account().getEmail() : null;
+            log.info("Kakao User Nickname: {}", nickName);
+            log.info("Kakao User Email: {}", email);
+
+            // 추가적인 로직...
+        } else {
+            log.error("Kakao User Info is null");
+            // 적절한 예외 처리를 수행하거나 오류 응답 반환
+        }
+
+        return kakaoUserInfoDto;
     }
 
 }

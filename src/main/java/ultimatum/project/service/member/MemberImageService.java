@@ -20,10 +20,8 @@ import java.util.List;
 @Log4j2
 public class MemberImageService {
 
-    private final MemberImageRepository imageRepository;
-    private final MemberRepository memberRepository;
-
     private final MemberS3Service memberS3Service;
+    private final MemberImageRepository imageRepository;
 
     @Transactional
     public List<MemberImage> createMemberImages(List<MultipartFile> files, Member member) {

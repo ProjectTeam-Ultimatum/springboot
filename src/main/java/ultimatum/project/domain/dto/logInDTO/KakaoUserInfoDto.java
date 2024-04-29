@@ -7,4 +7,5 @@ public class KakaoUserInfoDto {
     private String code;
     private String name;
     private String email;
+
 }

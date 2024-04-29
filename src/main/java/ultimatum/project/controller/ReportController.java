@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ultimatum.project.domain.dto.chatDTO.ReportDto;
 import ultimatum.project.global.config.Security.auth.PrincipalDetails;
 import ultimatum.project.service.chat.ReportService;
-import ultimatum.project.service.member.MemberService;
+
 
 @RestController
 @RequestMapping("/api/v1")

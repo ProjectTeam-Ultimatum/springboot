@@ -3,26 +3,31 @@ package ultimatum.project.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDto;
+import ultimatum.project.domain.dto.logInDTO.KakaoUserInfoDTO1;
 import ultimatum.project.domain.dto.logInDTO.MemberFindPasswordRequestDto;
 import ultimatum.project.domain.dto.logInDTO.MemberRequestDto;
+import ultimatum.project.domain.dto.logInDTO.MemberWithKakaoRequestDto;
 import ultimatum.project.domain.dto.logInDTO.MemberUpdateRequestDto;
 import ultimatum.project.domain.dto.logInDTO.UpdateStyleDto;
 import ultimatum.project.domain.entity.member.Member;
 import ultimatum.project.domain.entity.member.MemberImage;
+import ultimatum.project.global.config.Security.auth.PrincipalDetails;
+import ultimatum.project.global.config.Security.jwt.JwtProperties;
 import ultimatum.project.global.exception.CustomException;
 import ultimatum.project.global.exception.ErrorCode;
+import ultimatum.project.repository.member.MemberRepository;
 import ultimatum.project.service.member.KakaoService;
 import ultimatum.project.service.member.MemberImageService;
 import ultimatum.project.service.member.MemberService;
-import ultimatum.project.repository.member.MemberRepository;
-import ultimatum.project.global.config.Security.auth.PrincipalDetails;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,10 +39,12 @@ import java.util.stream.Collectors;
 @RequestMapping("api/v1")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
+@Log4j2
 public class RestApiController {
 
     private final MemberRepository memberRepository;
     private final MemberService memberService;
+    private final JwtProperties jwtProperties;
     private final KakaoService kakaoService;
     private final MemberImageService memberImageService;
 
@@ -81,28 +88,33 @@ public class RestApiController {
     }
 
     @PostMapping("/accessToken")
-    public String getKakaoAccessToken(@RequestParam String code) {
-        String accessToken = kakaoService.getKakaoAccessToken(code);
-        return "Access Token: " + accessToken;
-    }
+    public ResponseEntity<?> getKakaoAccessToken(@RequestParam String code) {
 
-    @PostMapping("/kakao-login")
-    public ResponseEntity<String> kakaoLogin(@RequestBody KakaoUserInfoDto kakaoUserInfoDto) {
-        String accessToken = kakaoService.getKakaoAccessToken(kakaoUserInfoDto.getCode());
-        if (accessToken != null && !accessToken.isEmpty()) {
-            // 카카오 사용자 정보 가져오기
-            String name = kakaoUserInfoDto.getName();
-            String email = kakaoUserInfoDto.getEmail();
+            String accessToken = memberService.getUserAccessTokenFromKaKao(code);
+           KakaoUserInfoDTO1 kakaoUserInfoDTO1 = memberService.getUserInfoFromKakao(accessToken);
+            // 데이터베이스에서 사용자 조회 또는 저장 로직
+            Member member = memberRepository.findByMemberEmail(kakaoUserInfoDTO1.getMemberEmail());
+            boolean isNewMember = member == null;
+            if (isNewMember) {
+                member = memberService.registerOrLookupMember(kakaoUserInfoDTO1);
+            }
 
-            // 사용자 정보로 로그인 또는 회원가입 처리
-            MemberRequestDto memberRequestDto = new MemberRequestDto();
-            memberRequestDto.setMemberName(name);
-            memberRequestDto.setMemberEmail(email);
+            // JWT 토큰 생성
+            String jwtToken = jwtProperties.generateToken(member);
+            // 응답 헤더에 JWT 토큰 추가
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(jwtToken);
+            log.info("jwtToken : " + jwtToken);
 
-            return memberService.processKakaoLogin(kakaoUserInfoDto, memberRequestDto);
-        } else {
-            return ResponseEntity.badRequest().body("카카오 액세스 토큰을 가져오지 못했습니다.");
-        }
+            // 응답 데이터 구성 및 반환
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("jwtToken", jwtToken);
+            responseData.put("kakaoAccessToken", accessToken);
+            responseData.put("userName", member.getMemberName());
+            responseData.put("email", member.getMemberEmail());
+            responseData.put("isNewMember", isNewMember);
+
+            return ResponseEntity.ok().headers(headers).body(responseData);
     }
 
     @GetMapping("/user/info")
@@ -129,31 +141,7 @@ public class RestApiController {
         }
     }
 
-//    @GetMapping("/user/info/detail")
-//    @SecurityRequirement(name = "bearerAuth")
-//    @ResponseBody
-//    public ResponseEntity<String> getUserInfoDetail(Authentication authentication) {
-//        if (authentication == null || !authentication.isAuthenticated()) {
-//            throw new CustomException(ErrorCode.BAD_REQUSET_USER);
-//        }
-//
-//        String memberEmail = authentication.getName();
-//
-//        Member member = memberRepository.findByMemberEmail(memberEmail);
-//
-//        if (member == null) {
-//            return ResponseEntity.badRequest().body("사용자 정보를 찾을 수 없습니다.");
-//        }
-//
-//        String userDetails =
-//                "사용자 이름: " + member.getMemberName() +
-//                        ", 이메일: " + member.getMemberEmail() +
-//                        ", 성별: " + member.getMemberGender() +
-//                        ", 나이: " + member.getMemberAge() +
-//                        ", 주소: " + member.getMemberAddress();
-//
-//        return ResponseEntity.ok(userDetails);
-//    }
+
 
 
     @GetMapping("/user/info/detail")
@@ -284,5 +272,17 @@ public class RestApiController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 업데이트 실패: " + e.getMessage());
         }
     }
+
+    @PutMapping(path = "/signup-with-kakao", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateWithKakao(@RequestParam String accessToken, @ModelAttribute MemberWithKakaoRequestDto requestDto) {
+
+        // 여기서 accessToken은 프론트엔드에서 받은 카카오 액세스 토큰입니다.
+        // Service 메소드는 카카오 API로부터 사용자 정보를 조회하고 추가 정보와 결합하여 처리합니다.
+        ResponseEntity<?> responseDto = memberService.registerOrLoginWithKakao(accessToken, requestDto);
+
+        // 결과를 클라이언트에 반환합니다.
+        return ResponseEntity.ok(responseDto.getBody());
+    }
+
 
 }

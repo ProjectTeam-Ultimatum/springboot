@@ -52,7 +52,7 @@ public class SecurityConfig {
 				.addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtProperties))
 				.addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository, jwtProperties))
 				.authorizeRequests()
-				.requestMatchers("/api/v1/user/info").access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+		 		.requestMatchers("/api/v1/user/info").access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
 				.requestMatchers("/api/v1/admin/**").access("hasRole('ROLE_ADMIN')")
 				.anyRequest().permitAll()
 				.and()
