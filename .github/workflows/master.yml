@@ -30,7 +30,7 @@ jobs:
 
       # Copy application.yml
       - name: Copy Private Files
-        run: ./gradlew copyPrivate
+        run: ./gradlew copyGitSubmodule
 
       # Gradle 빌드 진행
       - name: Build with Gradle
