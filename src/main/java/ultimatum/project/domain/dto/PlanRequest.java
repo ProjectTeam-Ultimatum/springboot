@@ -9,7 +9,6 @@ import ultimatum.project.domain.dto.plan.PlanHotelDTO;
 import ultimatum.project.domain.dto.plan.PlanPlaceDTO;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -23,10 +22,10 @@ public class PlanRequest {
     private LocalDate planEndDay;
     private String planTitle;
     private List<PlanDayRequest> planDays;
-    private List<PlanFoodDTO> planFoods; // 음식 리스트 추가
-    private List<PlanEventDTO> planEvents; // 이벤트 리스트 추가
-    private List<PlanPlaceDTO> planPlaces; // 장소 리스트 추가
-    private List<PlanHotelDTO> planHotels; // 호텔 리스트 추가
+    private List<PlanFoodDTO> planFoods;
+    private List<PlanEventDTO> planEvents;
+    private List<PlanPlaceDTO> planPlaces;
+    private List<PlanHotelDTO> planHotels;
 
     @Getter
     @Setter
