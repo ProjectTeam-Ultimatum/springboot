@@ -21,6 +21,7 @@ import java.util.List;
 public class MemberImageService {
 
     private final MemberS3Service memberS3Service;
+    private final MemberImageRepository imageRepository;
 
     @Transactional
     public List<MemberImage> createMemberImages(List<MultipartFile> files, Member member) {
