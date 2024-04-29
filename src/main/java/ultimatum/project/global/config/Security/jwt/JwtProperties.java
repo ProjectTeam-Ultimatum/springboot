@@ -30,7 +30,7 @@ public class JwtProperties {
 
 		return JWT.create()
 				.withSubject(Long.toString(member.getMemberId())) // 회원 ID를 subject로 사용
-				.withClaim("name", member.getMemberName()) // 사용자 이름을 claim으로 추가
+				.withClaim("username", member.getMemberName()) // 사용자 이름을 claim으로 추가
 				.withClaim("email", member.getMemberEmail()) // 사용자 이메일을 claim으로 추가
 				.withIssuedAt(now)
 				.withExpiresAt(expiryDate)

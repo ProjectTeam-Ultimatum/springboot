@@ -52,7 +52,6 @@ public class ChatService {
         chatMessage.setMessage(chatMessageDto.getMessage());
         chatMessage.setMessageType(chatMessageDto.getMessageType());
 
-        log.info("senderEmail{}!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", senderEmail);
         messageRepository.save(chatMessage);
     }
 
@@ -176,7 +175,7 @@ public class ChatService {
 
     private Long findSenderIdBySession(WebSocketSession session) {
         // 세션의 속성에서 사용자 ID 조회
-        return (Long) session.getAttributes().get("userId");
+        return (Long) session.getAttributes().get("email");
     }
 
     private void sendMessageToChatRoom(ChatMessageDto chatMessageDto, Set<WebSocketSession> chatRoomSession) {

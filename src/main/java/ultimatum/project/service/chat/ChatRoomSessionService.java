@@ -41,7 +41,7 @@ public class ChatRoomSessionService {
         return chatRoomSessionMap.entrySet().stream()
                 .filter(entry -> entry.getValue().stream()
                         .anyMatch(session -> {
-                            Long sessionMemberId = (Long) session.getAttributes().get("userId");
+                            Long sessionMemberId = (Long) session.getAttributes().get("email");
                             return sessionMemberId != null && sessionMemberId.equals(memberId);
                         }))
                 .map(Map.Entry::getKey)
