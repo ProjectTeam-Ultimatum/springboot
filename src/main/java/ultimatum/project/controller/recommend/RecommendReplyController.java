@@ -138,7 +138,7 @@ public class RecommendReplyController {
 
     //음식점 태그 카운팅
     @GetMapping("/food/reads/tag-counting/{recommend_food_id}")
-    @Operation(summary = "음식점 태그 카운팅")
+    @Operation(summary = "음식점 태그 counting")
     public ResponseEntity<List<Map.Entry<String, Long>>> getFoodTagFrequencies(@PathVariable("recommend_food_id") Long recommendFoodId) {
         List<Map.Entry<String, Long>> tagFrequencies = recommendReplyService.getTagsWithCountsByFoodId(recommendFoodId);
         if (tagFrequencies.isEmpty()) {
