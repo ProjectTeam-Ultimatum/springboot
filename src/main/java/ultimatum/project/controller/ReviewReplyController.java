@@ -18,7 +18,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
-@CrossOrigin(origins = "*")
 public class ReviewReplyController {
     private final ReviewReplyService reviewReplyService;
 

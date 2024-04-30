@@ -29,7 +29,6 @@ import java.util.Map;
 
 
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/api/plans")
 public class PlanController {
 

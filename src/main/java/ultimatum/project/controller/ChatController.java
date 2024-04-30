@@ -17,7 +17,6 @@ import ultimatum.project.service.chat.ChatService;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/chat")
 @Slf4j
