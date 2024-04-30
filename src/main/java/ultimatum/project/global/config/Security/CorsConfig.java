@@ -16,6 +16,7 @@ public class CorsConfig {
 
       // 개발 환경에서 허용할 origin 설정 (실제 배포시에는 필요한 origin으로 변경)
       config.addAllowedOrigin("https://testvue-flax.vercel.app");
+      config.addAllowedOrigin("https://jejurang.site/");
 
       // 필요한 헤더 및 메서드 설정
       config.addAllowedHeader("*");
