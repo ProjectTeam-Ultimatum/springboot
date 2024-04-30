@@ -240,11 +240,11 @@ public class RestApiController {
         return response;
     }
 
-    @PostMapping("/user/update-info")
+    @PutMapping(path = "/user/update-info",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<String> updateMemberInfo(
             @RequestParam String userEmail,
-            @RequestBody MemberUpdateRequestDto updateRequestDto) {
+            @ModelAttribute MemberUpdateRequestDto updateRequestDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String loggedInUserEmail = authentication.getName();
 

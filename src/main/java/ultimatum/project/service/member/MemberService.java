@@ -44,7 +44,7 @@ public class MemberService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    private final MemberImageRepository memberImageRepository; // MemberImageRepository 주입
+    private final MemberImageRepository imageRepository; // MemberImageRepository 주입
 
     @Transactional
     public String createMember(MemberRequestDto memberRequestDto) {
@@ -154,7 +154,6 @@ public class MemberService {
 //                .header(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtToken)
 //                .body("Login successful with Kakao account");
 //    }
-
 
 
     public String changePassword(String userEmail, String currentPassword, String newPassword) {
@@ -301,20 +300,33 @@ public class MemberService {
         }
 
         // 요청된 업데이트 필드를 검사하여 업데이트
-        if (updateRequestDto.getMemberAge() != null ) {
+        if (updateRequestDto.getMemberAge() != null) {
             member.setMemberAge(updateRequestDto.getMemberAge());
         }
 
         if (updateRequestDto.getMemberAddress() != null && !updateRequestDto.getMemberAddress().isEmpty()) {
             member.setMemberAddress(updateRequestDto.getMemberAddress());
         }
+        member.setMemberName(updateRequestDto.getMemberName());
+        member.setMemberGender(updateRequestDto.getMemberGender());
+        member.setMemberFindPasswordAnswer(updateRequestDto.getFindByPasswordAnswer());
 
         // 변경된 회원 정보 저장
         memberRepository.save(member);
 
+        if(updateRequestDto.getFiles() != null && !updateRequestDto.getFiles().isEmpty()) {
+            List<MemberImage> newMemberImages = memberImageService.createMemberImages(updateRequestDto.getFiles(), member);
+            // 기존 컬렉션에 새로운 이미지 객체들을 추가하기 전에 컬렉션의 모든 기존 요소를 삭제
+            if (member.getMemberImages() != null) {
+                member.getMemberImages().clear(); // 기존 이미지들 삭제
+                member.getMemberImages().addAll(newMemberImages); // 새로운 이미지들 추가
+            } else {
+                member.setMemberImages(new ArrayList<>(newMemberImages)); // 새 컬렉션 할당
+            }
+            memberRepository.save(member);
+        }
         return ResponseEntity.ok("회원 정보가 성공적으로 업데이트되었습니다.");
     }
-
 
 
 }
