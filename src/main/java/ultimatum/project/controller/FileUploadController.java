@@ -19,7 +19,6 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/upload")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class FileUploadController {
 
     private final AmazonS3 amazonS3Client;

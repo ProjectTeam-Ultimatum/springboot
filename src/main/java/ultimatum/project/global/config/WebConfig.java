@@ -10,7 +10,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:8081")  //vue localhost 주소
+                .allowedOrigins("https://testvue-flax.vercel.app")  //vue localhost 주소
                 .allowedMethods("GET","POST", "PUT", "DELETE");
     }
 

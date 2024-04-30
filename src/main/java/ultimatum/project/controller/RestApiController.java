@@ -38,7 +38,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/v1")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 @Log4j2
 public class RestApiController {
 

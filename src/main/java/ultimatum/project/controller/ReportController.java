@@ -14,7 +14,6 @@ import ultimatum.project.service.chat.ReportService;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class ReportController {
 
     private final ReportService reportService;

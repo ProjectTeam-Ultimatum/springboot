@@ -16,7 +16,6 @@ import java.util.List;
 
 @Tag(name = "recommend", description = "추천리스트")
 @Log4j2
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/recommend")
 public class RecommendController2 {
