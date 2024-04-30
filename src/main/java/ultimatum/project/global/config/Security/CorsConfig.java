@@ -6,41 +6,22 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-//@Configuration
-//public class CorsConfig {
-//
-//   @Bean
-//   public CorsFilter corsFilter() {
-//      UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//      CorsConfiguration config = new CorsConfiguration();
-//      config.setAllowCredentials(true);
-//      config.addAllowedOrigin("*");
-//      config.addAllowedHeader("*");
-//      config.addAllowedMethod("*");
-//
-//      source.registerCorsConfiguration("/api/**", config);
-//      source.registerCorsConfiguration("/login_proc", config);
-//      return new CorsFilter(source);
-//   }
-//
-//}
 @Configuration
 public class CorsConfig {
 
    @Bean
    public CorsFilter corsFilter() {
+      UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
       CorsConfiguration config = new CorsConfiguration();
-      config.setAllowCredentials(true);
-      config.addAllowedOriginPattern("http://localhost:8081"); // 실제 배포시에는 구체적인 도메인으로 제한하세요
-      config.addAllowedOriginPattern("http://localhost:8080");
-      config.addAllowedOriginPattern("http://localhost:8082");
-      config.addAllowedOriginPattern("http://localhost:8083");
-      config.addAllowedOriginPattern("http://localhost:8084");
+
+      // 개발 환경에서 허용할 origin 설정 (실제 배포시에는 필요한 origin으로 변경)
+      config.addAllowedOrigin("https://testvue-flax.vercel.app");
+
+      // 필요한 헤더 및 메서드 설정
       config.addAllowedHeader("*");
-      config.addExposedHeader("Authorization"); // 이 부분이 중요
+      config.addExposedHeader("Authorization");
       config.addAllowedMethod("*");
 
-      UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
       source.registerCorsConfiguration("/**", config);
       return new CorsFilter(source);
    }
