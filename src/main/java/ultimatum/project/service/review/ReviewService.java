@@ -44,7 +44,7 @@ public class ReviewService {
                                              CreateReviewRequest request,
                                              List<MultipartFile> files) {
 
-        if (authentication == null || !authentication.isAuthenticated())  {
+        if (authentication == null || !authentication.isAuthenticated()) {
             throw new CustomException(ErrorCode.BAD_REQUSET_USER);
         }
         String email = authentication.getName();
@@ -65,10 +65,9 @@ public class ReviewService {
         review = reviewRepository.save(review); // 저장하고 리턴받음으로써 ID를 획득
 
 
-
         // 이미지 파일 처리 및 ReviewImage 객체 리스트 생성
         List<ReviewImage> reviewImages = imageService.createReviewImages(files, review);
-        if(reviewImages.isEmpty() && !files.isEmpty()) {
+        if (reviewImages.isEmpty() && !files.isEmpty()) {
             throw new CustomException(ErrorCode.FILE_PROCESSING_ERROR);
         }
 
@@ -107,14 +106,14 @@ public class ReviewService {
         Page<Review> reviewPage;
 
         // 지역 정보만 사용하는 경우
-         if (reviewLocation != null && !reviewLocation.isEmpty()) {
+        if (reviewLocation != null && !reviewLocation.isEmpty()) {
             reviewPage = reviewRepository.findAllByReviewLocation(reviewLocation, pageable);
         }
         // 검색 키워드만 사용하는 경우
         else if (keyword != null && !keyword.isEmpty()) {
             reviewPage = reviewRepository
                     .findByReviewTitleContainingIgnoreCaseOrReviewSubtitleContainingIgnoreCaseOrReviewContentContainingIgnoreCaseOrReviewLocationContainingIgnoreCase
-                            (keyword,keyword,keyword,keyword,pageable);
+                            (keyword, keyword, keyword, keyword, pageable);
         }
         // 파라미터가 없는 경우
         else {
@@ -204,7 +203,7 @@ public class ReviewService {
                                              Long reviewId,
                                              UpdateReviewRequest request) throws CustomException {
 
-        if (authentication == null || !authentication.isAuthenticated())  {
+        if (authentication == null || !authentication.isAuthenticated()) {
             throw new CustomException(ErrorCode.BAD_REQUSET_USER);
         }
         String email = authentication.getName();
@@ -222,6 +221,7 @@ public class ReviewService {
         reviewRepository.save(review);
         imageService.updateReviewImages(reviewId, request);
 
+        // uuid로 저장되어있는 리뷰 이미지를 Response 객체로 변환하여 목록 생성
         List<ReviewImageResponse> imageResponses = review.getReviewImages().stream()
                 .map(image -> new ReviewImageResponse(image.getReviewImageId(), image.getImageName(), image.getImageUri(), image.getUuid()))
                 .collect(Collectors.toList());
@@ -237,15 +237,14 @@ public class ReviewService {
 
 
     @Transactional
-    public DeleteReviewResponse deleteReview(Authentication authentication, Long reviewId){
+    public DeleteReviewResponse deleteReview(Authentication authentication, Long reviewId) {
 
 
-        if (authentication == null || !authentication.isAuthenticated())  {
+        if (authentication == null || !authentication.isAuthenticated()) {
             throw new CustomException(ErrorCode.BAD_REQUSET_USER);
         }
         String email = authentication.getName();
         Member member = memberRepository.findByMemberEmail(email);
-
 
 
         Review review = reviewRepository.findById(reviewId)
@@ -282,4 +281,6 @@ public class ReviewService {
                 review.getReviewLike()
         );
     }
+
+
 }

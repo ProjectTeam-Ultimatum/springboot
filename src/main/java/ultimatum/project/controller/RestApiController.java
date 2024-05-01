@@ -216,8 +216,7 @@ public class RestApiController {
 
     @DeleteMapping("/user/delete")
     public ResponseEntity<String> deleteMember(
-            @RequestParam String password,
-            @RequestParam String answer) {
+            ) {
 
         // 현재 인증된 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -229,7 +228,7 @@ public class RestApiController {
         ResponseEntity<String> response;
 
         try {
-            response = memberService.deleteMember(userEmail, password, answer);
+            response = memberService.deleteMember(userEmail);
         } catch (CustomException e) {
             response = ResponseEntity.badRequest().body(e.getMessage());
         }

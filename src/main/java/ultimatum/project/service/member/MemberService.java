@@ -235,21 +235,11 @@ public class MemberService {
         javaMailSender.send(message);
     }
 
-    public ResponseEntity<String> deleteMember(String userEmail, String password, String answer) {
+    public ResponseEntity<String> deleteMember(String userEmail) {
         Member member = memberRepository.findByMemberEmail(userEmail);
 
         if (member == null) {
             throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
-        }
-
-        // 비밀번호 확인
-        if (!bCryptPasswordEncoder.matches(password, member.getMemberPassword())) {
-            throw new CustomException(ErrorCode.INVALID_PASSWORD);
-        }
-
-        // 특정 질문 답변 확인
-        if (!answer.equals(member.getMemberFindPasswordAnswer())) {
-            throw new CustomException(ErrorCode.INVALID_ANSWER);
         }
 
         // 회원 삭제

@@ -73,6 +73,7 @@ public class ReviewImageService {
 
     public void deleteImages(List<String> deleteImageIds, Review review) {
         for (String imageIdStr : deleteImageIds) {
+
             Long imageId = Long.parseLong(imageIdStr);
             ReviewImage image = imageRepository.findById(imageId)
                     .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
