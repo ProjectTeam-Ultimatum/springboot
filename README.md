@@ -6,5 +6,7 @@
 </p>
 
 *** 
-
+<div align="center">
 ![제주랑 로고](https://github.com/ProjectTeam-Ultimatum/springboot/assets/159854114/abb2b31c-fb62-44f7-a01f-bc10126bb07a)
+</div>
+
