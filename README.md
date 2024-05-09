@@ -12,7 +12,7 @@
 <h2 align="center">팀원 소개</h2>
 
 <div style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s; width: 40%; border-radius: 5px; display: inline-block; margin: 10px;">
-  <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%901.png" alt="John" style="width:100%; border-top-left-radius: 5px; border-top-right-radius: 5px;">
+  <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%901.png" alt="John" style="width:100px; height:100px; border-top-left-radius: 5px; border-top-right-radius: 5px;">
   <div style="padding: 2px 16px;">
     <h4><b>John Doe</b></h4>
     <p>프로젝트 매니저</p>
