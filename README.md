@@ -1,3 +1,21 @@
+
+
+
+<style>
+  .card {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    width: 40%;
+    border-radius: 5px;
+    display: inline-block;
+    margin: 10px;
+  }
+  
+  .card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.5);
+  }
+</style>
+
 <h1 align="center">여행 추천 플랫폼 "제주랑"</h1>
 <p align="center">
   사용자의 여행 MBTI 스타일에 맞춰서 맞춤 여행 추천 서비스를 제공! <br/>
@@ -30,22 +48,6 @@
 
 <h1> 목차 </h1>
 
-
-
-<style>
-  .card {
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    transition: 0.3s;
-    width: 40%;
-    border-radius: 5px;
-    display: inline-block;
-    margin: 10px;
-  }
-  
-  .card:hover {
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.5);
-  }
-</style>
   
   .container {
     padding: 2px 16px;
