@@ -8,9 +8,10 @@
 <p align="center">
   <img src="https://github.com/ProjectTeam-Ultimatum/springboot/assets/159854114/abb2b31c-fb62-44f7-a01f-bc10126bb07a" alt="제주랑 로고">
 </p>
+</div>
 
 <h2 align="center">팀원 소개</h2>
-* 배정현: 팀장
+＃ 배정현: 팀장
 * 이은재: 백엔드 팀장
 * 김이랑: 프론트 팀장
 * 이강권: 백엔드 개발
