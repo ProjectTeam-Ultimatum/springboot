@@ -14,7 +14,7 @@
 <div align="center">
 <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%B5%9C%ED%9B%84%ED%86%B5%EC%B2%A9.png" alt="팀 소개">
   <h3><strong>Ultimatum</strong></h3>
-  <p>우리 '최후통첩팀'은 최종 프로젝트라는 전쟁에서 승리를 목표로 하는 열정적인 6명으로 구성되어 있습니다. 
+  <p>우리 '최후통첩팀'은 최종 프로젝트라는 전쟁에서 승리를 목표로 하는 열정적인 6명으로 구성되어 있습니다. <br/>
 서로를 배려하며 협업을 통해 첫 승리를 거두고 최종적으로도 승리하겠다는 당찬 포부로 프로젝트에 임하는 사람들입니다.</p>
 </div>
 
