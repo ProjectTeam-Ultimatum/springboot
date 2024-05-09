@@ -12,6 +12,9 @@
   <img src="https://github.com/ProjectTeam-Ultimatum/springboot/assets/159854114/abb2b31c-fb62-44f7-a01f-bc10126bb07a" alt="제주랑 로고">
 </p>
 
+
+<h2>프로젝트 기간</h2>
+
 <h2>팀 소개</h2>
 
 <div align="center">
