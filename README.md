@@ -11,6 +11,10 @@
 
 <h2 align="center">팀 소개</h2>
 
+<div align="center">
+<img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%B5%9C%ED%9B%84%ED%86%B5%EC%B2%A9.png" alt="팀 소개">
+</div>
+
 <h2 align="center">팀원 소개</h2>
 </div> 
 
