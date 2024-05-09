@@ -11,9 +11,9 @@
 
 <h2 align="center">팀원 소개</h2>
 
-<div style="text-align:center; width:100%; box-sizing: border-box; padding: 0 10px;  display: flex; flex-direction: row;">
+<div style="text-align:center; width:100%; box-sizing: border-box; padding: 0 10px;  ">
   <!-- 첫 번째 줄의 팀원 3명 -->
-  <div style="display: flex; justify-content: space-between; align-items: center;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-direction: row;">
     <div style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s; width: calc(33% - 20px); border-radius: 5px; margin: 10px;">
       <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%901.png" alt="John" style="width:100px; height:100px; border-top-left-radius: 5px; border-top-right-radius: 5px;">
       <div style="padding: 2px 16px;">
