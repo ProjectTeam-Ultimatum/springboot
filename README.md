@@ -43,3 +43,5 @@
 <h2>시작 가이드</h2>
 
 - 설치 및 실행
+
+Gradle > Tasks > other > copyGitSubmodule
