@@ -20,7 +20,7 @@
 * **최준영**: 풀스택 개발/코스 스케줄 구현
 
 <div align="center">
-<img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%90%EC%86%8C%EA%B0%9C.png" alt="팀원소개">
+<img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%90%EC%86%8C%EA%B0%9C1.png" alt="팀원소개">
 </div>
 
 <h1>목차</h1>
