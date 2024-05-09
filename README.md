@@ -11,30 +11,30 @@
 
 <h2 align="center">팀원 소개</h2>
 
-<div style="text-align:center; width:100%;">
+<div style="text-align:center;">
   <!-- 첫 번째 줄의 팀원 3명 -->
-  <div style="display: inline-block; margin: 10px; width: 100%;">
-    <div style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s; width: 30%; border-radius: 5px; display: inline-block; margin: 1%; vertical-align: top;">
-      <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%901.png" alt="John" style="width:100%; height:100px; border-top-left-radius: 5px; border-top-right-radius: 5px;">
+  <div style="display: inline-block; margin: 10px;">
+    <div style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s; width: 30%; border-radius: 5px; display: inline-block; margin: 10px;">
+      <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%904.png" alt="John" style="width:100px; height:100px; border-top-left-radius: 5px; border-top-right-radius: 5px;">
       <div style="padding: 2px 16px;">
         <h4><b>John Doe</b></h4>
         <p>프로젝트 매니저</p>
       </div>
     </div>
     <!-- 두 번째 팀원 -->
-    <div style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s; width: 30%; border-radius: 5px; display: inline-block; margin: 1%; vertical-align: top;">
-      <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%901.png" alt="John" style="width:100%; height:100px; border-top-left-radius: 5px; border-top-right-radius: 5px;">
+    <div style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s; width: 30%; border-radius: 5px; display: inline-block; margin: 10px;">
+      <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%905.png" alt="Jane" style="width:100px; height:100px; border-top-left-radius: 5px; border-top-right-radius: 5px;">
       <div style="padding: 2px 16px;">
-        <h4><b>John Doe</b></h4>
-        <p>프로젝트 매니저</p>
+        <h4><b>Jane Doe</b></h4>
+        <p>리드 개발자</p>
       </div>
     </div>
     <!-- 세 번째 팀원 -->
-    <div style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s; width: 30%; border-radius: 5px; display: inline-block; margin: 1%; vertical-align: top;">
-      <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%901.png" alt="John" style="width:100%; height:100px; border-top-left-radius: 5px; border-top-right-radius: 5px;">
+    <div style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s; width: 30%; border-radius: 5px; display: inline-block; margin: 10px;">
+      <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%906.png" alt="Mark" style="width:100px; height:100px; border-top-left-radius: 5px; border-top-right-radius: 5px;">
       <div style="padding: 2px 16px;">
-        <h4><b>John Doe</b></h4>
-        <p>프로젝트 매니저</p>
+        <h4><b>Mark Lee</b></h4>
+        <p>테크 리드</p>
       </div>
     </div>
   </div>
