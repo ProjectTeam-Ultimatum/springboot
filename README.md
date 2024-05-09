@@ -13,7 +13,7 @@
 <h2 align="center">팀원 소개</h2>
 
 <div class="card">
-  <img src="[https://your-image-url.jpg](https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%901.png)" alt="John" style="width:100%; border-top-left-radius: 5px; border-top-right-radius: 5px;">
+  <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%901.png" alt="John" style="width:100%; border-top-left-radius: 5px; border-top-right-radius: 5px;">
   <div class="container">
     <h4><b>John Doe</b></h4>
     <p>프로젝트 매니저</p>
@@ -45,6 +45,7 @@
   .card:hover {
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.5);
   }
+</style>
   
   .container {
     padding: 2px 16px;
