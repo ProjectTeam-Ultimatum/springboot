@@ -11,10 +11,10 @@
 
 <h2 align="center">팀원 소개</h2>
 
-<div style="text-align:center; width:100%;">
+<div style="text-align:center; width:100%; box-sizing: border-box; padding: 0 10px;">
   <!-- 첫 번째 줄의 팀원 3명 -->
-  <div style="display: inline-block; margin: 10px; width: 100%;">
-    <div style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s; width: calc(33.33% - 22px); border-radius: 5px; display: inline-block; margin: 10px; vertical-align: top;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s; width: calc(33% - 20px); border-radius: 5px; margin: 10px;">
       <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%901.png" alt="John" style="width:100%; height:100px; border-top-left-radius: 5px; border-top-right-radius: 5px;">
       <div style="padding: 2px 16px;">
         <h4><b>John Doe</b></h4>
@@ -22,7 +22,7 @@
       </div>
     </div>
     <!-- 두 번째 팀원 -->
-    <div style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s; width: calc(33.33% - 22px); border-radius: 5px; display: inline-block; margin: 10px; vertical-align: top;">
+    <div style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s; width: calc(33% - 20px); border-radius: 5px; margin: 10px;">
       <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%902.png" alt="Jane" style="width:100%; height:100px; border-top-left-radius: 5px; border-top-right-radius: 5px;">
       <div style="padding: 2px 16px;">
         <h4><b>Jane Doe</b></h4>
@@ -30,7 +30,7 @@
       </div>
     </div>
     <!-- 세 번째 팀원 -->
-    <div style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s; width: calc(33.33% - 22px); border-radius: 5px; display: inline-block; margin: 10px; vertical-align: top;">
+    <div style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s; width: calc(33% - 20px); border-radius: 5px; margin: 10px;">
       <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%903.png" alt="Mark" style="width:100%; height:100px; border-top-left-radius: 5px; border-top-right-radius: 5px;">
       <div style="padding: 2px 16px;">
         <h4><b>Mark Lee</b></h4>
@@ -39,6 +39,7 @@
     </div>
   </div>
 </div>
+
 
 
 <h1>목차</h1>
