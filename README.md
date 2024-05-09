@@ -12,6 +12,7 @@
 <h2 align="center">팀원 소개</h2>
 
 
+![Uploading 팀원소개.png…]()
 
 
 
