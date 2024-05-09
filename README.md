@@ -10,7 +10,12 @@
 </p>
 
 <h2 align="center">팀원 소개</h2>
-
+- 배정현: 팀장
+- 이은재: 백엔드 팀장
+- 김이랑: 프론트 팀장
+- 이강권: 백엔드 개발
+- 김루아: 풀스택 개발
+- 최준영: 풀스택 개발
 <div align="center">
 <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%90%EC%86%8C%EA%B0%9C.png" alt="팀원소개">
 </div>
