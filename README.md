@@ -11,8 +11,7 @@
 
 <h2 align="center">팀원 소개</h2>
 
-
-![Uploading 팀원소개.png…]()
+<img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%90%EC%86%8C%EA%B0%9C.png" alt="제주랑 로고">
 
 
 
