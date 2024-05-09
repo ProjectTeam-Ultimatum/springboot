@@ -12,7 +12,7 @@
 <h2 align="center">팀원 소개</h2>
 </div> 
 
-* <span style:"font-weight:bold;">배정현</span>: 팀장/풀스택 개발
+* <span style="font-weight:bold;">배정현</span>: 팀장/풀스택 개발
 * 이은재: 백엔드 팀장/백엔드 개발
 * 김이랑: 프론트 팀장/풀스택 개발
 * 이강권: 백엔드 개발/데이터베이스 설계
