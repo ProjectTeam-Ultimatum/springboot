@@ -11,7 +11,7 @@
 
 <h2 align="center">팀원 소개</h2>
 
-<div style="text-align:center; width:100%; box-sizing: border-box; padding: 0 10px;">
+<div style="text-align:center; width:100%; box-sizing: border-box; padding: 0 10px;  display: flex; flex-direction: row;">
   <!-- 첫 번째 줄의 팀원 3명 -->
   <div style="display: flex; justify-content: space-between; align-items: center;">
     <div style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s; width: calc(33% - 20px); border-radius: 5px; margin: 10px;">
