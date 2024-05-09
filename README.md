@@ -13,7 +13,7 @@
 <h2 align="center">팀원 소개</h2>
 
 <div class="card">
-  <img src="https://your-image-url.jpg" alt="John" style="width:100%; border-top-left-radius: 5px; border-top-right-radius: 5px;">
+  <img src="[https://your-image-url.jpg](https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%901.png)" alt="John" style="width:100%; border-top-left-radius: 5px; border-top-right-radius: 5px;">
   <div class="container">
     <h4><b>John Doe</b></h4>
     <p>프로젝트 매니저</p>
