@@ -66,3 +66,5 @@ Gradle > Tasks > other > copyGitSubmodule
 
 <h2>기술 스택</h2>
 <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EA%B8%B0%EC%88%A0%EC%8A%A4%ED%83%9D.png" alt="기술 스택">
+
+<h2>화면 구</h2>
