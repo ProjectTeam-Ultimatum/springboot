@@ -84,7 +84,7 @@ Gradle > Tasks > other > copyGitSubmodule
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
     <h3>추천코스 페이지</h3>
-    <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%90%EC%86%8C%EA%B0%9C1.png" alt="강좌 소개 페이지" style="width: 200px; max-width: 200px;">
+    <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%B6%94%EC%B2%9C%EC%BD%94%EC%8A%A4.png" alt="강좌 소개 페이지" style="width: 200px; max-width: 200px;">
     <p>각 강좌의 세부 정보를 제공하며, 사용자는 이 페이지에서 원하는 강좌를 선택하여 학습할 수 있습니다.</p>
 </div>
 
