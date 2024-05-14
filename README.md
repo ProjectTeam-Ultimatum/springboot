@@ -12,9 +12,12 @@
   <img src="https://github.com/ProjectTeam-Ultimatum/springboot/assets/159854114/abb2b31c-fb62-44f7-a01f-bc10126bb07a" alt="제주랑 로고">
 </p>
 
+---
 
 <h2>프로젝트 기간</h2>
 <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8+%EA%B8%B0%EA%B0%84.png" alt="프로젝트 기간">
+
+---
 
 <h2>팀 소개</h2>
 
@@ -25,6 +28,7 @@
 서로를 배려하며 협업을 통해 첫 승리를 거두고 최종적으로도 승리하겠다는 당찬 포부로 프로젝트에 임하는 사람들입니다.</p>
 </div>
 
+---
 
 <h2>팀원 소개</h2>
 </div> 
@@ -39,6 +43,8 @@
 <div align="center">
 <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%90%EC%86%8C%EA%B0%9C1.png" alt="팀원소개">
 </div>
+
+---
 
 <h2>시작 가이드</h2>
 
@@ -66,6 +72,8 @@ Gradle > Tasks > other > copyGitSubmodule
 
 <h2>기술 스택</h2>
 <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EA%B8%B0%EC%88%A0%EC%8A%A4%ED%83%9D.png" alt="기술 스택">
+
+---
 
 ## 화면 구성 📺
 
@@ -116,6 +124,10 @@ Gradle > Tasks > other > copyGitSubmodule
       <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%8A%A4%ED%83%80%EC%9D%BC2.png" alt="강의 영상 페이지" style="width: 200px; max-width: 200px;">
       <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%8A%A4%ED%83%80%EC%9D%BC3.png" alt="강의 영상 페이지" style="width: 200px; max-width: 200px;">
 </div>
+
+
+---
+
 
 ## 주요 기능 📦
 
