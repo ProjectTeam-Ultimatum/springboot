@@ -82,33 +82,33 @@ Gradle > Tasks > other > copyGitSubmodule
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
     <h3>메인 페이지</h3>
-    <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EB%A9%94%EC%9D%B8%ED%8E%98%EC%9D%B4%EC%A7%802.png" alt="소개 페이지" style="width: 300px; max-width: 300px;">
-    <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EB%A9%94%EC%9D%B8%ED%8E%98%EC%9D%B4%EC%A7%803.png" alt="소개 페이지" style="width: 300px; max-width: 300px;">
+    <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EB%A9%94%EC%9D%B8%ED%8E%98%EC%9D%B4%EC%A7%802.png" alt="소개 페이지" style="width: 350px; max-width: 350px;">
+    <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EB%A9%94%EC%9D%B8%ED%8E%98%EC%9D%B4%EC%A7%803.png" alt="소개 페이지" style="width: 350px; max-width: 350px;">
 </div>
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
     <h3>여행정보 페이지</h3>
-    <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%A0%95%EB%B3%B4~.png" alt="소개 페이지" style="width: 300px; max-width: 300px;">
-    <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%A0%95%EB%B3%B42.png" alt="소개 페이지" style="width: 300px; max-width: 300px;">
+    <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%A0%95%EB%B3%B4~.png" alt="소개 페이지" style="width: 350px; max-width: 350px;">
+    <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%A0%95%EB%B3%B42.png" alt="소개 페이지" style="width: 350px; max-width: 350px;">
 </div>
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
     <h3>추천코스 페이지</h3>
-    <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%B6%94%EC%B2%9C%EC%BD%94%EC%8A%A4.png" alt="강좌 소개 페이지" style="width: 300px; max-width: 300px;">
+    <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%B6%94%EC%B2%9C%EC%BD%94%EC%8A%A4.png" alt="강좌 소개 페이지" style="width: 350px; max-width: 350px;">
 </div>
 
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
     <h3>여행메이트 페이지</h3>
-    <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EB%A9%94%EC%9D%B4%ED%8A%B81.png" alt="강의 영상 페이지" style="width: 300px; max-width: 300px;">
-  <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EB%A9%94%EC%9D%B4%ED%8A%B82.png" alt="강의 영상 페이지" style="width: 300px; max-width: 300px;">
+    <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EB%A9%94%EC%9D%B4%ED%8A%B81.png" alt="강의 영상 페이지" style="width: 350px; max-width: 350px;">
+  <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EB%A9%94%EC%9D%B4%ED%8A%B82.png" alt="강의 영상 페이지" style="width: 350px; max-width: 350px;">
 </div>
 
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
     <h3>여행후기 페이지</h3>
-      <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%ED%9B%84%EA%B8%B01.png" alt="강의 영상 페이지" style="width: 300px; max-width: 300px;">
-      <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/2024-05-14+17+01+32.png" alt="강의 영상 페이지" style="width: 300px; max-width: 300px;">
+      <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%ED%9B%84%EA%B8%B01.png" alt="강의 영상 페이지" style="width: 350px; max-width: 350px;">
+      <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/2024-05-14+17+01+32.png" alt="강의 영상 페이지" style="width: 350px; max-width: 350px;">
 </div>
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
