@@ -126,3 +126,192 @@ Gradle > Tasks > other > copyGitSubmodule
 
 
 ## 아키텍처 
+
+### 디렉토리 구조
+```
+C:.
+├───.github
+│   └───ISSUE_TEMPLATE
+├───.gradle
+│   ├───8.7
+│   │   ├───checksums
+│   │   ├───dependencies-accessors
+│   │   ├───executionHistory
+│   │   ├───expanded
+│   │   ├───fileChanges
+│   │   ├───fileHashes
+│   │   └───vcsMetadata
+│   ├───buildOutputCleanup
+│   └───vcs-1
+├───.idea
+│   └───modules
+├───build
+│   ├───classes
+│   │   └───java
+│   │       └───main
+│   │           └───ultimatum
+│   │               └───project
+│   │                   ├───controller
+│   │                   │   └───recommend
+│   │                   ├───domain
+│   │                   │   ├───dto
+│   │                   │   │   ├───chatDTO
+│   │                   │   │   ├───event
+│   │                   │   │   ├───food
+│   │                   │   │   ├───hotel
+│   │                   │   │   ├───image
+│   │                   │   │   ├───logInDTO
+│   │                   │   │   ├───place
+│   │                   │   │   ├───plan
+│   │                   │   │   ├───recommendReply
+│   │                   │   │   │   ├───event
+│   │                   │   │   │   ├───food
+│   │                   │   │   │   ├───hotel
+│   │                   │   │   │   └───place
+│   │                   │   │   ├───reviewDTO
+│   │                   │   │   └───reviewReplyDTO
+│   │                   │   └───entity
+│   │                   │       ├───chat
+│   │                   │       ├───event
+│   │                   │       ├───food
+│   │                   │       ├───hotel
+│   │                   │       ├───image
+│   │                   │       ├───Map
+│   │                   │       ├───member
+│   │                   │       ├───place
+│   │                   │       ├───plan
+│   │                   │       ├───question
+│   │                   │       ├───recommendReply
+│   │                   │       └───review
+│   │                   ├───global
+│   │                   │   ├───config
+│   │                   │   │   ├───mail
+│   │                   │   │   ├───modelmapper
+│   │                   │   │   ├───s3
+│   │                   │   │   ├───Security
+│   │                   │   │   │   ├───auth
+│   │                   │   │   │   └───jwt
+│   │                   │   │   ├───swagger
+│   │                   │   │   ├───util
+│   │                   │   │   └───websocket
+│   │                   │   └───exception
+│   │                   ├───handler
+│   │                   ├───map
+│   │                   ├───repository
+│   │                   │   ├───chat
+│   │                   │   ├───event
+│   │                   │   ├───food
+│   │                   │   ├───hotel
+│   │                   │   ├───image
+│   │                   │   ├───member
+│   │                   │   ├───place
+│   │                   │   ├───plan
+│   │                   │   ├───reply
+│   │                   │   └───review
+│   │                   └───service
+│   │                       ├───chat
+│   │                       ├───member
+│   │                       ├───recommned
+│   │                       ├───review
+│   │                       └───S3
+│   ├───generated
+│   │   └───sources
+│   │       ├───annotationProcessor
+│   │       │   └───java
+│   │       │       └───main
+│   │       └───headers
+│   │           └───java
+│   │               └───main
+│   ├───resources
+│   │   └───main
+│   │       ├───static
+│   │       │   ├───css
+│   │       │   └───images
+│   │       └───templates
+│   └───tmp
+│       └───compileJava
+│           └───compileTransaction
+│               ├───backup-dir
+│               └───stash-dir
+├───gradle
+│   └───wrapper
+├───src
+│   ├───main
+│   │   ├───java
+│   │   │   └───ultimatum
+│   │   │       └───project
+│   │   │           ├───controller
+│   │   │           │   └───recommend
+│   │   │           ├───domain
+│   │   │           │   ├───dto
+│   │   │           │   │   ├───chatDTO
+│   │   │           │   │   ├───event
+│   │   │           │   │   ├───food
+│   │   │           │   │   ├───hotel
+│   │   │           │   │   ├───image
+│   │   │           │   │   ├───logInDTO
+│   │   │           │   │   ├───place
+│   │   │           │   │   ├───plan
+│   │   │           │   │   ├───recommendReply
+│   │   │           │   │   │   ├───event
+│   │   │           │   │   │   ├───food
+│   │   │           │   │   │   ├───hotel
+│   │   │           │   │   │   └───place
+│   │   │           │   │   ├───reviewDTO
+│   │   │           │   │   └───reviewReplyDTO
+│   │   │           │   └───entity
+│   │   │           │       ├───chat
+│   │   │           │       ├───event
+│   │   │           │       ├───food
+│   │   │           │       ├───hotel
+│   │   │           │       ├───image
+│   │   │           │       ├───Map
+│   │   │           │       ├───member
+│   │   │           │       ├───place
+│   │   │           │       ├───plan
+│   │   │           │       ├───question
+│   │   │           │       ├───recommendReply
+│   │   │           │       └───review
+│   │   │           ├───global
+│   │   │           │   ├───config
+│   │   │           │   │   ├───mail
+│   │   │           │   │   ├───modelmapper
+│   │   │           │   │   ├───s3
+│   │   │           │   │   ├───Security
+│   │   │           │   │   │   ├───auth
+│   │   │           │   │   │   └───jwt
+│   │   │           │   │   ├───swagger
+│   │   │           │   │   ├───util
+│   │   │           │   │   └───websocket
+│   │   │           │   └───exception
+│   │   │           ├───handler
+│   │   │           ├───map
+│   │   │           ├───repository
+│   │   │           │   ├───chat
+│   │   │           │   ├───event
+│   │   │           │   ├───food
+│   │   │           │   ├───hotel
+│   │   │           │   ├───image
+│   │   │           │   ├───member
+│   │   │           │   ├───place
+│   │   │           │   ├───plan
+│   │   │           │   ├───reply
+│   │   │           │   └───review
+│   │   │           └───service
+│   │   │               ├───chat
+│   │   │               ├───member
+│   │   │               ├───recommned
+│   │   │               ├───review
+│   │   │               └───S3
+│   │   └───resources
+│   │       ├───static
+│   │       │   ├───css
+│   │       │   └───images
+│   │       └───templates
+│   └───test
+│       └───java
+│           └───ultimatum
+│               └───project
+└───Submodule
+
+```
