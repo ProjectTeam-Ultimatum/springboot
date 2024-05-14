@@ -123,9 +123,9 @@ Gradle > Tasks > other > copyGitSubmodule
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
     <h3>나의 여행 스타일 페이지</h3>
-      <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%8A%A4%ED%83%80%EC%9D%BC1.png" alt="강의 영상 페이지" style="width: 200px; max-width: 200px;">
-      <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%8A%A4%ED%83%80%EC%9D%BC2.png" alt="강의 영상 페이지" style="width: 200px; max-width: 200px;">
-      <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%8A%A4%ED%83%80%EC%9D%BC3.png" alt="강의 영상 페이지" style="width: 200px; max-width: 200px;">
+      <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%8A%A4%ED%83%80%EC%9D%BC1.png" alt="강의 영상 페이지" style="width: 300px; max-width: 300px;">
+      <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%8A%A4%ED%83%80%EC%9D%BC2.png" alt="강의 영상 페이지" style="width: 300px; max-width: 300px;">
+      <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%8A%A4%ED%83%80%EC%9D%BC3.png" alt="강의 영상 페이지" style="width: 300px; max-width: 300px;">
 </div>
 
 
