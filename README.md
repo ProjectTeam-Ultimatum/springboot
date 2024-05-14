@@ -71,7 +71,7 @@ Gradle > Tasks > other > copyGitSubmodule
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
     <h3>메인 페이지</h3>
-    <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EB%A9%94%EC%9D%B8%ED%8E%98%EC%9D%B4%EC%A7%80.png" alt="소개 페이지" style="width: 300px; max-width: 300px;">
+    
     <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EB%A9%94%EC%9D%B8%ED%8E%98%EC%9D%B4%EC%A7%802.png" alt="소개 페이지" style="width: 300px; max-width: 300px;">
     <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EB%A9%94%EC%9D%B8%ED%8E%98%EC%9D%B4%EC%A7%803.png" alt="소개 페이지" style="width: 300px; max-width: 300px;">
     <p>메인 페이지에서는 사용자들이 학습할 수 있는 코스들을 선택할 수 있습니다. 현재 Scratch와 Python 코스가 제공됩니다.</p>
