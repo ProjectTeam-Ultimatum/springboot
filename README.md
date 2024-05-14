@@ -95,3 +95,11 @@ Gradle > Tasks > other > copyGitSubmodule
   <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EB%A9%94%EC%9D%B4%ED%8A%B82.png" alt="강의 영상 페이지" style="width: 200px; max-width: 200px;">
     <p>강의 영상 페이지에서는 각 강의의 영상을 제공하며, 학습자가 쉽게 강의를 시청하고 따라할 수 있도록 도와줍니다.</p>
 </div>
+
+
+<div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
+    <h3>여행후기 페이지</h3>
+    <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%ED%9B%84%EA%B8%B0.jpg" alt="강의 영상 페이지" style="width: 200px; max-width: 200px;">
+  <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%ED%9B%84%EA%B8%B01.png" alt="강의 영상 페이지" style="width: 200px; max-width: 200px;">
+    <p>강의 영상 페이지에서는 각 강의의 영상을 제공하며, 학습자가 쉽게 강의를 시청하고 따라할 수 있도록 도와줍니다.</p>
+</div>
