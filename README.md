@@ -74,20 +74,17 @@ Gradle > Tasks > other > copyGitSubmodule
     <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EB%A9%94%EC%9D%B8%ED%8E%98%EC%9D%B4%EC%A7%80.png" alt="소개 페이지" style="width: 300px; max-width: 300px;">
     <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EB%A9%94%EC%9D%B8%ED%8E%98%EC%9D%B4%EC%A7%802.png" alt="소개 페이지" style="width: 300px; max-width: 300px;">
     <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EB%A9%94%EC%9D%B8%ED%8E%98%EC%9D%B4%EC%A7%803.png" alt="소개 페이지" style="width: 300px; max-width: 300px;">
-    <p>메인 페이지에서는 "제주랑" 에서 제공하는 서비스를 간단하게 카드형식으로 볼 수 있습니다.</p>
 </div>
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
     <h3>여행정보 페이지</h3>
     <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%A0%95%EB%B3%B4~.png" alt="소개 페이지" style="width: 300px; max-width: 300px;">
     <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%A0%95%EB%B3%B42.png" alt="소개 페이지" style="width: 300px; max-width: 300px;">
-    <p>여행정보 페이지에서는 제주도에 있는 여행정보를 카테고리, 태그 별로 구분해서 정보를 제공합니다.</p>
 </div>
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
     <h3>추천코스 페이지</h3>
     <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%B6%94%EC%B2%9C%EC%BD%94%EC%8A%A4.png" alt="강좌 소개 페이지" style="width: 300px; max-width: 300px;">
-    <p>추천코스 페이지에서는 "제주랑"에서 제공하는 코스를 한눈에 볼 수 있습니다.</p>
 </div>
 
 
@@ -95,7 +92,6 @@ Gradle > Tasks > other > copyGitSubmodule
     <h3>여행메이트 페이지</h3>
     <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EB%A9%94%EC%9D%B4%ED%8A%B81.png" alt="강의 영상 페이지" style="width: 300px; max-width: 300px;">
   <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EB%A9%94%EC%9D%B4%ED%8A%B82.png" alt="강의 영상 페이지" style="width: 300px; max-width: 300px;">
-    <p>여행메이트 페이지에서는 같이 여행갈 메이트를 찾아볼 수 있는 채팅기능을 이용할 수 있습니다.</p>
 </div>
 
 
@@ -103,7 +99,6 @@ Gradle > Tasks > other > copyGitSubmodule
     <h3>여행후기 페이지</h3>
       <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%ED%9B%84%EA%B8%B01.png" alt="강의 영상 페이지" style="width: 300px; max-width: 300px;">
       <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/2024-05-14+17+01+32.png" alt="강의 영상 페이지" style="width: 300px; max-width: 300px;">
-    <p>여행후기 페이지는 다른 사용자들이 다녀온 여행지에대한 후기를 볼 수 있습니다.</p>
 </div>
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
@@ -113,7 +108,6 @@ Gradle > Tasks > other > copyGitSubmodule
       <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%9D%BC%EC%A0%95%EC%A7%9C%EA%B8%B03.png" alt="강의 영상 페이지" style="width: 300px; max-width: 300px;">
       <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%9D%BC%EC%A0%95%EC%A7%9C%EA%B8%B04.png" alt="강의 영상 페이지" style="width: 300px; max-width: 300px;">
       <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%9D%BC%EC%A0%95%EC%A7%9C%EA%B8%B05.png" alt="강의 영상 페이지" style="width: 300px; max-width: 300px;">
-    <p>일정짜기 페이지에서는 나만의 코스를 간편하게 짜볼 수 있습니다.</p>
 </div>
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
@@ -121,7 +115,6 @@ Gradle > Tasks > other > copyGitSubmodule
       <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%8A%A4%ED%83%80%EC%9D%BC1.png" alt="강의 영상 페이지" style="width: 200px; max-width: 200px;">
       <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%8A%A4%ED%83%80%EC%9D%BC2.png" alt="강의 영상 페이지" style="width: 200px; max-width: 200px;">
       <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%8A%A4%ED%83%80%EC%9D%BC3.png" alt="강의 영상 페이지" style="width: 200px; max-width: 200px;">
-    <p>나만의 여행 스타일을 간단한 질문을 통해 알아볼 수 있는 페이지입니다.</p>
 </div>
 
 ## 주요 기능 📦
