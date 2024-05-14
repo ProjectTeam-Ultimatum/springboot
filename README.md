@@ -70,7 +70,8 @@ Gradle > Tasks > other > copyGitSubmodule
 ## 화면 구성 📺
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
-    <h3>메인 페이지</h3>
+    <h3>메인 페이지</h3>![Uploading 홈.png…]()
+
     <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%99%88.png" alt="메인 페이지" style="width: 200px; max-width:200px;">
   <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%99%882.png" alt="메인 페이지" style="width: 200px; max-width:200px;">
   <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%99%883.png" alt="메인 페이지" style="width: 200px; max-width:200px;">
