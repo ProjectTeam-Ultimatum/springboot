@@ -123,3 +123,6 @@ Gradle > Tasks > other > copyGitSubmodule
       <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%EC%97%AC%ED%96%89%EC%8A%A4%ED%83%80%EC%9D%BC3.png" alt="강의 영상 페이지" style="width: 200px; max-width: 200px;">
     <p>나만의 여행 스타일을 간단한 질문을 통해 알아볼 수 있는 페이지입니다.</p>
 </div>
+
+
+## 아키텍처 
