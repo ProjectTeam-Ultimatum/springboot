@@ -79,21 +79,21 @@ Gradle > Tasks > other > copyGitSubmodule
 </div>
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
-    <h3>소개 페이지</h3>
+    <h3>여행정보 페이지</h3>
     <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%90%EC%86%8C%EA%B0%9C1.png" alt="소개 페이지" style="width: 200px; max-width: 200px;">
   <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%90%EC%86%8C%EA%B0%9C1.png" alt="소개 페이지" style="width: 200px; max-width: 200px;">
     <p>소개 페이지에서는 Voluntain의 목적과 기능에 대해 설명합니다.</p>
 </div>
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
-    <h3>강좌 소개 페이지</h3>
+    <h3>추천코스 페이지</h3>
     <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%90%EC%86%8C%EA%B0%9C1.png" alt="강좌 소개 페이지" style="width: 200px; max-width: 200px;">
     <p>각 강좌의 세부 정보를 제공하며, 사용자는 이 페이지에서 원하는 강좌를 선택하여 학습할 수 있습니다.</p>
 </div>
 
 
 <div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
-    <h3>강의 영상 페이지</h3>
+    <h3>여행메이트 페이지</h3>
     <img src="https://ultimatum-project.s3.ap-northeast-2.amazonaws.com/%ED%8C%80%EC%9B%90%EC%86%8C%EA%B0%9C1.png" alt="강의 영상 페이지" style="width: 200px; max-width: 200px;">
     <p>강의 영상 페이지에서는 각 강의의 영상을 제공하며, 학습자가 쉽게 강의를 시청하고 따라할 수 있도록 도와줍니다.</p>
 </div>
