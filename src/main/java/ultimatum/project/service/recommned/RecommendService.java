@@ -36,16 +36,22 @@ import ultimatum.project.repository.place.RecommendPlaceRepository;
 @Transactional
 public class RecommendService {
 
+    //final 필드는 생성자 주입을 통해 초기화, 불변성
+    //@RequiredArgsConstructor 어노테이션에 의해 생성자를 통해 주입받습니다.
+    //Repository를 주입받아 데이터를 관리
     private final RecommendFoodRepository recommendListRepository;
     private final RecommendHotelRepository recommendHotelRepository;
     private final RecommendPlaceRepository recommendPlaceRepository;
 
+    //@Autowired 어노테이션을 사용하여 setter 메서드에서 주입
     private RecommendListFoodRepository recommendListFoodRepository;
     private RecommendListPlaceRepository recommendListPlaceRepository;
     private RecommendListHotelRepository recommendListHotelRepository;
     private RecommendListEventRepository recommendListEventRepository;
     private ModelMapper modelMapper;
 
+    //각 리포지토리와 ModelMapper 객체를 주입받아 클래스의 필드에 할당
+    //클래스는 데이터베이스 작업과 객체 매핑을 수행할 수 있는 필요한 의존성을 갖춤
     @Autowired
     public void RecommendImageService(RecommendListFoodRepository recommendListFoodRepository,
                                       RecommendListPlaceRepository recommendListPlaceRepository,
@@ -115,6 +121,7 @@ public class RecommendService {
 
 
     //관광지 전체 조회, 페이징 처리
+    //태그와 지역을 기반으로 관광지를 검색하고 페이징 처리된 결과를 반환
     public Page<RecommendListPlaceResponse> findRecommendListPlace(String tag, String region, Pageable pageable) {
         // 페이지 번호를 0부터 시작하도록 조정
         pageable = PageRequest.of(
@@ -124,6 +131,7 @@ public class RecommendService {
         );
 
         Page<RecommendListPlace> results;
+        //tag 또는 region에 따라 각각의 필터링된 결과를 RecommendListPlaceRepository를 통해 가져옴
         if (tag != null && !tag.isEmpty()) {
             // recommendPlaceTag를 기준으로 필터링된 페이지 데이터를 반환
             results = recommendListPlaceRepository.findByRecommendPlaceTagContainingIgnoreCase(tag, pageable);
@@ -134,16 +142,18 @@ public class RecommendService {
             // 관광지 리스트 데이터를 반환
             results = recommendListPlaceRepository.findAll(pageable);
         }
-
+        //결과는 RecommendListPlaceResponse DTO로 매핑
         return results.map(entity -> modelMapper.map(entity, RecommendListPlaceResponse.class));
     }
 
     //관광지 Id 1건 조회
     @Transactional(readOnly = true)
     public RecommendListPlaceByIdResponse getRecommendListPlaceById(Long recommendPlaceId) {
+        //RecommendPlaceRepository를 통해 데이터를 가져오고, 없으면 EntityNotFoundException을 발생시킵니다.
         RecommendListPlace place = recommendListPlaceRepository.findById(recommendPlaceId)
                 .orElseThrow(() -> new EntityNotFoundException("음식 추천 ID를 찾을 수 없습니다: " + recommendPlaceId));
 
+        //결과는 RecommendListPlaceByIdResponse DTO로 매핑
         return new RecommendListPlaceByIdResponse(
                 place.getRecommendPlaceId(),
                 place.getRecommendPlaceTitle(),
@@ -155,13 +165,13 @@ public class RecommendService {
                 place.getRecommendPlaceRegion(),
                 place.getRecommendPlaceOpentime(),
                 place.getRecommendPlaceClosetime(),
-                place.getRecommendPlaceStar(), // 순서를 맞춰서
-                place.getRecommendPlaceLike(), // 이 라인과 교체
+                place.getRecommendPlaceStar(),
+                place.getRecommendPlaceLike(),
                 place.getRecommendPlaceLatitude(),
                 place.getRecommendPlaceLongitude(),
                 place.getRecommendPlacePhoneNo(),
                 place.getRecommendPlaceImgPath(),
-                place.getRecommendPlaceBudget() // 마지막 콤마 제거
+                place.getRecommendPlaceBudget()
         );
     }
 

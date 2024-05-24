@@ -30,7 +30,8 @@ public class RecommendController {
     //Service 생성자 주입
     private final RecommendService recommendService;
 
-    // 생성자
+    //RecommendService를 생성자 주입 방식으로 받아 필드에 할당.
+    //컨트롤러가 RecommendService를 사용하여 비즈니스 로직 처리
     public RecommendController(RecommendService recommendService) {
         this.recommendService = recommendService;
     }
@@ -62,24 +63,30 @@ public class RecommendController {
     //관광지 전체 조회
     @Tag(name = "recommend", description = "API 관광지 리스트")
     @Operation(summary = "관광지 태그, 지역 조회")
-    @GetMapping("/listplace")
+    @GetMapping("/listplace") //get 요청
     public ResponseEntity<Page<RecommendListPlaceResponse>> getAllListPlaces(
+            //@RequestParam: URL 쿼리 파라미터를 통해 태그(tag)와 지역(region)를 선택적으로 받습니다.
             @RequestParam(value = "tag", required = false) String tag,
             @RequestParam(value = "region", required = false) String region,
+            //@PageableDefault: 기본 페이징 정보를 설정
             @PageableDefault(size = 12, sort = "recommendPlaceId", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        // Use the integrated service method that handles both cases
+        // findRecommendListFood 메서드를 호출하여 음식점 리스트를 가져오고
         Page<RecommendListPlaceResponse> response = recommendService.findRecommendListPlace(tag, region, pageable);
 
         log.info("listplace pageable : {}", pageable);
+        //ResponseEntity로 감싸 클라이언트에 반환
         return ResponseEntity.ok(response);
     }
 
     //관광지 1개 조회
-    @GetMapping("/listplace/{recommend_place_id}")
+    @GetMapping("/listplace/{recommend_place_id}") //get요청
     @Operation(summary = "관광지 id 조회")
+    //@PathVariable: URL 경로에서 음식점 ID를 추출하여 서비스 메서드에 전달
     public ResponseEntity<RecommendListPlaceByIdResponse> getByIdListPlaces(@PathVariable Long recommend_place_id) {
+        //getRecommendListFoodById 메서드를 호출하여 특정 ID의 음식점 정보를 가져오고
         RecommendListPlaceByIdResponse response = recommendService.getRecommendListPlaceById(recommend_place_id);
+        //결과를 ResponseEntity로 감싸 클라이언트에 반환
         return ResponseEntity.ok(response);
     }
 
